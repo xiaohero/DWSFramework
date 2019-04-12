@@ -1,0 +1,7 @@
+#.settings/*
+#.project
+#__pycache__/*
+**/.DS_Store
+**/__pycache__/*
+**/migrations/*
+**/.idea/*

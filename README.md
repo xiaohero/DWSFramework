@@ -1,7 +1,7 @@
 # DWSFramework
 
 #### 介绍
-Django+Websocket框架
+Django+Websocket框架,纯OOP框架(java写法)，方便好用!
 
 #### 软件架构
 软件架构说明
@@ -9,9 +9,9 @@ Django+Websocket框架
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. 将整个项目拷到你的工程根目录下
+2. 进入DWSFramework，安装所需依赖:pip3 install -r requirements_version_xx.txt
+3. django配置文件中加入属性: PROJECT_NAME='xxx',然后就可以使用了
 
 #### 使用说明
 
@@ -20,6 +20,7 @@ Django+Websocket框架
 3. xxxx
 
 #### 参与贡献
+1. 核心开发者: oodd123@126.com (xiaoxi)
 
 1. Fork 本仓库
 2. 新建 Feat_xxx 分支

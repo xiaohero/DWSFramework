@@ -1,16 +1,16 @@
 # DWSFramework
 
 #### Description
-Django+Websocket框架
+Django+Websocket framework,a pure OOP framework like java
 
 #### Software Architecture
 Software architecture description
 
 #### Installation
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. copy this project to you root project dir
+2. cd DWSFramework，and then install the python libs: pip3 install -r requirements_version_xx.txt
+3. django's settings add,PROJECT_NAME='xxx',and enjoy it
 
 #### Instructions
 

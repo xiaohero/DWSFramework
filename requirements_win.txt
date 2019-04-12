@@ -1,0 +1,13 @@
+Django
+channels==1.1.8
+asgi_redis
+django-allauth
+celery
+django-celery-beat
+django_redis
+mysqlclient
+pypiwin32
+#web服务器
+uwsgi
+#dj-static
+#WhiteNoise
