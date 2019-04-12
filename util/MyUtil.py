@@ -12,8 +12,8 @@ from collections import namedtuple
 from pathlib import Path
 from django.conf import settings
 import hashlib
-from util.CacheUtil import CacheUtil
-from util.ConstUtil import ConstUtil
+from .CacheUtil import CacheUtil
+from .ConstUtil import ConstUtil
 import subprocess
 
 logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')

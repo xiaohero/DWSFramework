@@ -4,10 +4,9 @@ Created on Jul 1, 2017
 @author: xiaoxi
 '''
 
-from util.CacheUtil import CacheUtil
-from service.xnb.store.StoreBase import StoreBase
-from util.ConstUtil import ConstUtil
-
+from ...util.CacheUtil import CacheUtil
+from .StoreBase import StoreBase
+from ...util.ConstUtil import ConstUtil
 
 
 class StoreByRedis(StoreBase):

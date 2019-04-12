@@ -7,7 +7,6 @@ from urllib.request import urlopen
 from urllib.parse import urlencode
 from urllib.parse import urlparse
 import json
-import re
 import http.client
 
 class HttpUtil:

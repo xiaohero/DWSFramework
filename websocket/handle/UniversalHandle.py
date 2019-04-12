@@ -4,10 +4,6 @@ Created on Jul 1, 2017
 @author: xiaoxi
 '''
 import json
-from django.db.models.fields import related_descriptors
-from django.db.models.query import QuerySet
-from util.MyUtil import MyUtil
-
 
 class UniversalHandle:
     '''

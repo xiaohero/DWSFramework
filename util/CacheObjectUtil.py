@@ -10,52 +10,52 @@ import pickle
 class CacheObjectUtil:
     redisConnect = get_redis_connection('default')
     redisConnectPool = redisConnect.connection_pool
-    @classmethod
-    def push(cls,queueName,val):
-        return cls.redisConnect.lpush(queueName,pickle.dumps(val))
 
     @classmethod
-    def pop(cls,queueName):
-        oriVal=cls.redisConnect.rpop(queueName)
+    def push(cls, queueName, val):
+        return cls.redisConnect.lpush(queueName, pickle.dumps(val))
+
+    @classmethod
+    def pop(cls, queueName):
+        oriVal = cls.redisConnect.rpop(queueName)
         if not oriVal:
             return oriVal
         return pickle.loads(oriVal)
 
     @classmethod
-    def len(cls,queueName):
+    def len(cls, queueName):
         return cls.redisConnect.llen(queueName)
 
     @classmethod
-    def hset(cls,hashKey,itemKey,val):
-        return cls.redisConnect.hset(hashKey,itemKey,pickle.dumps(val))
-
+    def hset(cls, hashKey, itemKey, val):
+        return cls.redisConnect.hset(hashKey, itemKey, pickle.dumps(val))
 
     @classmethod
     def hmset(cls, hashKey, mapping):
         return cls.redisConnect.hmset(hashKey, pickle.dumps(mapping))
 
     @classmethod
-    def expire(cls,name, time):
+    def expire(cls, name, time):
         return cls.redisConnect.expire(name, time)
 
     @classmethod
-    def hsetnx(cls,hashKey,itemKey,val):
-        return cls.redisConnect.hsetnx(hashKey,itemKey,pickle.dumps(val))
+    def hsetnx(cls, hashKey, itemKey, val):
+        return cls.redisConnect.hsetnx(hashKey, itemKey, pickle.dumps(val))
 
     @classmethod
-    def hmget(cls,hashKey,keys):
-        oriVal=cls.redisConnect.hmget(hashKey,keys)
+    def hmget(cls, hashKey, keys):
+        oriVal = cls.redisConnect.hmget(hashKey, keys)
         if not oriVal:
             return oriVal
         return pickle.loads(oriVal)
 
     @classmethod
-    def hlen(cls,hashKey):
+    def hlen(cls, hashKey):
         return cls.redisConnect.hlen(hashKey)
 
     @classmethod
-    def hget(cls,hashKey,itemKey):
-        oriVal = cls.redisConnect.hget(hashKey,itemKey)
+    def hget(cls, hashKey, itemKey):
+        oriVal = cls.redisConnect.hget(hashKey, itemKey)
         if not oriVal:
             return oriVal
         return pickle.loads(oriVal)
@@ -65,14 +65,14 @@ class CacheObjectUtil:
         return cls.redisConnect.hdel(hashKey, *keys)
 
     @classmethod
-    def hgetall(cls,hashKey):
+    def hgetall(cls, hashKey):
         oriVal = cls.redisConnect.hgetall(hashKey)
         if not oriVal:
             return oriVal
         return pickle.loads(oriVal)
 
     @classmethod
-    def hkeys(cls,hashKey):
+    def hkeys(cls, hashKey):
         return cls.redisConnect.hkeys(hashKey)
 
     @classmethod
@@ -91,12 +91,12 @@ class CacheObjectUtil:
         # return pickle.loads(oriVal)
 
     @classmethod
-    def incr(cls, key,amount=1):
-        return cls.redisConnect.incr(key,amount)
+    def incr(cls, key, amount=1):
+        return cls.redisConnect.incr(key, amount)
 
     @classmethod
-    def set(cls, key,val,expireSeconds=3600):
-        return cls.redisConnect.set(key,pickle.dumps(val),expireSeconds)
+    def set(cls, key, val, expireSeconds=3600):
+        return cls.redisConnect.set(key, pickle.dumps(val), expireSeconds)
 
     @classmethod
     def get(cls, key):
@@ -111,12 +111,12 @@ class CacheObjectUtil:
 
     @classmethod
     def deleteByKeyPrefix(cls, keyPrefix):
-        keyLikes = cls.keys(keyPrefix+'*')
+        keyLikes = cls.keys(keyPrefix + '*')
         for eachHashKey in keyLikes:
             cls.delete(eachHashKey)
 
     @classmethod
-    def __decodeDictBytesToDict(cls,data):
+    def __decodeDictBytesToDict(cls, data):
         if isinstance(data, bytes):
             return data.decode()
         if isinstance(data, (str, int)):

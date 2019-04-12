@@ -5,10 +5,10 @@ Created on 2017年7月3日
 '''
 import functools
 from channels.sessions import channel_session
-from util.MyUtil import MyUtil
+from ..util.MyUtil import MyUtil
 from pprint import pformat
 from django.core.cache import cache
-from util.CacheUtil import CacheUtil
+from ..util.CacheUtil import CacheUtil
 
 class AnnoUtil(object):
     '''

@@ -4,7 +4,7 @@ Created on Jul 1, 2017
 @author: xiaoxi
 '''
 
-from service.xnb.store.StoreBase import StoreBase
+from .StoreBase import StoreBase
 
 
 class StoreByPy(StoreBase):

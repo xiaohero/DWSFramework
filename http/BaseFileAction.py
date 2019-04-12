@@ -9,10 +9,9 @@ from django.http import HttpResponse
 from django.http import HttpResponseNotFound
 from django.views.decorators.cache import never_cache
 
-from http.BaseHttpAction import BaseHttpAction
+from .BaseHttpAction import BaseHttpAction
 from django.conf import settings
 import urllib
-from django.utils.http import urlencode
 
 
 class BaseFileAction(BaseHttpAction):

@@ -3,7 +3,7 @@ Created on 2017年6月22日
 
 @author: xiaoxi
 '''
-from util.MyUtil import MyUtil
+from .MyUtil import MyUtil
 import json
 from channels.channel import Group
 

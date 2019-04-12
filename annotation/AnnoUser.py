@@ -5,7 +5,7 @@ Created on 2017年7月3日
 '''
 import functools
 import json
-from util.WebsocketUtil import WebsocketUtil
+from ..util.WebsocketUtil import WebsocketUtil
 from channels.auth import  http_session_user,channel_and_http_session_user_from_http
 
 class AnnoUser(object):

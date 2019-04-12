@@ -3,11 +3,7 @@ Created on 2017年6月22日
 
 @author: xiaoxi
 '''
-from django.core import validators
 from django_redis import get_redis_connection
-from django_redis.cache import RedisCache
-import pickle
-import ast
 
 
 class CacheUtil:

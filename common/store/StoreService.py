@@ -4,8 +4,8 @@ Created on Jul 1, 2017
 @author: xiaoxi
 '''
 
-from service.xnb.store.StoreByRedis2 import StoreByRedis2
-from service.xnb.store.StoreByPy import StoreByPy
+from .StoreByRedis2 import StoreByRedis2
+from .StoreByPy import StoreByPy
 
 
 class StoreService:

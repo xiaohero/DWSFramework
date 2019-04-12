@@ -3,12 +3,12 @@ Created on Jul 1, 2017
 
 @author: xiaoxi
 '''
-from websocket.UniversalWebsocket import UniversalWebsocket
-from util.MyUtil import MyUtil
 import json
 from builtins import isinstance
 from django.utils.decorators import method_decorator
-from annotation.AnnoUser import AnnoUser
+from .UniversalWebsocket import UniversalWebsocket
+from ..util.MyUtil import MyUtil
+from ..annotation.AnnoUser import AnnoUser
 
 class MainAction(UniversalWebsocket):
     '''

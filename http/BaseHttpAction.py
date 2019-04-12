@@ -7,7 +7,7 @@ from django.http.response import  HttpResponseNotFound
 from django.views.decorators.cache import never_cache
 from django.views.generic.base import View
 from django.shortcuts import render
-from util.MyUtil import MyUtil
+from ..util.MyUtil import MyUtil
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 

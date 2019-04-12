@@ -3,7 +3,7 @@ Created on Jul 1, 2017
 
 @author: xiaoxi
 '''
-from common.UniversalHandle import UniversalHandle
+from .UniversalHandle import UniversalHandle
 
 class BaseHandle(UniversalHandle):
     '''

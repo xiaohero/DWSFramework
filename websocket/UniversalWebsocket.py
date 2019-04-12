@@ -5,13 +5,12 @@ Created on Jul 1, 2017
 '''
 from channels.generic.websockets import WebsocketConsumer
 import json
-
-from util.MyUtil import MyUtil
 from channels.auth import channel_and_http_session_user_from_http,channel_session_user_from_http
 from channels.sessions import enforce_ordering
-from annotation.AnnoUser import AnnoUser
 from django.utils.decorators import method_decorator
-from util.WebsocketUtil import WebsocketUtil
+from ..annotation.AnnoUser import AnnoUser
+from ..util.WebsocketUtil import WebsocketUtil
+from ..util.MyUtil import MyUtil
 
 
 
