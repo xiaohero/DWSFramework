@@ -3,6 +3,7 @@ Created on 2017年6月22日
 
 @author: xiaoxi
 '''
+import os
 from datetime import datetime
 import logging
 from pprint import pprint, pformat
@@ -15,6 +16,9 @@ import hashlib
 from .CacheUtil import CacheUtil
 import subprocess
 
+if not getattr(settings,'PROJECT_NAME',None):
+    print('settings.PROJECT_NAME must be defined(settings配置文件必须定义工程名属性:PROJECT_NAME)')
+    exit(0)
 logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')
     
 class MyUtil:
@@ -269,3 +273,11 @@ class MyUtil:
     @classmethod
     def setJsFileCacheStatus(cls,enable):
         return CacheUtil.set(cls.REDIS_JS_FILE_CACHE, enable)
+
+    @classmethod
+    def getDWSRootDir(cls):
+        return  os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    @classmethod
+    def getDWSClientDir(cls):
+        return os.path.join(cls.getDWSRootDir(), 'client')
