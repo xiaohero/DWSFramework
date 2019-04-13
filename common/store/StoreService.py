@@ -5,7 +5,7 @@ Created on Jul 1, 2017
 '''
 
 from .StoreByRedis2 import StoreByRedis2
-from .StoreByPy import StoreByPy
+# from .StoreByPy import StoreByPy
 
 
 class StoreService:

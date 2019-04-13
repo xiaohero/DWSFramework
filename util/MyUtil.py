@@ -13,7 +13,6 @@ from pathlib import Path
 from django.conf import settings
 import hashlib
 from .CacheUtil import CacheUtil
-from .ConstUtil import ConstUtil
 import subprocess
 
 logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')
@@ -21,6 +20,13 @@ logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')
 class MyUtil:
     #全局缓存器
     __caches={}
+    #用作存储
+    REDIS_STORE='REDIS_{}:STORE'.format(settings.PROJECT_NAME)
+    #重复值检测key前缀
+    REDIS_CHECK_DUP_KEY_VALUE='REDIS_{}:CHECK_DUP_KEY_VALUE'.format(settings.PROJECT_NAME)
+    #是否开启js缓存
+    REDIS_JS_FILE_CACHE='REDIS_{}:JS_FILE_CACHE'.format(settings.PROJECT_NAME)
+
     def __init__(self):
         # print('MyUtil __init__')
         pass
@@ -141,7 +147,7 @@ class MyUtil:
         #线上代码混淆后新文件名
         if not ('third-party' in filePath or 'AjaxUtil' in filePath or 'ChmExtFtUtil' in filePath) and isOnlineEnv and '.js' in filePath:
             filePath = newPath
-        enableJsFileCache= (True if 'Y'==CacheUtil.get(ConstUtil.REDIS_JS_FILE_CACHE) else False)
+        enableJsFileCache= (True if 'Y'==CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False)
         # 线上默认开启文件缓存
         if filePath in cls.__caches and enableJsFileCache:
             return cls.__caches[filePath]
@@ -217,26 +223,6 @@ class MyUtil:
         return settings.IS_ONLINE_ENV
 
     @classmethod
-    def getServAddrByMainCoin(cls, mainCoinCode, proto='http', port=8000):
-        allRegionServConf = {
-            'LOCAL': '127.0.0.1',
-            'ETH': '116.196.76.53',
-            'BTC': '',
-            'USDT': '106.12.33.147',
-            # 'QC':'',
-            # 'LTC':'',
-        }
-        if mainCoinCode not in allRegionServConf:
-            return ''
-        # return '{}://{}:{}'.format(proto, allRegionServConf[mainCoinCode],port)#测试用
-        return '{}://{}:{}'.format(proto, allRegionServConf[mainCoinCode] if cls.isOnlineEnv() else '127.0.0.1', port)
-
-    @classmethod
-    def getResServUrl(cls):
-        # return cls.getServAddrByMainCoin('BTC','http',9090)
-        return 'http://bt170.com'
-
-    @classmethod
     def getDjClientIp(cls,request):
         xForwardedFor = request.META.get('HTTP_X_FORWARDED_FOR')
         if xForwardedFor:
@@ -253,7 +239,7 @@ class MyUtil:
 
     @classmethod
     def checkDuplicate(cls,key,value):
-        cacheKey='{}:{}'.format(ConstUtil.REDIS_CHECK_DUP_KEY_VALUE,key)
+        cacheKey='{}:{}'.format('REDIS_{}:CHECK_DUP_KEY_VALUE'.format(settings.PROJECT_NAME),key)
         oldValue=CacheUtil.get(cacheKey)
         if value==oldValue:
             return True
@@ -262,7 +248,7 @@ class MyUtil:
 
     @classmethod
     def getDuplicateCheckOldValue(cls,key):
-        cacheKey='{}:{}'.format(ConstUtil.REDIS_CHECK_DUP_KEY_VALUE,key)
+        cacheKey='{}:{}'.format(cls.REDIS_CHECK_DUP_KEY_VALUE,key)
         oldValue=CacheUtil.get(cacheKey)
         return  oldValue
 
@@ -277,5 +263,9 @@ class MyUtil:
         return retDict
 
     @classmethod
-    def getCurMainCoinCode(cls):
-        return settings.CUR_MAIN_COIN_CODE
+    def getJsFileCacheStatus(cls):
+        return True if 'Y'==CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False
+
+    @classmethod
+    def setJsFileCacheStatus(cls,enable):
+        return CacheUtil.set(cls.REDIS_JS_FILE_CACHE, enable)

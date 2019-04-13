@@ -6,8 +6,8 @@ Created on Jul 1, 2017
 
 from ...util.CacheUtil import CacheUtil
 from .StoreBase import StoreBase
-from datetime import datetime
-from ...util.ConstUtil import ConstUtil
+# from datetime import datetime
+from ...util.MyUtil import MyUtil
 
 
 
@@ -17,7 +17,7 @@ class StoreByRedis2(StoreBase):
     ''':
     #通过redis存储数据，跨程序，外部可获取,热更新数据不会丢失
     '''
-    __redisKeyPrefix=ConstUtil.REDIS_STORE+':SR2'
+    __redisKeyPrefix=MyUtil.REDIS_STORE+':SR2'
 
     def __init__(self):
         '''

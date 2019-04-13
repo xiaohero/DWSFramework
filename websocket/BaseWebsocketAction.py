@@ -10,7 +10,7 @@ from .UniversalWebsocket import UniversalWebsocket
 from ..util.MyUtil import MyUtil
 from ..annotation.AnnoUser import AnnoUser
 
-class MainAction(UniversalWebsocket):
+class BaseWebsocketAction(UniversalWebsocket):
     '''
     websocket主类
     '''

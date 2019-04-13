@@ -5,15 +5,15 @@ Created on Jul 1, 2017
 '''
 
 from ...util.CacheUtil import CacheUtil
+from ...util.MyUtil import MyUtil
 from .StoreBase import StoreBase
-from ...util.ConstUtil import ConstUtil
 
 
 class StoreByRedis(StoreBase):
     ''':
     #通过redis存储数据，跨程序，外部可获取,热更新数据不会丢失
     '''
-    __redisKeyPrefix=ConstUtil.REDIS_STORE+':SR1'
+    __redisKeyPrefix=MyUtil.REDIS_STORE+':SR1'
 
     def __init__(self):
         '''
