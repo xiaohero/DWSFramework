@@ -1,7 +1,6 @@
 /**WebSocket辅助类**/
 class DwsWebSocket {
-    constructor(servHost, targetUrl, needJquery,runModel) {
-        this.runModel=runModel?runModel:'common';//'common','faster'
+    constructor(servHost, targetUrl, needJquery) {
         this.servHost = servHost ? servHost : 'ws://127.0.0.1:8000';
         this.targetUrl = targetUrl ? targetUrl : window.location.href;
         this.needJquery = needJquery ? needJquery : 0;
@@ -54,8 +53,7 @@ class DwsWebSocket {
             op: 'getScript',
             host: targetUrl?targetUrl:this.targetUrl,
             data: {
-                needJquery: needJquery?1:(this.needJquery?1:0),
-                runModel:this.runModel
+                needJquery: needJquery?1:(this.needJquery?1:0)
             }
         });
         this.allEnterJsParams[targetUrl]=needJquery;//保存参数
@@ -85,11 +83,7 @@ class DwsWebSocket {
             this.isEnterJsLoaded = (data.data.exeJsCode.startsWith('/*! jQuery') ? true : this.isEnterJsLoaded);
             this.isLogined=(this.isEnterJsLoaded?true:this.isLogined);
             if (this.isCurRunInBg) {
-                let realTargetUrl=this.targetUrl;
-                this.runModel=btChmExtBgUtil.runModel;//更新runModel
-                if('faster'==this.runModel){
-                    realTargetUrl= data.targetUrl?data.targetUrl:this.targetUrl;
-                }
+                let realTargetUrl= data.targetUrl?data.targetUrl:this.targetUrl;
                 if(this.isRunInBg(realTargetUrl)){
                     alert('后台收到ws消息:'+':'+data.data.exeJsCode+',debug:'+JSON.stringify(data));
                    return;
@@ -149,7 +143,7 @@ class DwsWebSocket {
         this.myLog('连接断开' + this.recnCounts + '次,10秒后尝试重连(剩余次数:' + (this.MAX_REC_TIMES - this.recnCounts) + ')');
         await this.sleepSyncPromise(10000);
         this.init();
-        if('faster'==this.runModel&&this.isRunInBg()){
+        if(this.isRunInBg()){
             //后端ws重连时主动刷新所有页面
             this.reEnterJsOfAll(1000);
         }

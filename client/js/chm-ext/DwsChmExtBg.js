@@ -4,7 +4,6 @@ class DwsChmExtBg extends BaseChmExtBg {
         super();
         this.webSocket = {};
         this.bgWebSocket = null;
-        this.runModel = 'faster';//'common','faster'
 
         //其它业务参数
         this.enableBgDebug = false;
@@ -28,7 +27,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         }
         //fixme:考虑上次的链接是否需要手工断开?
         curServUrl = curServUrl.replace('http:', 'ws:');
-        this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0, this.runModel);
+        this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0);
         this.bgWebSocket.init();
     }
 
@@ -73,7 +72,7 @@ class DwsChmExtBg extends BaseChmExtBg {
             // delete this.webSocket[targetUrl];//释放内存
         }
         if (!toInjtIframeName) {
-            this.webSocket[targetUrl] = new DwsWebSocket(wsServHost, targetUrl, needJquery, this.runModel);
+            this.webSocket[targetUrl] = new DwsWebSocket(wsServHost, targetUrl, needJquery);
             this.webSocket[targetUrl].init();
             return;
         }
@@ -85,7 +84,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         if (targetSender && targetSender.frameId) {
             // alert('检测到目标:' + ':frameId:' + targetSender.frameId + ',url:' + targetUrl + ',真实url;' + targetSender.frameInfo.url);
             //方案1:跟mix content一样，通过后台代理所有ws通信(注意:需要考虑全局webSocket对象也要重新注入到iframe种，否则会报错找不到)
-            this.webSocket[targetUrl] = new DwsWebSocket(wsServHost, targetSender.frameInfo.url, needJquery, this.runModel);
+            this.webSocket[targetUrl] = new DwsWebSocket(wsServHost, targetSender.frameInfo.url, needJquery);
             this.webSocket[targetUrl].init();
             this.webSocket[targetSender.frameInfo.url] = this.webSocket[targetUrl];//复制一份副本，映射真实url
             //方案2:直接到真实目标frame执行ws通信
@@ -97,14 +96,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     getWebSocket(targetUrl) {
-        if ('faster' == this.runModel) {
-            return this.bgWebSocket;
-        }
-        if (!this.webSocket[targetUrl]) {
-            alert('bg未找到对应webSocket对象:' + targetUrl + ':all:' + JSON.stringify(this.webSocket));
-            return false;
-        }
-        return this.webSocket[targetUrl];
+        return this.bgWebSocket;
     }
 
     exeJsToPageFrame(tabUrl, iframeName, iframeJsCode) {
@@ -186,22 +178,6 @@ class DwsChmExtBg extends BaseChmExtBg {
         return getCurServInfo()[0];
     }
 
-    reloadAllClientsEnterJs() {
-        if ('faster' != this.runModel) {
-            return;
-        }
-        let allSenders = this.globalSenders;
-        // alert('所有目标对象:'+JSON.stringify(allSenders));
-        let clientTmpJs = 'if("undefined"!=typeof clientReact){clientReact.whenMonitorCoinRecords("' + this.getCurMainCoinCode() + '");clientReact.whenMonitorBalance("' + this.getCurMainCoinCode() + '");}else{}';
-        // alert('每个目标tab执行js:'+clientTmpJs);
-        for (let eachSender in allSenders) {
-            if (!allSenders[eachSender].tab) {
-                continue;
-            }
-            // this.getBgWebSocket();
-        }
-    }
-
     getBgWebSocketStatus() {
         return this.bgWebSocket ? this.bgWebSocket.getReadyState()[2] : '未初始化';
     }
@@ -232,18 +208,6 @@ class DwsChmExtBg extends BaseChmExtBg {
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
                 this.reOpenAllPages(2000);
-            }
-        });
-
-        //其它右键菜单
-        chrome.contextMenus.create({
-            id: 'switchRunModel',
-            type: 'normal',
-            title: '切换插件运行模式',
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                this.runModel = ('faster' == this.runModel ? 'common' : 'faster');
-                alert('切换成功,当前模式(' + this.runModel + ')');
             }
         });
 
@@ -323,7 +287,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     getFrontJs() {
         //notice: encodeURI must call before return
         let frontJs = BaseChmExtFt.toString() + BtChmExtFt.toString() +
-            ';var dwsChmExtFt=new BtChmExtFt("' + this.runModel + '");';//var级别变量作用域更广，其它地方可以调用
+            ';var dwsChmExtFt=new BtChmExtFt();';//var级别变量作用域更广，其它地方可以调用
         return encodeURI(frontJs);
     }
 
@@ -373,36 +337,5 @@ class DwsChmExtBg extends BaseChmExtBg {
 
 
     /////////////////////////业务相关方法////////////////
-    //币价，余额监控定时器
-    async bgStartTimer(curMainCoinCode) {
-        //定时器启动检测
-        // this.bgTimerCount = 0;
-        //推荐定时器放这里
-        this.myCoinRecordsTimer = setInterval(
-            //自动绑定this
-            () => {
-                if ('faster' != this.runModel) {
-                    return;
-                }
-                ++this.bgTimerCount;//计数器
-                //遍历所有通信tab目标
-                let allSenders = this.globalSenders;
-                // alert('所有目标对象:'+JSON.stringify(allSenders));
-                let clientTmpJs1 = 'if("undefined"!=typeof clientReact){clientReact.whenMonitorCoinRecords("' + this.getCurMainCoinCode() + '",0);}';
-                let clientTmpJs2 = 'if("undefined"!=typeof clientReact){clientReact.whenMonitorBalance("' + this.getCurMainCoinCode() + '",0);}';
-                // alert('每个目标tab执行js:'+clientTmpJs);
-                for (let eachSender in allSenders) {
-                    if (!allSenders[eachSender].tab) {
-                        continue;
-                    }
-                    this.sendJsToPage(allSenders[eachSender].tab.id, allSenders[eachSender].frameId, clientTmpJs1);//检测币价
-                    if (0 == this.bgTimerCount % 5) {
-                        this.sendJsToPage(allSenders[eachSender].tab.id, allSenders[eachSender].frameId, clientTmpJs2);//检测余额默认1秒1次
-                    }
-                }
-            },
-            200//fixme:当用户量大起来之后这里采集频率要调低点
-        );
-    }
 }
 dwsChmExtBg = new BtChmExtBg();
