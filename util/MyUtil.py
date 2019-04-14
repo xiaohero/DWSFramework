@@ -86,6 +86,9 @@ class MyUtil:
 
     @classmethod
     def getClassByStrName(cls,strModuleName,strClasName):
+        moduleExisted=True if importlib.util.find_spec(strModuleName) is not None else False
+        if not moduleExisted:
+            return False
         module = importlib.import_module(strModuleName)
         findCls = getattr(module, strClasName,None)
         return findCls
@@ -180,6 +183,16 @@ class MyUtil:
         cls.__caches['upPrjName']=upPrjName
         return upPrjName
         #return settings.PROJECT_NAME
+
+    @classmethod
+    def getFrameworkName(cls):
+        if 'fwPrjName' in cls.__caches:
+            return cls.__caches['fwPrjName']
+        fwPrjRootDirList = cls.getDWSRootDir().split('/')
+        fwPrjName=fwPrjRootDirList[-1] if len(fwPrjRootDirList) > 1 else ''
+        cls.__caches['fwPrjName']=fwPrjName
+        return fwPrjName
+
 
     @classmethod
     def getClassSimpleName(cls, obj):

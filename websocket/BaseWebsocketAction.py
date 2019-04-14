@@ -38,15 +38,21 @@ class BaseWebsocketAction(UniversalWebsocket):
             self.sendErrMsgToCurUser('格式错误，非法请求，请不要恶意攻击!')
             return
         #判断服务类是否存在
-        serviceHandleCls=MyUtil.getClassByStrName(MyUtil.getProjectName()+'.websocket.'+clientData['clsName'],clientData['clsName'])
+        handleModulPath1=MyUtil.getProjectName()+'.websocket.'+clientData['clsName']
+        serviceHandleCls=MyUtil.getClassByStrName(handleModulPath1,clientData['clsName'])
         if not serviceHandleCls:
-            self.sendErrMsgToCurUser('无效业务，请不要恶意攻击!')
-            return
+            #再从DWS框架websocket目录找一下
+            handleModulPath2=MyUtil.getFrameworkName() + '.websocket.' + clientData['clsName']
+            MyUtil.logInfo('工程内未找到指定handle，尝试从框架目录查找:{}'.format(handleModulPath2))
+            serviceHandleCls = MyUtil.getClassByStrName(handleModulPath2,clientData['clsName'])
+            if not serviceHandleCls:
+                self.sendErrMsgToCurUser('无效业务({}.{})，请不要恶意攻击!'.format(handleModulPath1,clientData['clsName']))
+                return
         serviceHandleObj=serviceHandleCls(**clientData)
         #判断业务方法是否存在
         serviceHandleMethod=MyUtil.getClassMethodByStrName(serviceHandleObj, clientData['op'])
         if not serviceHandleMethod:
-            self.sendErrMsgToCurUser('无效操作，请不要恶意攻击!')
+            self.sendErrMsgToCurUser('无效操作({})，请不要恶意攻击!'.format(clientData['op']))
             return
         #父类检测
         serviceHandleInitMethod = MyUtil.getClassMethodByStrName(serviceHandleObj, 'initHandle')

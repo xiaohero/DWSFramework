@@ -119,7 +119,6 @@ class UniversalWebsocket(WebsocketConsumer):
         self.message.channel_session['clientInfo'] = {
             'ip':message.content['client']
         }
-
         MyUtil.logInfo('客户端({}) username:({}) IP:{} 请求连接:'.format(message.reply_channel,message.user.username, message.content['client']))
 
         #广播全组欢迎消息

@@ -45,10 +45,10 @@ class DwsWebSocket {
     }
 
     getEnterJs(targetUrl,needJquery) {
-        // alert('getEnterJs:'+targetUrl);
         if(!targetUrl||this.isRunInBg(targetUrl)){
             return;
         }
+        //alert('getEnterJs:'+targetUrl);
         this.sendMessage({
             clsName: 'MainHandle',
             op: 'getScript',
