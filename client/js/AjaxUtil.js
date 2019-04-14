@@ -33,6 +33,8 @@ class AjaxUtil {
         }
         var x = this.x();
         x.open(method, url, async);
+        //set true,auto add cookie in http header
+        //x.withCredentials = true;
         x.onreadystatechange = function () {
             if (x.readyState == 4) {
                 callback(x.responseText)

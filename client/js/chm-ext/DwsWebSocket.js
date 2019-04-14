@@ -156,6 +156,7 @@ class DwsWebSocket {
         if (!this.isCurRunInBg) {
             this.needJquery = ('undefined' == typeof jQuery ? 1 : 0);
         }
+        //ws enter path
         let webSocketHost = this.servHost + '/'+this.upPrjName+'/Main';
         this.myLog('服务器地址:' + webSocketHost + ',目标网站地址:' + this.targetUrl + ',needJquery:' + this.needJquery + ',开始连接服务器', true);
         this.wsCheckOk = false;
@@ -166,11 +167,12 @@ class DwsWebSocket {
         } catch (e) {
             // this.wsCheckOk= (-1!==e.toString().indexOf('insecure')?false:true);//fixme: may be like this?
             this.wsCheckOk = (-1 !== e.toString().indexOf('insecure') ? false : this.wsCheckOk);
+            //alert('连接服务器异常:'+e);
         } finally {
+            //alert('服务器连接结果:'+this.isOpened());
             //this.wsCheckOk=false;//测试参数
             if (!this.wsCheckOk&&!this.isCurRunInBg) {
                 this.myLog('mixed content混用错误,启动插件辅助!');
-                // this.extExeGlobalJs('dwsChmExtBg.startWebSocket("' + this.targetUrl + '","' + this.servHost + '",' + this.needJquery + ')', (result) => {});
                 return;
             }
             this.myLog('mixed content检测正常,准备进入游戏!');
@@ -187,42 +189,6 @@ class DwsWebSocket {
                 this.onOpen(event);
             };//用this去调
             this.isStarted = true;//标示已启动
-        }
-    }
-
-    async start(model) {
-        model = (model == 'timeout' ? 'timeout' : 'load');
-        if (this.isStarted) {//重复启动检测
-            this.myLog('系统已经启动过,此次跳过:' + model);
-            return 0;
-        }
-        'timeout' == model ? this.myLog('等待页面加载(load)超时,直接启动系统..') : this.myLog('页面加载完成,开始启动系统..');
-        this.myLog('正在检测浏览器环境:' + model + ',睡眠n秒');
-        await this.sleepSyncPromise(5000);
-        try {
-            this.targetUrl = window.frames['myIframe'].location.href;
-            this.myLog('环境检测OK,开始启动系统,准备连接服务器..');
-        } catch (e) {
-            this.myLog('(frame模式受限,启动插件辅助运行!)');
-        } finally {
-            if('about:blank'==this.targetUrl&&!this.isCurRunInBg){
-                // alert('页面加载失败,自动为你刷新页面!');
-                this.myLog('页面加载失败,自动为你刷新页面!');
-                window.location.reload();
-                return;
-            }
-            if(!this.isSelfServPage()){
-                this.init();
-                return;
-            }
-            let dwsChmExtVersion= (document.getElementsByTagName('body').length>0&&document.getElementsByTagName('body')[0].getAttribute('dwsVersion'))?document.getElementsByTagName('body')[0].getAttribute('dwsVersion'):0;
-            if(!dwsChmExtVersion){
-                alert('检测到你尚未安装最新版插件，请先下载安装插件!');
-                //window.location.href=this.servHost.replace('ws:','http:')+'/'+this.upPrjName+'/Download/dwsChmExtClient.zip';
-                return;
-            }
-            //查找内嵌iframe注入代码
-            // this.extExeGlobalJs('dwsChmExtBg.startWebSocket("' + this.targetUrl + '","' + this.servHost + '",1,true)', (result) => {});
         }
     }
 
@@ -243,15 +209,15 @@ class DwsWebSocket {
         if (!str) {
             return;
         }
-        if (-1 !== str.indexOf('请先登录') && !this.isLogined) {//可能多次弹出登录提示
-        // if (-1 !== str.indexOf('请先登录') && null===this.isLogined) {//确保只弹出一次登录提示
-            this.isLogined=false;
-            //let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");';
-            let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName + '");';
-            // this.isCurRunInBg?dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);
-            window.eval(tmpJs);
-            return;
-        }
+        // 临时屏蔽登录
+        // if (-1 !== str.indexOf('请先登录') && !this.isLogined) {//可能多次弹出登录提示
+        // // if (-1 !== str.indexOf('请先登录') && null===this.isLogined) {//确保只弹出一次登录提示
+        //     this.isLogined=false;
+        //     let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");';
+        //     // this.isCurRunInBg?dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);
+        //     window.eval(tmpJs);
+        //     return;
+        // }
         if(this.isCurRunInBg&&this.isRunInBg(this.targetUrl)){
             'undefined'!=typeof dwsChmExtBg&&dwsChmExtBg.enableBgDebug ?alert(str):false;
             // alert(str);

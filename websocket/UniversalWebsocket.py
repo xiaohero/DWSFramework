@@ -106,6 +106,7 @@ class UniversalWebsocket(WebsocketConsumer):
 
         return [roomName]
 
+    #加入注解，需登录后才能连接
     @method_decorator(AnnoUser.channelLoginRequired)
     def connect(self, message, **kwargs):
         """
@@ -118,7 +119,6 @@ class UniversalWebsocket(WebsocketConsumer):
         self.message.channel_session['clientInfo'] = {
             'ip':message.content['client']
         }
-
 
         MyUtil.logInfo('客户端({}) username:({}) IP:{} 请求连接:'.format(message.reply_channel,message.user.username, message.content['client']))
 

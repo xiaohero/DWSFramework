@@ -38,7 +38,7 @@ class BaseWebsocketAction(UniversalWebsocket):
             self.sendErrMsgToCurUser('格式错误，非法请求，请不要恶意攻击!')
             return
         #判断服务类是否存在
-        serviceHandleCls=MyUtil.getClassByStrName(MyUtil.getProjectName()+'.service.xnb.'+clientData['clsName'],clientData['clsName'])
+        serviceHandleCls=MyUtil.getClassByStrName(MyUtil.getProjectName()+'.websocket.'+clientData['clsName'],clientData['clsName'])
         if not serviceHandleCls:
             self.sendErrMsgToCurUser('无效业务，请不要恶意攻击!')
             return
@@ -71,4 +71,12 @@ class BaseWebsocketAction(UniversalWebsocket):
         #当前玩家删除redis缓存
         MyUtil.logInfo('玩家:{},删除断开连接'.format(message.reply_channel.name))
 
-
+    @classmethod
+    def getDefaultRouteConf(cls):
+        from channels.routing import route_class
+        # return route_class(
+        #     cls, path=r'^/{}/Main'.format(MyUtil.getProjectName())
+        # )
+        return route_class(
+            BaseWebsocketAction, path=r'^/{}/Main'.format(MyUtil.getProjectName())
+        )

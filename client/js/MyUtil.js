@@ -981,6 +981,16 @@ MyUtils.prototype.checkDwsChmExtRunInBg = function () {
     return (-1 !== window.location.href.indexOf('chrome-extension://') ? true : false);
 };
 
+MyUtils.prototype.getXMLHttp = function () {
+    try {
+        return XPCNativeWrapper(new window.wrappedJSObject.XMLHttpRequest());
+    }
+    catch (evt) {
+        return new XMLHttpRequest();
+    }
+};
+
+
 /*创建工具类对象*/
 //注意:使用let作用域会导致console控制台无法使用myUtils变量
 var myUtils = new MyUtils();

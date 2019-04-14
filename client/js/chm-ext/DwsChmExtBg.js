@@ -2,7 +2,7 @@
 class DwsChmExtBg extends BaseChmExtBg {
     constructor() {
         super();
-        this.upPrjName='DJXXX';
+        this.upPrjName = ('undefined' !== dwsServPrjName ? dwsServPrjName : 'DJXXX');
         this.bgWebSocket = null;
 
         //其它业务参数
@@ -25,7 +25,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         }
         //fixme:考虑上次的链接是否需要手工断开?
         curServUrl = curServUrl.replace('http:', 'ws:');
-        this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0,this.upPrjName);
+        this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0, this.upPrjName);
         this.bgWebSocket.init();
     }
 
