@@ -2,12 +2,11 @@
 class DwsChmExtBg extends BaseChmExtBg {
     constructor() {
         super();
-        this.webSocket = {};
+        this.upPrjName='DJXXX';
         this.bgWebSocket = null;
 
         //其它业务参数
         this.enableBgDebug = false;
-        this.bgTimerCount = 0;
         //初始化
         this.init();
     }
@@ -17,7 +16,6 @@ class DwsChmExtBg extends BaseChmExtBg {
         this.redirectHttpsToHttp();
         this.createContextMenus();
         this.startBgWebSocket();
-        this.bgStartTimer();
     }
 
     startBgWebSocket() {
@@ -27,7 +25,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         }
         //fixme:考虑上次的链接是否需要手工断开?
         curServUrl = curServUrl.replace('http:', 'ws:');
-        this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0);
+        this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0,this.upPrjName);
         this.bgWebSocket.init();
     }
 
@@ -61,41 +59,8 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
 
-    async startWebSocket(targetUrl, wsServHost, needJquery, toInjtIframeName) {
-        // alert('后台收到消息:'+targetUrl+','+wsServHost);
-        //判断如果是带有服务器url地址的，取其子frame
-        if ('undefined' != typeof this.webSocket[targetUrl]) {
-            if (this.webSocket[targetUrl].isOpened()) {
-                return;
-            }
-            // this.webSocket[targetUrl].closeAll();
-            // delete this.webSocket[targetUrl];//释放内存
-        }
-        if (!toInjtIframeName) {
-            this.webSocket[targetUrl] = new DwsWebSocket(wsServHost, targetUrl, needJquery);
-            this.webSocket[targetUrl].init();
-            return;
-        }
-        // alert('主页面iframe特殊处理,睡眠n秒..');
-        await this.sleepSyncPromise(1000);//fixme:时间可能还需要加长
-        let targetSender = this.getSenderByUrl(targetUrl);
-        (!targetSender || !targetSender.frameId) ? await this.sleepSyncPromise(5000) : false;//再睡眠5秒
-        targetSender = this.getSenderByUrl(targetUrl);
-        if (targetSender && targetSender.frameId) {
-            // alert('检测到目标:' + ':frameId:' + targetSender.frameId + ',url:' + targetUrl + ',真实url;' + targetSender.frameInfo.url);
-            //方案1:跟mix content一样，通过后台代理所有ws通信(注意:需要考虑全局webSocket对象也要重新注入到iframe种，否则会报错找不到)
-            this.webSocket[targetUrl] = new DwsWebSocket(wsServHost, targetSender.frameInfo.url, needJquery);
-            this.webSocket[targetUrl].init();
-            this.webSocket[targetSender.frameInfo.url] = this.webSocket[targetUrl];//复制一份副本，映射真实url
-            //方案2:直接到真实目标frame执行ws通信
-        } else {
-            //再睡眠5秒
-            // console.log('页面未找到真实frame地址,请刷新重试');
-            this.sendJsToPageByUrl(targetUrl, "console.log('页面未找到真实frame地址,自动为你刷新重试');window.location.reload();", true);
-        }
-    }
 
-    getWebSocket(targetUrl) {
+    getWebSocket() {
         return this.bgWebSocket;
     }
 
@@ -197,7 +162,7 @@ class DwsChmExtBg extends BaseChmExtBg {
                 if (!curServUrl || '0' == curServUrl || 'string' != typeof curServUrl) {
                     return;
                 }
-                window.open(curServUrl + '/DJXNB/BCD/a140c0c1eda2def2b830363ba362aa4d7d255c262960544821f556e16661b6ff');
+                window.open(curServUrl + '/'+this.upPrjName+'/');
             }
         });
         //插件辅助
@@ -286,8 +251,8 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     getFrontJs() {
         //notice: encodeURI must call before return
-        let frontJs = BaseChmExtFt.toString() + BtChmExtFt.toString() +
-            ';var dwsChmExtFt=new BtChmExtFt();';//var级别变量作用域更广，其它地方可以调用
+        let frontJs = BaseChmExtFt.toString() + DwsChmExtFt.toString() +
+            ';var dwsChmExtFt=new DwsChmExtFt();';//var级别变量作用域更广，其它地方可以调用
         return encodeURI(frontJs);
     }
 
@@ -296,10 +261,11 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     isSelfServPage(targetUrl) {
+        let selfServUrlKeywords=this.upPrjName+'/';
         if (targetUrl && 'string' == typeof targetUrl) {
-            return -1 !== targetUrl.indexOf('DJXNB/Gj') ? true : false;
+            return -1 !== targetUrl.indexOf(selfServUrlKeywords) ? true : false;
         }
-        return -1 !== window.location.href.indexOf('DJXNB/Gj') ? true : 0;
+        return -1 !== window.location.href.indexOf(selfServUrlKeywords) ? true : 0;
     }
 
     //重写父类方法，自动纠正主页面iframe嵌套的目标sender
@@ -338,4 +304,4 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     /////////////////////////业务相关方法////////////////
 }
-dwsChmExtBg = new BtChmExtBg();
+dwsChmExtBg = new DwsChmExtBg();

@@ -102,7 +102,7 @@ class Res(BaseHttpAction):
         if not byChmExt and curSiteJoinCoin.site.canNested:
             return HttpResponse('console.log("当前平台支持iframe嵌套,跳过:{}")'.format(url))
         if not request.user.is_authenticated and 'next=' not in url:
-            return HttpResponse('alert("币豚:检测那你尚未登录币豚,即将为你自动跳转登录页面,请先登录");window.location.href="{}"'.format(
+            return HttpResponse('alert("检测那你尚未登录,即将为你自动跳转登录页面,请先登录");window.location.href="{}"'.format(
                 request.build_absolute_uri('/DJXNB/Home/index')))
         # 读取用户交易密码
         userStpInfo = XnbUserService.getUserStpInfo(request.user, curSiteJoinCoin.site)

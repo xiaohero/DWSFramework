@@ -8,7 +8,7 @@ MyUtils.prototype.log = function (str, notLogToTopPage) {
         return;
     }
     let curDate = MyUtils.prototype.formatDate((new Date()), 'yyyy-MM-dd hh:mm:ss');
-    let tmpStr = MyUtils.prototype.checkBtChmExtRunInBg() ? '后台:' : '前台:';
+    let tmpStr = MyUtils.prototype.checkDwsChmExtRunInBg() ? '后台:' : '前台:';
     // if('前台:'==tmpStr){//测试调试用代码
     //     return;
     // }
@@ -597,7 +597,7 @@ MyUtils.prototype.reload = function (iframeName) {
     // console.log('页面刷新跳过');return;
     if (!MyUtils.prototype.isIframeSupport(iframeName)) {
         MyUtils.prototype.log('未找到iframe:(' + iframeName + '),直接刷新顶层页面!');
-        MyUtils.prototype.extExeGlobalJs('btChmExtBgUtil.flushParentWindowByFrameUrl("' + window.location + '")');
+        MyUtils.prototype.extExeGlobalJs('dwsChmExtBgUtil.flushParentWindowByFrameUrl("' + window.location + '")');
         window.location.reload();
         return;
     }
@@ -965,19 +965,19 @@ MyUtils.prototype.extExeGlobalJs = function (jsStr, callback, debug) {
         }, '*');
 };
 
-MyUtils.prototype.getBtChmExtVersion = function () {
-    if ('undefined' != typeof glbBtChmExtVersion) {
-        return glbBtChmExtVersion;
+MyUtils.prototype.getDwsChmExtVersion = function () {
+    if ('undefined' != typeof glbDwsChmExtVersion) {
+        return glbDwsChmExtVersion;
     }
-    let btChmExtVersion = MyUtils.prototype.getJQuery()('body').attr('btVersion');
-    btChmExtVersion = btChmExtVersion ? btChmExtVersion : '';
-    if (btChmExtVersion) {
-        glbBtChmExtVersion = btChmExtVersion;
+    let dwsChmExtVersion = MyUtils.prototype.getJQuery()('body').attr('dwsVersion');
+    dwsChmExtVersion = dwsChmExtVersion ? dwsChmExtVersion : '';
+    if (dwsChmExtVersion) {
+        glbDwsChmExtVersion = dwsChmExtVersion;
     }
-    return btChmExtVersion;
+    return dwsChmExtVersion;
 };
 
-MyUtils.prototype.checkBtChmExtRunInBg = function () {
+MyUtils.prototype.checkDwsChmExtRunInBg = function () {
     return (-1 !== window.location.href.indexOf('chrome-extension://') ? true : false);
 };
 

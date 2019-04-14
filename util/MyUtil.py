@@ -16,20 +16,17 @@ import hashlib
 from .CacheUtil import CacheUtil
 import subprocess
 
-if not getattr(settings,'PROJECT_NAME',None):
-    print('settings.PROJECT_NAME must be defined(settings配置文件必须定义工程名属性:PROJECT_NAME)')
-    exit(0)
 logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')
-    
+
 class MyUtil:
     #全局缓存器
     __caches={}
     #用作存储
-    REDIS_STORE='REDIS_{}:STORE'.format(settings.PROJECT_NAME)
+    REDIS_STORE='REDIS_DWS:STORE'
     #重复值检测key前缀
-    REDIS_CHECK_DUP_KEY_VALUE='REDIS_{}:CHECK_DUP_KEY_VALUE'.format(settings.PROJECT_NAME)
+    REDIS_CHECK_DUP_KEY_VALUE='REDIS_DWS:CHECK_DUP_KEY_VALUE'
     #是否开启js缓存
-    REDIS_JS_FILE_CACHE='REDIS_{}:JS_FILE_CACHE'.format(settings.PROJECT_NAME)
+    REDIS_JS_FILE_CACHE='REDIS_DWS:JS_FILE_CACHE'
 
     def __init__(self):
         # print('MyUtil __init__')
@@ -176,7 +173,13 @@ class MyUtil:
 
     @classmethod
     def getProjectName(cls):
-        return settings.PROJECT_NAME
+        if 'upPrjName' in cls.__caches:
+            return cls.__caches['upPrjName']
+        prjRootDirList = cls.getProjectRootDir().split('/')
+        upPrjName=prjRootDirList[-1] if len(prjRootDirList) > 1 else ''
+        cls.__caches['upPrjName']=upPrjName
+        return upPrjName
+        #return settings.PROJECT_NAME
 
     @classmethod
     def getClassSimpleName(cls, obj):
@@ -281,3 +284,7 @@ class MyUtil:
     @classmethod
     def getDWSClientDir(cls):
         return os.path.join(cls.getDWSRootDir(), 'client')
+
+    @classmethod
+    def getProjectRootDir(cls):
+        return  os.path.abspath(os.path.join(os.path.dirname(cls.getDWSRootDir()), '.'))

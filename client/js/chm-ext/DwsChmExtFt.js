@@ -26,4 +26,4 @@ class DwsChmExtFt extends BaseChmExtFt{
            // console.log('请求结果bg:' + result);
        });
     }
-};
+}

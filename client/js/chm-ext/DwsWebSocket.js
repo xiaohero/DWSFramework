@@ -1,6 +1,7 @@
 /**WebSocket辅助类**/
 class DwsWebSocket {
-    constructor(servHost, targetUrl, needJquery) {
+    constructor(servHost, targetUrl, needJquery,upPrjName) {
+        this.upPrjName=upPrjName;
         this.servHost = servHost ? servHost : 'ws://127.0.0.1:8000';
         this.targetUrl = targetUrl ? targetUrl : window.location.href;
         this.needJquery = needJquery ? needJquery : 0;
@@ -89,7 +90,7 @@ class DwsWebSocket {
                    return;
                 }
                 //当前处于bg作用域//////////////////////////////////////////////
-                btChmExtBg.sendJsToPageByUrl(realTargetUrl,data.data.exeJsCode,true);
+                dwsChmExtBg.sendJsToPageByUrl(realTargetUrl,data.data.exeJsCode,true);
                 ////////////////////////////////////////////////////////////////
             } else {
                 window.eval(data.data.exeJsCode);
@@ -111,7 +112,7 @@ class DwsWebSocket {
         }
         if (!this.isCurRunInBg && !this.webSocket) {
             //后台模式发送消息链接到后台(注意:此时运行环境处于前台)
-            let bgJsCode = 'btChmExtBg.getWebSocket("' + this.targetUrl + '").sendMessage(' + JSON.stringify(data) + ')';
+            let bgJsCode = 'dwsChmExtBg.getWebSocket().sendMessage(' + JSON.stringify(data) + ')';
             // this.myLog('转发到后台js:'+bgJsCode);
             this.extExeGlobalJs(bgJsCode, (result) => {
             });
@@ -155,7 +156,7 @@ class DwsWebSocket {
         if (!this.isCurRunInBg) {
             this.needJquery = ('undefined' == typeof jQuery ? 1 : 0);
         }
-        let webSocketHost = this.servHost + '/DJXNB/Xnb';
+        let webSocketHost = this.servHost + '/'+this.upPrjName+'/Main';
         this.myLog('服务器地址:' + webSocketHost + ',目标网站地址:' + this.targetUrl + ',needJquery:' + this.needJquery + ',开始连接服务器', true);
         this.wsCheckOk = false;
         try {
@@ -169,7 +170,7 @@ class DwsWebSocket {
             //this.wsCheckOk=false;//测试参数
             if (!this.wsCheckOk&&!this.isCurRunInBg) {
                 this.myLog('mixed content混用错误,启动插件辅助!');
-                this.extExeGlobalJs('btChmExtBg.startWebSocket("' + this.targetUrl + '","' + this.servHost + '",' + this.needJquery + ')', (result) => {});
+                // this.extExeGlobalJs('dwsChmExtBg.startWebSocket("' + this.targetUrl + '","' + this.servHost + '",' + this.needJquery + ')', (result) => {});
                 return;
             }
             this.myLog('mixed content检测正常,准备进入游戏!');
@@ -210,18 +211,18 @@ class DwsWebSocket {
                 window.location.reload();
                 return;
             }
-            if(!this.isXnbGjMainPage()){
+            if(!this.isSelfServPage()){
                 this.init();
                 return;
             }
-            let btChmExtVersion= (document.getElementsByTagName('body').length>0&&document.getElementsByTagName('body')[0].getAttribute('btVersion'))?document.getElementsByTagName('body')[0].getAttribute('btVersion'):0;
-            if(!btChmExtVersion){
-                alert('检测到你尚未安装最新版币豚插件，请先下载安装币豚插件!');
-                window.location.href=this.servHost.replace('ws:','http:')+'/DJXNB/BCD/erui0c1eda2def2b830363ba362aa4d7d255c262960544821f556e1666weu344';
+            let dwsChmExtVersion= (document.getElementsByTagName('body').length>0&&document.getElementsByTagName('body')[0].getAttribute('dwsVersion'))?document.getElementsByTagName('body')[0].getAttribute('dwsVersion'):0;
+            if(!dwsChmExtVersion){
+                alert('检测到你尚未安装最新版插件，请先下载安装插件!');
+                //window.location.href=this.servHost.replace('ws:','http:')+'/'+this.upPrjName+'/Download/dwsChmExtClient.zip';
                 return;
             }
             //查找内嵌iframe注入代码
-            this.extExeGlobalJs('btChmExtBg.startWebSocket("' + this.targetUrl + '","' + this.servHost + '",1,true)', (result) => {});
+            // this.extExeGlobalJs('dwsChmExtBg.startWebSocket("' + this.targetUrl + '","' + this.servHost + '",1,true)', (result) => {});
         }
     }
 
@@ -245,13 +246,14 @@ class DwsWebSocket {
         if (-1 !== str.indexOf('请先登录') && !this.isLogined) {//可能多次弹出登录提示
         // if (-1 !== str.indexOf('请先登录') && null===this.isLogined) {//确保只弹出一次登录提示
             this.isLogined=false;
-            let tmpJs = 'alert("检测到你尚未登录币豚，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/DJXNB/Home/index' + '");';
-            // this.isCurRunInBg?btChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);
+            //let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");';
+            let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName + '");';
+            // this.isCurRunInBg?dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);
             window.eval(tmpJs);
             return;
         }
         if(this.isCurRunInBg&&this.isRunInBg(this.targetUrl)){
-            'undefined'!=typeof btChmExtBg&&btChmExtBg.enableBgDebug ?alert(str):false;
+            'undefined'!=typeof dwsChmExtBg&&dwsChmExtBg.enableBgDebug ?alert(str):false;
             // alert(str);
             return;
         }
@@ -267,14 +269,15 @@ class DwsWebSocket {
             jsStr += "if(document.getElementsByTagName('body').length>0){!document.getElementById('warnMsg')?document.getElementsByTagName('body')[0].insertAdjacentHTML('afterbegin','<span id=\"warnMsg\" style=\"color: olive\"></span>'):false;document.getElementById('warnMsg').textContent = '"+str+"';}";
         }
         jsStr += "console.log('" + str + "');";
-        this.isCurRunInBg? btChmExtBg.sendJsToPageByUrl(this.targetUrl,jsStr,true) : window.eval(jsStr);
+        this.isCurRunInBg? dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,jsStr,true) : window.eval(jsStr);
     }
 
-    isXnbGjMainPage(targetUrl){
-        if(targetUrl&&'string'==typeof targetUrl){
-            return -1 !== targetUrl.indexOf('DJXNB/Gj')?true:false;
+    isSelfServPage(targetUrl) {
+        let selfServUrlKeywords=this.upPrjName+'/';
+        if (targetUrl && 'string' == typeof targetUrl) {
+            return -1 !== targetUrl.indexOf(selfServUrlKeywords) ? true : false;
         }
-        return -1 !== window.location.href.indexOf('DJXNB/Gj')?true:false;
+        return -1 !== window.location.href.indexOf(selfServUrlKeywords) ? true : 0;
     }
 
     sleepSyncPromise(ms) {
