@@ -65,7 +65,7 @@ class BaseWebsocketAction(UniversalWebsocket):
         retData=serviceHandleMethod()
 
 
-    #重写父类方法，额外处理用户
+    #重写父类方法，额外处理
     @method_decorator(AnnoUser.channelLoginRequired)
     def disconnect(self, message, **kwargs):
         """
@@ -73,9 +73,18 @@ class BaseWebsocketAction(UniversalWebsocket):
         如果定义了组，父类会自动维护踢出组
         """
         super().disconnect(message, **kwargs)
+        #todo:当前玩家删除redis
 
-        #当前玩家删除redis缓存
-        MyUtil.logInfo('玩家:{},删除断开连接'.format(message.reply_channel.name))
+    #重写父类方法，额外处理
+    @method_decorator(AnnoUser.channelLoginRequired)
+    def connect(self, message, **kwargs):
+        """
+        处理connect消息，如果无特殊处理需求可以不用覆盖该方法，父类会自动默认处理
+        """
+        #直接调用父类方法处理
+        super().connect(message)
+        #todo:当前玩家保存redis
+
 
     @classmethod
     def getDefaultRouteConf(cls):

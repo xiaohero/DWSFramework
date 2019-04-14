@@ -31,7 +31,6 @@ class Res(BaseHttpAction):
 
     #chrome插件后台核心入口,代码由服务器下发,方便热更
     def getDwsChromeExtJs(self, request):
-        print('username:'+str(request.user))
         version = request.GET.get('version')
         if not version:
             version='latest'

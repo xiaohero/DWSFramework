@@ -120,7 +120,6 @@ class UniversalWebsocket(WebsocketConsumer):
             'ip':message.content['client']
         }
         MyUtil.logInfo('客户端({}) username:({}) IP:{} 请求连接:'.format(message.reply_channel,message.user.username, message.content['client']))
-
         #广播全组欢迎消息
         # self.sendToGroupAll('欢迎:'+self.message.user.username+' 进入房间')
 
@@ -143,7 +142,9 @@ class UniversalWebsocket(WebsocketConsumer):
         处理客户端ws_disconnect断开消息,
         如果定义了组，父类会自动维护踢出组
         """
-        MyUtil.logInfo('客户端({}) username:({}) 断开连接:'.format(message.reply_channel,message.user.username))
+        #直接调用父类方法处理
+        super().connect(message)
+        #MyUtil.logInfo('客户端({}) username:({}) 断开连接:'.format(message.reply_channel,message.user.username))
         #给其它用户广播xx用户离开消息
         # self.sendToGroupOthers(self.message.user.username+'离开房间')
 
