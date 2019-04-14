@@ -21,11 +21,10 @@ class HttpUtil:
     @classmethod
     def curlGet(cls, url,params={}):
         urlInfo = urlparse(url)
-        print(urlInfo)
+        #print(urlInfo)
         # print(urlInfo.path+'?'+urlencode(params))
         # headers = {'Content-type': 'application/json'}
         headers = {'Content-type': 'application/x-www-form-urlencoded','Accept': 'text/plain'}
-        conn=None
         if 'https'==urlInfo.scheme:
             conn = http.client.HTTPSConnection(urlInfo.netloc)
         else:
@@ -42,3 +41,12 @@ class HttpUtil:
     @classmethod
     def post(cls, key,amount=1):
         pass
+
+    @classmethod
+    def getDomainByUrl(cls, url):
+        domain=''
+        if url and isinstance(url,str):
+            urlInfos=urlparse(url)
+            if urlInfos and getattr(urlInfos,'netloc',None):
+                domain=getattr(urlInfos,'netloc')
+        return domain
