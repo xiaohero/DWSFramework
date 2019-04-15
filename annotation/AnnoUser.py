@@ -79,21 +79,23 @@ class AnnoUser(object):
             needSkipCheck= True if ('127.0.0.1'==brwClientIp and 'chrome-extension://' in str(message.content)) else False
             if not needSkipCheck and 'clientInfo' in message.channel_session:
                 needSkipCheck= True if '127.0.0.1'==message.channel_session['clientInfo']['ip'][0] else False
-            needSkipCheck and print('warn:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format('本地chrome后台环境测试,临时跳过登录验证',message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username,message.reply_channel,brwClientIp))
             loginErr=None
             if not message.user.is_authenticated:
                 loginErr='请先登录!'
             elif not message.user.is_active:
                 loginErr='用户未激活，请联系管理员激活!'
-            if loginErr and not needSkipCheck:
-                MyUtil.logInfo('error:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format(loginErr,message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username,message.reply_channel,brwClientIp))
-                # 踢掉未登录客户端
-                loginErr={
-                    'text': json.dumps(WebsocketUtil.makeErrMsg(loginErr))
-                }
-                message.reply_channel.send(loginErr)
-                #临时屏蔽
-                message.reply_channel.send({'close': True})
+            if loginErr:
+                if needSkipCheck and not MyUtil.isCurWindowsSystem():
+                    print('warn:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format('本地chrome后台环境测试,临时跳过登录验证',message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username,message.reply_channel, brwClientIp))
+                else:
+                    MyUtil.logInfo('error:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format(loginErr, message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username, message.reply_channel, brwClientIp))
+                    # 踢掉未登录客户端
+                    loginErr = {
+                        'text': json.dumps(WebsocketUtil.makeErrMsg(loginErr))
+                    }
+                    message.reply_channel.send(loginErr)
+                    # 临时屏蔽
+                    message.reply_channel.send({'close': True})
             #still return whenever check is ok
             return func(*args, **kw)
         return wrapper

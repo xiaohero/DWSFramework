@@ -22,7 +22,7 @@ class Res(BaseHttpAction):
         Constructor
         '''
 
-    #登录拦截
+    #取消登录拦截
     @never_cache
     def get(self, request, *args, **kwargs):
         if not getattr(self, self.getActionName(),None):

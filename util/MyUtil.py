@@ -4,6 +4,7 @@ Created on 2017年6月22日
 @author: xiaoxi
 '''
 import os
+import platform
 from datetime import datetime
 import logging
 from pprint import pprint, pformat
@@ -176,9 +177,9 @@ class MyUtil:
 
     @classmethod
     def getProjectName(cls):
-        if 'upPrjName' in cls.__caches:
+        if 'upPrjName' in cls.__caches and cls.__caches['upPrjName']:
             return cls.__caches['upPrjName']
-        prjRootDirList = cls.getProjectRootDir().split('/')
+        prjRootDirList = cls.getProjectRootDir().split(cls.getDIRECTORY_SEPARATOR())
         upPrjName=prjRootDirList[-1] if len(prjRootDirList) > 1 else ''
         cls.__caches['upPrjName']=upPrjName
         return upPrjName
@@ -188,7 +189,7 @@ class MyUtil:
     def getFrameworkName(cls):
         if 'fwPrjName' in cls.__caches:
             return cls.__caches['fwPrjName']
-        fwPrjRootDirList = cls.getDWSRootDir().split('/')
+        fwPrjRootDirList = cls.getDWSRootDir().split(cls.getDIRECTORY_SEPARATOR())
         fwPrjName=fwPrjRootDirList[-1] if len(fwPrjRootDirList) > 1 else ''
         cls.__caches['fwPrjName']=fwPrjName
         return fwPrjName
@@ -301,3 +302,15 @@ class MyUtil:
     @classmethod
     def getProjectRootDir(cls):
         return  os.path.abspath(os.path.join(os.path.dirname(cls.getDWSRootDir()), '.'))
+
+    @classmethod
+    def getOsName(cls):
+        return platform.system()
+
+    @classmethod
+    def isCurWindowsSystem(cls):
+        return 'indow' in cls.getOsName()
+
+    @classmethod
+    def getDIRECTORY_SEPARATOR(cls):
+        return '\\' if cls.isCurWindowsSystem() else '/'

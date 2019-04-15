@@ -9,6 +9,9 @@ from urllib.parse import urlparse
 import json
 import http.client
 
+import re
+
+
 class HttpUtil:
     @classmethod
     def get(cls, url,params={}):
@@ -43,10 +46,12 @@ class HttpUtil:
         pass
 
     @classmethod
-    def getDomainByUrl(cls, url):
+    def getDomainByUrl(cls, url,getLv1=False):
         domain=''
         if url and isinstance(url,str):
             urlInfos=urlparse(url)
             if urlInfos and getattr(urlInfos,'netloc',None):
                 domain=getattr(urlInfos,'netloc')
+                if getLv1 and re.findall('.com|cn|net', domain) and len(domain.split('.'))>2:
+                    domain='{}.{}'.format(domain.split('.')[-2],domain.split('.')[-1])
         return domain

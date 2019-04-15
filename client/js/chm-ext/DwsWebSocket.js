@@ -145,8 +145,8 @@ class DwsWebSocket {
         await this.sleepSyncPromise(10000);
         this.init();
         if(this.isRunInBg()){
-            //后端ws重连时主动刷新所有页面
-            this.reEnterJsOfAll(1000);
+            //后端ws重连时主动刷新所有页面(临时屏蔽)
+            //this.reEnterJsOfAll(1000);
         }
     }
 
@@ -210,14 +210,14 @@ class DwsWebSocket {
             return;
         }
         // 临时屏蔽登录
-        // if (-1 !== str.indexOf('请先登录') && !this.isLogined) {//可能多次弹出登录提示
-        // // if (-1 !== str.indexOf('请先登录') && null===this.isLogined) {//确保只弹出一次登录提示
-        //     this.isLogined=false;
-        //     let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");';
-        //     // this.isCurRunInBg?dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);
-        //     window.eval(tmpJs);
-        //     return;
-        // }
+        if (-1 !== str.indexOf('请先登录') && !this.isLogined) {//可能多次弹出登录提示
+        // if (-1 !== str.indexOf('请先登录') && null===this.isLogined) {//确保只弹出一次登录提示
+            this.isLogined=false;
+            let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");';
+            // this.isCurRunInBg?dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);
+            window.eval(tmpJs);
+            return;
+        }
         if(this.isCurRunInBg&&this.isRunInBg(this.targetUrl)){
             'undefined'!=typeof dwsChmExtBg&&dwsChmExtBg.enableBgDebug ?alert(str):false;
             // alert(str);
