@@ -3,7 +3,7 @@ Created on Jul 1, 2017
 
 @author: xiaoxi
 '''
-
+from DWSFramework.common.JsResource import JsResource
 from ..util.MyUtil import MyUtil
 from .BaseHttpAction import BaseHttpAction
 from django.http.response import HttpResponse
@@ -34,13 +34,4 @@ class Res(BaseHttpAction):
         version = request.GET.get('version')
         if not version:
             version='latest'
-        jsFileBaseChmExtBg = '{}/js/chm-ext/base/BaseChmExtBg.js'.format(MyUtil.getDWSClientDir())
-        jsFileBaseChmExtFt = '{}/js/chm-ext/base/BaseChmExtFt.js'.format(MyUtil.getDWSClientDir())
-        jsFileDwsChmBbExt = '{}/js/chm-ext/DwsChmExtBg.js'.format(MyUtil.getDWSClientDir())
-        jsFileDwsChmFtExt = '{}/js/chm-ext/DwsChmExtFt.js'.format(MyUtil.getDWSClientDir())
-        jsFileWebSocket = '{}/js/chm-ext/DwsWebSocket.js'.format(MyUtil.getDWSClientDir())
-        fileContent = MyUtil.readFileToStr(jsFileBaseChmExtBg, True)+MyUtil.readFileToStr(jsFileBaseChmExtFt, True)
-        fileContent += MyUtil.readFileToStr(jsFileWebSocket, True)#提到前面引入
-        fileContent += MyUtil.readFileToStr(jsFileDwsChmBbExt, True)
-        fileContent += MyUtil.readFileToStr(jsFileDwsChmFtExt, True)
-        return HttpResponse(fileContent)
+        return HttpResponse(JsResource.getChmExtJsContents(version))

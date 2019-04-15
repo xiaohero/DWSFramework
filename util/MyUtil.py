@@ -314,3 +314,12 @@ class MyUtil:
     @classmethod
     def getDIRECTORY_SEPARATOR(cls):
         return '\\' if cls.isCurWindowsSystem() else '/'
+
+    @classmethod
+    def getProjectStaticDir(cls):
+        return settings.STATICFILES_DIRS[0]
+        #return os.path.abspath(os.path.join(cls.getProjectRootDir,'static'))
+
+    @classmethod
+    def isFilePathExisted(cls,filePath):
+        return os.path.exists(filePath)
