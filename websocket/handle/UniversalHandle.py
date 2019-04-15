@@ -20,5 +20,3 @@ class UniversalHandle:
         self.data = json.loads(data)
     def initHandle(self, websocketAction):
         self.websocketAction=websocketAction
-        pass
-

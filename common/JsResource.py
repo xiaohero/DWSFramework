@@ -37,11 +37,12 @@ class JsResource:
 
     #获取基础js资源
     @classmethod
-    def getBaseJsContents(cls, needJquery=0, needJqueryXpath=0,needReact=0,needVue=0):
+    def getBaseJsContents(cls, needJquery=0, needJqueryXpath=0, needReact=0, needVue=0, needJqueryCookie=1):
         fileContent = ''
         # fixme:正式上线后，如若js不再更改，可开启读文件缓存
         jsFileJquery = '{}/js/third-party/jquery/3.2.1/jquery.js'.format(MyUtil.getDWSClientDir())
         jsFileJqueryXPath = '{}/js/third-party/jquery-xpath/0.3.1/jquery.xpath.min.js'.format(MyUtil.getDWSClientDir())
+        jsFileJqueryCookie = '{}/js/third-party/jquery-cookie/1.4.1/jquery.cookie.min.js'.format(MyUtil.getDWSClientDir())
         jsFileReact = '{}/js/third-party/react/15.6.1/react.js'.format(MyUtil.getDWSClientDir())
         jsFileReactDom = '{}/js/third-party/react/15.6.1/react-dom.js'.format(MyUtil.getDWSClientDir())
         jsFileVue = '{}/js/third-party/vue/2.3.4/vue.js'.format(MyUtil.getDWSClientDir())
@@ -56,6 +57,8 @@ class JsResource:
             fileContent += MyUtil.readFileToStr(jsFileJquery, True)
         if needJqueryXpath:
             fileContent += MyUtil.readFileToStr(jsFileJqueryXPath, True)
+        if needJqueryCookie:
+            fileContent += MyUtil.readFileToStr(jsFileJqueryCookie, True)
         # react支持########################
         if needReact:
             fileContent += MyUtil.readFileToStr(jsFileReact, True)
