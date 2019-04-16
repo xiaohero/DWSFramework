@@ -10,7 +10,15 @@ class ModelValidatorUtil:
     @classmethod
     def alphaNumeric(cls):
         return validators.RegexValidator(
-            regex='^[a-zA-Z0-9_\-]*$',
+            regex='^[a-zA-Z0-9_\-]+$',
             message='Code must be alphanumeric',
+            # code='invalid_code'
+        )
+
+    @classmethod
+    def numeric(cls):
+        return validators.RegexValidator(
+            regex='^[0-9]+$',
+            message='Code must be numeric',
             # code='invalid_code'
         )

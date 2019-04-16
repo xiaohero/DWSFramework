@@ -38,15 +38,7 @@ class OnlineUsers:
                 'updateDateTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
         return StoreService.getStoreCls().save(MyUtil.REDIS_ONLINE_USERS, MyUtil.getProjectName(), userName,{
-            wsChannelId: {
-                'wsChannelId':wsChannelId,
-                'wsPath': wsPath,
-                'userName': userName,
-                'clientIp': clientIp,
-                'clientUrl': clientUrl,
-                'clientAgent': clientAgent,
-                'updateDateTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }
+            wsChannelId: upDict
         },86400)
 
 
@@ -62,39 +54,41 @@ class OnlineUsers:
         #print('allUsers:{}'.format(allUsers))
         #提高查询速度
         findOver=False
-        for eachUserName, curUserList in allUsers.items():
-            # 排除不匹配的用户名
-            if userName:
-                if eachUserName != userName:
-                    continue
-                findOver=True
-            for eachChannelId, userInfo in curUserList.items():
-                if wsChannelId and wsChannelId!=eachChannelId:
-                    continue
-                #print('{}=>{}=>{}'.format(eachUserName,eachChannelId, userInfo))
-                # 对象存进去变json字符串了
-                if isinstance(userInfo, str):
-                    userInfo = eval(userInfo)
-                # 各种过滤匹配
-                if wsPath and wsPath!=userInfo['wsPath']:
-                    continue
-                if clientIp and clientIp!=userInfo['clientIp']:
-                    continue
-                if clientUrlLike and clientUrlLike not in userInfo['clientUrl']:
-                    continue
-                if clientAgentLike and clientAgentLike not in userInfo['clientAgent']:
-                    continue
-                if groupByField:
-                    gbyField= HttpUtil.getDomainByUrl(userInfo['clientUrl'],True) if 'userName'!=groupByField else eachUserName
-                    if not gbyField in retData:
-                        retData[gbyField] = []
-                    retData[gbyField].append(userInfo)
-                else:
-                    retData.append(userInfo)
-                if wsChannelId:
-                    break;
-            if findOver:
-                break
+        if allUsers:
+            for eachUserName, curUserList in allUsers.items():
+                # 排除不匹配的用户名
+                if userName:
+                    if eachUserName != userName:
+                        continue
+                    findOver = True
+                for eachChannelId, userInfo in curUserList.items():
+                    if wsChannelId and wsChannelId != eachChannelId:
+                        continue
+                    # print('{}=>{}=>{}'.format(eachUserName,eachChannelId, userInfo))
+                    # 对象存进去变json字符串了
+                    if isinstance(userInfo, str):
+                        userInfo = eval(userInfo)
+                    # 各种过滤匹配
+                    if wsPath and wsPath != userInfo['wsPath']:
+                        continue
+                    if clientIp and clientIp != userInfo['clientIp']:
+                        continue
+                    if clientUrlLike and clientUrlLike not in userInfo['clientUrl']:
+                        continue
+                    if clientAgentLike and clientAgentLike not in userInfo['clientAgent']:
+                        continue
+                    if groupByField:
+                        gbyField = HttpUtil.getDomainByUrl(userInfo['clientUrl'],
+                                                           True) if 'userName' != groupByField else eachUserName
+                        if not gbyField in retData:
+                            retData[gbyField] = []
+                        retData[gbyField].append(userInfo)
+                    else:
+                        retData.append(userInfo)
+                    if wsChannelId:
+                        break
+                if findOver:
+                    break
         return retData
 
 
