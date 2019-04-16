@@ -28,6 +28,8 @@ class MyUtil:
     REDIS_CHECK_DUP_KEY_VALUE='REDIS_DWS:CHECK_DUP_KEY_VALUE'
     #是否开启js缓存
     REDIS_JS_FILE_CACHE='REDIS_DWS:JS_FILE_CACHE'
+    #是否开启js缓存
+    REDIS_ONLINE_USERS='REDIS_DWS:ONLINE_USERS'
 
     def __init__(self):
         # print('MyUtil __init__')
@@ -184,6 +186,10 @@ class MyUtil:
         cls.__caches['upPrjName']=upPrjName
         return upPrjName
         #return settings.PROJECT_NAME
+
+    @classmethod
+    def getWsRoomName(cls):
+        return 'ROOM_DWS_{}'.format(cls.getProjectName())
 
     @classmethod
     def getFrameworkName(cls):

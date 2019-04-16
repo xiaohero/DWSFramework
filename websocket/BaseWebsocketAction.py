@@ -5,7 +5,11 @@ Created on Jul 1, 2017
 '''
 import json
 from builtins import isinstance
+
+import re
 from django.utils.decorators import method_decorator
+
+from ..common.OnlineUsers import OnlineUsers
 from .UniversalWebsocket import UniversalWebsocket
 from ..util.MyUtil import MyUtil
 from ..annotation.AnnoUser import AnnoUser
@@ -73,7 +77,8 @@ class BaseWebsocketAction(UniversalWebsocket):
         如果定义了组，父类会自动维护踢出组
         """
         super().disconnect(message, **kwargs)
-        #todo:当前玩家删除redis
+        #当前玩家删除redis
+        OnlineUsers.removeByChannelId(message.reply_channel.name)
 
     #重写父类方法，额外处理
     @method_decorator(AnnoUser.channelLoginRequired)
@@ -83,7 +88,11 @@ class BaseWebsocketAction(UniversalWebsocket):
         """
         #直接调用父类方法处理
         super().connect(message)
-        #todo:当前玩家保存redis
+        #当前玩家保存redis
+        reqHeaderStr=(str(self.message.content['headers']))
+        findClientAgents = re.findall("agent', b'([^']+)']", reqHeaderStr)
+        findClientUrls = re.findall("b'origin', b'([^']+)']", reqHeaderStr)
+        OnlineUsers.updateUser(self.message.content['reply_channel'],self.message.content['path'],self.message.user.username,message.content['client'][0],findClientUrls[0] if findClientUrls else '',findClientAgents[0] if findClientAgents else '')
 
 
     @classmethod

@@ -97,13 +97,14 @@ class UniversalWebsocket(WebsocketConsumer):
         list类型，可加入多个组，会自动将当前connect客户端分别加入
         各个组维护,不分组的话可返回空元组
         """
-        roomName='DWS'+self.path.replace('/','_')
+        # roomName='DWS'+self.path.replace('/','_')
+        roomName=MyUtil.getWsRoomName()
 
         # 方案1.组名存到self.groups(经验证不可行，因为每次connect,ws_message不同到消息都会产生新对象，self.groups是对象属性，各自独立)
         # self.groups=[roomName]
         # 方案2.组名存到channel_session
         self.message.channel_session['room'] = roomName
-
+        #print('roomName:'+roomName)
         return [roomName]
 
     #加入注解，需登录后才能连接

@@ -86,7 +86,7 @@ class DwsWebSocket {
             if (this.isCurRunInBg) {
                 let realTargetUrl= data.targetUrl?data.targetUrl:this.targetUrl;
                 if(this.isRunInBg(realTargetUrl)){
-                    alert('后台收到ws消息:'+':'+data.data.exeJsCode+',debug:'+JSON.stringify(data));
+                    alert('后台收到ws消息:'+':'+data.data.exeJsCode+',origin_data:'+JSON.stringify(data));
                    return;
                 }
                 //当前处于bg作用域//////////////////////////////////////////////
