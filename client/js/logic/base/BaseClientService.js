@@ -26,7 +26,7 @@ class BaseClientService {
             // alert('发送错误，请先安装DWS谷歌插件!');
             return false;
         }
-        let bgJsCode = 'dwsChmExtBgUtil.getWebSocket("' + myUtils.getTargetCurrentUrl() + '").sendMessage(' + JSON.stringify(sendData) + ')';
+        let bgJsCode = 'dwsChmExtBgUtil.getWebSocket().sendMessage(' + JSON.stringify(sendData) + ')';
         myUtils.extExeGlobalJs(bgJsCode, result => {});
     }
 
