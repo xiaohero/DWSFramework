@@ -21,10 +21,22 @@ class OnlineUsers:
         '''
 
     @classmethod
-    def updateUser(cls,wsChannelId,wsPath,userName,clientIp,clientUrl='',clientAgent=''):
+    def updateUser(cls,wsChannelId,wsPath,userName='',clientIp='',clientUrl='',clientAgent=''):
+        if not wsChannelId:
+            return False
         #临时处理，兼容未登陆用户,fixme:上线后可关闭此处,理论上connect前必须做登陆验证
         userName= 'guest' if not userName else userName
         #print('更新在线用户信息:wsChannelId:{},wsPath:{},userName:{},clientIp:{},clientUrl:{},clientAgent:{}'.format(wsChannelId,wsPath,userName,clientIp,clientUrl,clientAgent))
+        # 字典去除空元素
+        upDict=MyUtil.dictRemoveEmptyItems({
+                'wsChannelId':wsChannelId,
+                'wsPath': wsPath,
+                'userName': userName,
+                'clientIp': clientIp,
+                'clientUrl': clientUrl,
+                'clientAgent': clientAgent,
+                'updateDateTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
         return StoreService.getStoreCls().save(MyUtil.REDIS_ONLINE_USERS, MyUtil.getProjectName(), userName,{
             wsChannelId: {
                 'wsChannelId':wsChannelId,

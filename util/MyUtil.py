@@ -329,3 +329,7 @@ class MyUtil:
     @classmethod
     def isFilePathExisted(cls,filePath):
         return os.path.exists(filePath)
+
+    @classmethod
+    def dictRemoveEmptyItems(cls,oldDict):
+        return {k: v for k, v in oldDict.items() if v}
