@@ -64,9 +64,10 @@ class BaseWebsocketAction(UniversalWebsocket):
             self.sendErrMsgToCurUser('内部错误(initHandle),请联系管理员!')
             return
         #初始化handle
-        serviceHandleInitMethod(self)
+        initResult=serviceHandleInitMethod(self)
         #调用业务方法处理
-        retData=serviceHandleMethod()
+        initResult and serviceHandleMethod()
+
 
 
     #重写父类方法，额外处理

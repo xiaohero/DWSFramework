@@ -16,6 +16,10 @@ class BaseHandle(UniversalHandle):
 
     def __init__(self, clsName, op, host,data):
         super().__init__(clsName, op, host, data)
+
+    '''
+    子类必须实现该方法，并返回bool型,以便后续是否调用相关handle的op方法
+    '''
     def initHandle(self, websocketAction):
         #先调基类
         super().initHandle(websocketAction)
@@ -23,10 +27,4 @@ class BaseHandle(UniversalHandle):
         self.user=self.websocketAction.message.user
         #更新当前用户url
         OnlineUsers.updateUser(wsChannelId=self.websocketAction.message.content['reply_channel'],wsPath=self.websocketAction.message.content['path'],userName=self.websocketAction.message.user.username,clientUrl=self.host)
-    '''
-    子类必须实现该方法，用于判断当前前端页面是否命中条件，以便后续自动注入chm-ext front js
-    '''
-    @abc.abstractmethod
-    def filterSite(self)->bool:
-        return False
-        #raise NotImplementedError('Should have implemented this')
+        return True
