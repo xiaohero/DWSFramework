@@ -143,8 +143,8 @@ class UniversalWebsocket(WebsocketConsumer):
         如果定义了组，父类会自动维护踢出组
         """
         #直接调用父类方法处理
-        super().connect(message)
-        #MyUtil.logInfo('客户端({}) username:({}) 断开连接:'.format(message.reply_channel,message.user.username))
+        super().disconnect(message)
+        MyUtil.logInfo('客户端({}) username:({}) 断开连接:'.format(message.reply_channel,message.user.username))
         #给其它用户广播xx用户离开消息
         # self.sendToGroupOthers(self.message.user.username+'离开房间')
 
