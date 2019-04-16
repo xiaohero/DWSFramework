@@ -31,9 +31,10 @@ class BaseHttpAction(View):
         return getattr(self, self.getActionName())(request)
 
     def getActionName(self):
-        # print(self.request.path)
-        # print('xx:/{}/{}/'.format(MyUtil.getProjectName(), MyUtil.getClassSimpleName(self)))
+        #print('path:'+self.request.path)
+        #print('replace:/{}/{}/'.format(MyUtil.getProjectName(), MyUtil.getClassSimpleName(self)))
         self.__actionName= self.__actionName if self.__actionName else self.request.path.replace('/{}/{}/'.format(MyUtil.getProjectName(), MyUtil.getClassSimpleName(self)), '').replace('/','')
+        #print('__actionName:'+self.__actionName)
         return self.__actionName
 
     def getDefaultTplName(self):

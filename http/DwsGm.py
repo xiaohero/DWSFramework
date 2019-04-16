@@ -15,7 +15,7 @@ from ..util.CacheUtil import CacheUtil
 from ..util.MyUtil import MyUtil
 from ..websocket.WebsocketUtil import WebsocketUtil
 
-class DwsGmAction(BaseHttpAction):
+class DwsGm(BaseHttpAction):
     '''
     辅助页面
     '''
