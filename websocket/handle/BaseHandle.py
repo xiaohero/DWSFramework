@@ -18,6 +18,8 @@ class BaseHandle(UniversalHandle):
     def initHandle(self, websocketAction):
         #先调基类
         super().initHandle(websocketAction)
+        #记录当前登录用户
+        self.user=self.websocketAction.message.user
     '''
     子类必须实现该方法，用于判断当前前端页面是否命中条件，以便后续自动注入chm-ext front js
     '''
