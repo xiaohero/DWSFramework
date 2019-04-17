@@ -25,6 +25,8 @@ class BaseHandle(UniversalHandle):
         super().initHandle(websocketAction)
         #记录当前登录用户
         self.user=self.websocketAction.message.user
+        self.wsChannelId=self.websocketAction.message.content['reply_channel']
+        self.clientIp=self.websocketAction.message.channel_session['clientInfo']['ip'][0]
         #更新当前用户url
-        OnlineUsers.updateUser(wsChannelId=self.websocketAction.message.content['reply_channel'],wsPath=self.websocketAction.message.content['path'],userName=self.websocketAction.message.user.username,clientUrl=self.host)
+        OnlineUsers.updateUser(wsChannelId=self.websocketAction.message.content['reply_channel'],wsPath=self.websocketAction.message.content['path'],userName=self.websocketAction.message.user.username,clientIp=self.clientIp,clientUrl=self.host)
         return True

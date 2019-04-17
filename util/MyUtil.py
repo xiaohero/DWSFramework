@@ -28,7 +28,7 @@ class MyUtil:
     REDIS_CHECK_DUP_KEY_VALUE='REDIS_DWS:CHECK_DUP_KEY_VALUE'
     #是否开启js缓存
     REDIS_JS_FILE_CACHE='REDIS_DWS:JS_FILE_CACHE'
-    #是否开启js缓存
+    #在线用户redis key
     REDIS_ONLINE_USERS='REDIS_DWS:ONLINE_USERS'
 
     def __init__(self):
@@ -333,3 +333,7 @@ class MyUtil:
     @classmethod
     def dictRemoveEmptyItems(cls,oldDict):
         return {k: v for k, v in oldDict.items() if v}
+
+    @classmethod
+    def getCurDateTime(cls,format='%Y-%m-%d %H:%M:%S'):
+        datetime.now().strftime(format)

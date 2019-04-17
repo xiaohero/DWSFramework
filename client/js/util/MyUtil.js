@@ -546,7 +546,6 @@ MyUtils.prototype.getTargetFullHost = function () {
 
 /*获取目标网站url全路径*/
 MyUtils.prototype.getTargetCurrentUrl = function () {
-    alert('curl:'+window.location.href+':'+/(\d.\d.\d.\d)|(localhost)/.test(window.location.href));
     /*先搜索自身域*/
     if (!/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|(localhost)/.test(window.location.href)) {
         return window.location.href;
