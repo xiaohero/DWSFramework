@@ -546,8 +546,9 @@ MyUtils.prototype.getTargetFullHost = function () {
 
 /*获取目标网站url全路径*/
 MyUtils.prototype.getTargetCurrentUrl = function () {
+    alert('curl:'+window.location.href+':'+/(\d.\d.\d.\d)|(localhost)/.test(window.location.href));
     /*先搜索自身域*/
-    if (!/(\d.\d.\d.\d)|(localhost)/.test(window.location.href)) {
+    if (!/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|(localhost)/.test(window.location.href)) {
         return window.location.href;
     }
     /*搜索子域*/
@@ -597,7 +598,7 @@ MyUtils.prototype.reload = function (iframeName) {
     // console.log('页面刷新跳过');return;
     if (!MyUtils.prototype.isIframeSupport(iframeName)) {
         MyUtils.prototype.log('未找到iframe:(' + iframeName + '),直接刷新顶层页面!');
-        MyUtils.prototype.extExeGlobalJs('dwsChmExtBgUtil.flushParentWindowByFrameUrl("' + window.location + '")');
+        MyUtils.prototype.extExeGlobalJs('dwsChmExtBg.flushParentWindowByFrameUrl("' + window.location + '")');
         window.location.reload();
         return;
     }

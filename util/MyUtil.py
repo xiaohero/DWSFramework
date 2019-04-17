@@ -152,7 +152,7 @@ class MyUtil:
         oldPath=filePath
         newPath=filePath.replace('.js', '_Protected.js')
         #线上代码混淆后新文件名
-        if not ('third-party' in filePath or 'AjaxUtil' in filePath or 'ChmExtFtUtil' in filePath) and isOnlineEnv and '.js' in filePath:
+        if not ('third-party' in filePath or 'AjaxUtil' in filePath or 'ChmExtFt' in filePath) and isOnlineEnv and '.js' in filePath:
             filePath = newPath
         enableJsFileCache= (True if 'Y'==CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False)
         # 线上默认开启文件缓存

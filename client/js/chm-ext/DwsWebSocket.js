@@ -113,7 +113,7 @@ class DwsWebSocket {
         if (!this.isCurRunInBg && !this.webSocket) {
             //后台模式发送消息链接到后台(注意:此时运行环境处于前台)
             let bgJsCode = 'dwsChmExtBg.getWebSocket().sendMessage(' + JSON.stringify(data) + ')';
-            // this.myLog('转发到后台js:'+bgJsCode);
+            this.myLog('转发到后台js:'+bgJsCode);
             this.extExeGlobalJs(bgJsCode, (result) => {
             });
             return;
@@ -236,14 +236,6 @@ class DwsWebSocket {
         }
         jsStr += "console.log('" + str + "');";
         this.isCurRunInBg? dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,jsStr,true) : window.eval(jsStr);
-    }
-
-    isSelfServPage(targetUrl) {
-        let selfServUrlKeywords=this.upPrjName+'/';
-        if (targetUrl && 'string' == typeof targetUrl) {
-            return -1 !== targetUrl.indexOf(selfServUrlKeywords) ? true : false;
-        }
-        return -1 !== window.location.href.indexOf(selfServUrlKeywords) ? true : 0;
     }
 
     sleepSyncPromise(ms) {
