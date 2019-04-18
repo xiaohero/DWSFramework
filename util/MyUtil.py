@@ -3,8 +3,6 @@ Created on 2017年6月22日
 
 @author: xiaoxi
 '''
-import os
-import platform
 from datetime import datetime
 import logging
 from pprint import pprint, pformat
@@ -14,6 +12,8 @@ from collections import namedtuple
 from pathlib import Path
 from django.conf import settings
 import hashlib
+
+from .InitUtil import InitUtil
 from .CacheUtil import CacheUtil
 import subprocess
 
@@ -299,27 +299,31 @@ class MyUtil:
 
     @classmethod
     def getDWSRootDir(cls):
-        return  os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        return  InitUtil.getDWSRootDir()
 
     @classmethod
     def getDWSClientDir(cls):
-        return os.path.join(cls.getDWSRootDir(), 'client')
+        return InitUtil.getDWSClientDir()
 
     @classmethod
     def getProjectRootDir(cls):
-        return  os.path.abspath(os.path.join(os.path.dirname(cls.getDWSRootDir()), '.'))
+        return  InitUtil.getProjectRootDir()
+
+    @classmethod
+    def getProjectLogDir(cls):
+        return  InitUtil.getProjectLogDir()
 
     @classmethod
     def getOsName(cls):
-        return platform.system()
+        return InitUtil.getOsName()
 
     @classmethod
     def isCurWindowsSystem(cls):
-        return 'indow' in cls.getOsName()
+        return InitUtil.isCurWindowsSystem()
 
     @classmethod
     def getDIRECTORY_SEPARATOR(cls):
-        return '\\' if cls.isCurWindowsSystem() else '/'
+        return InitUtil.getDIRECTORY_SEPARATOR()
 
     @classmethod
     def getProjectStaticDir(cls):
@@ -328,7 +332,7 @@ class MyUtil:
 
     @classmethod
     def isFilePathExisted(cls,filePath):
-        return os.path.exists(filePath)
+        return InitUtil.isFilePathExisted(filePath)
 
     @classmethod
     def dictRemoveEmptyItems(cls,oldDict):
