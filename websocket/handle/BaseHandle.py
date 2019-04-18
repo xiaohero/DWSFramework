@@ -30,5 +30,5 @@ class BaseHandle(UniversalHandle):
         self.wsChannelId=self.websocketAction.message.content['reply_channel']
         self.clientUuidId = OnlineUsers.getClientUuidId(self.user.username,self.wsChannelId)
         #更新当前用户url
-        OnlineUsers.updateUser(wsChannelId=self.wsChannelId,wsPath=self.wsPath,userName=self.user.username,clientIp=self.clientIp,clientUrl=self.host,clientExtId=self.clientExtId)
+        OnlineUsers.updateUser(wsChannelId=self.wsChannelId,wsPath=self.wsPath,userName=self.user.username,clientIp=self.clientIp,clientUrl=self.host,clientExtId=self.clientExtId,clientUuidId=self.clientUuidId)
         return True

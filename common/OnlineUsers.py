@@ -44,6 +44,7 @@ class OnlineUsers:
                 'clientIp': clientIp,
                 'clientUrl': clientUrl,
                 'clientUuidId': clientUuidId,
+                'clientExtId': clientExtId,
                 'clientAgent': clientAgent if clientAgent else '',
                 'updateDateTime': MyUtil.getCurDateTime()
         }
