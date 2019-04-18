@@ -38,7 +38,7 @@ class BaseWebsocketAction(UniversalWebsocket):
         """
         MyUtil.logDebug('客户端({}) username:({}) 发来消息:{}'.format(self.message.reply_channel,self.message.user.username, self.message.content['text']))
         clientData=json.loads(text)
-        if not (isinstance(clientData,dict) and 'clsName' in clientData and 'op' in clientData and 'host' in clientData and 'data' in clientData and isinstance(clientData['data'],str)):
+        if not (isinstance(clientData,dict) and 'clsName' in clientData and 'op' in clientData and 'host' in clientData and 'clientExtId' in clientData and 'data' in clientData and isinstance(clientData['data'],str)):
             self.sendErrMsgToCurUser('格式错误，非法请求，请不要恶意攻击!')
             return
         #判断服务类是否存在
@@ -93,7 +93,7 @@ class BaseWebsocketAction(UniversalWebsocket):
         reqHeaderStr=(str(self.message.content['headers']))
         findClientAgents = re.findall("agent', b'([^']+)']", reqHeaderStr)
         findClientUrls = re.findall("b'origin', b'([^']+)']", reqHeaderStr)
-        OnlineUsers.updateUser(self.message.content['reply_channel'],self.message.content['path'],self.message.user.username,message.content['client'][0],findClientUrls[0] if findClientUrls else '',findClientAgents[0] if findClientAgents else '')
+        OnlineUsers.updateUser(wsChannelId=self.message.content['reply_channel'],wsPath=self.message.content['path'],userName=self.message.user.username,clientIp=message.content['client'][0],clientUrl=findClientUrls[0] if findClientUrls else '',clientAgent=findClientAgents[0] if findClientAgents else '')
 
 
     @classmethod

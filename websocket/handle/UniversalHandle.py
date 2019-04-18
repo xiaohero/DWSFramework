@@ -10,10 +10,11 @@ class UniversalHandle:
     基础服务类
     '''
 
-    def __init__(self, clsName, op, host,data):
+    def __init__(self, clsName, op, host,data,clientExtId):
         self.clsName = clsName
         self.op = op
         self.host = host
+        self.clientExtId = clientExtId
         self.isInitCheckOk = True
         # self.data = data
         # data json串转动态对象

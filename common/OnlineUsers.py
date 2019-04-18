@@ -21,7 +21,7 @@ class OnlineUsers:
         '''
 
     @classmethod
-    def updateUser(cls, wsChannelId: str, wsPath: str = '', userName: str = '', clientIp: str = '', clientUrl: str = '',clientAgent: str = ''):
+    def updateUser(cls, wsChannelId: str, wsPath: str = '', userName: str = '', clientIp: str = '', clientUrl: str = '',clientAgent: str = '',clientUuidId='',clientExtId=''):
         if not wsChannelId:
             return False
         #临时处理，兼容未登陆用户,fixme:上线后可关闭此处,理论上connect前必须做登陆验证
@@ -29,15 +29,21 @@ class OnlineUsers:
         #print('更新在线用户信息:wsChannelId:{},wsPath:{},userName:{},clientIp:{},clientUrl:{},clientAgent:{}'.format(wsChannelId,wsPath,userName,clientIp,clientUrl,clientAgent))
         #agent单独再存一个key，以免被冲掉
         if clientAgent:
-            CacheUtil.set('{}:{}:{}'.format(MyUtil.REDIS_ONLINE_USERS,userName,wsChannelId), clientAgent,86400)
+            CacheUtil.set('{}:WSID:{}:{}'.format(MyUtil.REDIS_ONLINE_USERS,userName,wsChannelId), clientAgent,86400)
         else:
-            clientAgent = CacheUtil.get('{}:{}:{}'.format(MyUtil.REDIS_ONLINE_USERS, userName, wsChannelId))
+            #todo: 也许不用每次都同步存agent信息,考虑性能优化
+            clientAgent = CacheUtil.get('{}:WSID:{}:{}'.format(MyUtil.REDIS_ONLINE_USERS, userName, wsChannelId))
+        #客户端chmId单独再存一个key，以免被冲掉
+        if clientUrl and 'chrome-extension://' in clientUrl:
+            clientUuidId = clientUrl.replace('chrome-extension://','')
+            CacheUtil.set('{}:EXTID:{}:{}'.format(MyUtil.REDIS_ONLINE_USERS,userName,wsChannelId), clientUuidId,86400)
         upDict={
                 'wsChannelId':wsChannelId,
                 'wsPath': wsPath,
                 'userName': userName,
                 'clientIp': clientIp,
                 'clientUrl': clientUrl,
+                'clientUuidId': clientUuidId,
                 'clientAgent': clientAgent if clientAgent else '',
                 'updateDateTime': MyUtil.getCurDateTime()
         }
@@ -117,3 +123,9 @@ class OnlineUsers:
                 eachUser['wsChannelId']: None
             }, 86400) if users else False)
         return delRet
+
+    @classmethod
+    def getClientUuidId(cls, userName,wsChannelId):
+        if not userName or not wsChannelId:
+            return False
+        return CacheUtil.get('{}:EXTID:{}:{}'.format(MyUtil.REDIS_ONLINE_USERS, userName, wsChannelId))

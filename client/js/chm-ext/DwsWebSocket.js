@@ -107,6 +107,10 @@ class DwsWebSocket {
     }
 
     sendMessage(data) {
+        if('object'!==typeof data||'undefined'===typeof data.data){
+            //this.myLog('ws_send数据格式错误:'+JSON.stringify(data));
+            return false;
+        }
         if (!this.isOpened()) {
             this.recnCounts > this.MAX_REC_TIMES ? this.myLog('当前连接已断开(连接超时,请刷新页面重试):'+this.getReadyState()[1]) : this.myLog('当前连接已断开,等待重连:'+this.getReadyState()[1]);
         }
@@ -118,8 +122,10 @@ class DwsWebSocket {
             });
             return;
         }
-        //this.myLog('发送消息给服务器:' + JSON.stringify(data));
+        //自动引入clientExtId
+        data.clientExtId=this.isCurRunInBg?dwsChmExtBg.getClientExtId():'';
         data.data = JSON.stringify(data.data);
+        //this.myLog('发送消息给服务器:' + JSON.stringify(data));
         this.webSocket.send(JSON.stringify(data));
     }
 

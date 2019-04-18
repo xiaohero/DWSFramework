@@ -197,7 +197,7 @@ class DwsChmExtBg extends BaseChmExtBg {
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
                 this.enableBgDebug = !this.enableBgDebug;
-                alert('切换成功,当前调试开关(' + this.enableBgDebug + ')');
+                alert('切换成功,当前调试开关(' + this.enableBgDebug + '):'+this.getClientExtId());
             }
         });
 

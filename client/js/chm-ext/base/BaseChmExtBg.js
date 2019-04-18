@@ -12,6 +12,9 @@ class BaseChmExtBg {
         //控制https转http开关
         this.enableHttpstoHttp = false;
         this.latestHttpUrl='';
+        //插件id
+        this.clientExtId='';
+        this.initClientExtId();
     }
 
     //已过时:注意该函数有可能不准确
@@ -148,6 +151,44 @@ class BaseChmExtBg {
         let frontJs = BaseChmExtFt.toString() + ';var baseChmExtFt=new BaseChmExtFt();';//var级别变量作用域更广，其它地方可以调用
         frontJs = encodeURI(frontJs);
         return frontJs;
+    }
+
+    getClientUuid() {
+        return chrome.runtime.getURL('');
+    }
+
+    genRandomToken(keyLen) {
+        // E.g. 8 * 32 = 256 bits token
+        let randomPool = new Uint8Array(keyLen);
+        crypto.getRandomValues(randomPool);
+        let hex = '';
+        for (let i = 0; i < randomPool.length; ++i) {
+            hex += randomPool[i].toString(16);
+        }
+        // E.g. db18458e2782b2b77e36769c569e263a53885a9944dd0a861e5064eac16f1a
+        return hex;
+    }
+
+    getClientExtId(){
+        if(!this.clientExtId){
+            this.initClientExtId();
+        }
+        return this.clientExtId;
+    }
+
+    initClientExtId() {
+        chrome.storage.sync.get('chmId', (items)=>{
+            let chmId = items.chmId;
+            if (chmId) {
+                this.clientExtId=chmId;
+                return;
+            }
+            chmId = this.genRandomToken(10);
+            chrome.storage.sync.set({chmId: chmId}, () => {
+                this.clientExtId=chmId;
+                return chmId
+            });
+        });
     }
 
     removeIframeDisable() {
