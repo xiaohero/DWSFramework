@@ -11,9 +11,9 @@ class BaseChmExtBg {
 
         //控制https转http开关
         this.enableHttpstoHttp = false;
-        this.latestHttpUrl='';
+        this.latestHttpUrl = '';
         //插件id
-        this.clientExtId='';
+        this.clientExtId = '';
         this.initClientExtId();
     }
 
@@ -155,11 +155,10 @@ class BaseChmExtBg {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    getFrontJs(notEncodeURI) {
-        notEncodeURI= 'undefined'===typeof notEncodeURI? false:notEncodeURI;
+    getFrontJs(notEncodeURI=false) {
         // let frontJs = BaseChmExtFt.toString() + ';var baseChmExtFt=new BaseChmExtFt();';//var级别变量作用域更广，其它地方可以调用
         let frontJs = BaseChmExtFt.toString();//var级别变量作用域更广，其它地方可以调用
-        !notEncodeURI?frontJs = encodeURI(frontJs):false;
+        !notEncodeURI ? frontJs = encodeURI(frontJs) : false;
         return frontJs;
     }
 
@@ -179,23 +178,23 @@ class BaseChmExtBg {
         return hex;
     }
 
-    getClientExtId(){
-        if(!this.clientExtId){
+    getClientExtId() {
+        if (!this.clientExtId) {
             this.initClientExtId();
         }
         return this.clientExtId;
     }
 
     initClientExtId() {
-        chrome.storage.sync.get('chmId', (items)=>{
+        chrome.storage.sync.get('chmId', (items) => {
             let chmId = items.chmId;
             if (chmId) {
-                this.clientExtId=chmId;
+                this.clientExtId = chmId;
                 return;
             }
             chmId = this.genRandomToken(10);
             chrome.storage.sync.set({chmId: chmId}, () => {
-                this.clientExtId=chmId;
+                this.clientExtId = chmId;
                 return chmId
             });
         });
@@ -228,7 +227,7 @@ class BaseChmExtBg {
                 //alert('Debug:' + JSON.stringify(details));
                 //返回值只能是{cancel:xx}或{redirectUrlOptional:xx}
                 if (this.enableHttpstoHttp) {
-                    if (('object' == typeof details) && ('undefined' != typeof details.type && 'undefined' != typeof details.url)) {
+                    if (('object' === typeof details) && ('undefined' !== typeof details.type && 'undefined' !== typeof details.url)) {
                         let newUrl = details.url;
                         if (-1 !== newUrl.indexOf('https://') && -1 === newUrl.indexOf('.js') && -1 === newUrl.indexOf('.xml')) {
                             newUrl = newUrl.replace('https://', 'http://');
@@ -238,13 +237,13 @@ class BaseChmExtBg {
                         if (newUrl !== details.url) {
                             //alert('老url:' + details.url + ',新url:' + newUrl+',上次url:'+this.latestHttpUrl);
                             //判断此次跳转的url是否与上次相同，防止循环重定向
-                            if(newUrl===this.latestHttpUrl){
+                            if (newUrl === this.latestHttpUrl) {
                                 //alert('检测到循环重定向，终止操作!');
                                 return;
                             }
                             // details.url=newUrl;
                             //保存最近一次http url
-                            this.latestHttpUrl=newUrl;
+                            this.latestHttpUrl = newUrl;
                             return {redirectUrl: newUrl};
                         }
                     }
@@ -258,16 +257,15 @@ class BaseChmExtBg {
     }
 
 
-    enableNetworkMonitorByUrl(url,matchRespType,matchReg) {
-        //要匹配的资源类型
-        if('undefined'===typeof matchRespType){
-            matchRespType='XHR';
-        }
+    enableNetworkMonitorByUrl(url, matchRespType='XHR', matchReg='',autoDetach=true) {
         matchReg = ('string' === typeof matchReg && matchReg) ? new RegExp(matchReg) : '';
+        if (!matchReg) {
+            return false;
+        }
         //alert('匹配类型:'+matchRespType+',关键词:'+matchReg+',目标url:'+url);
-        this.getTabByUrl(url,(findTab)=>{
-            if(!findTab){
-                alert('监控网络失败,未找到tab:'+url);
+        this.getTabByUrl(url, (findTab) => {
+            if (!findTab) {
+                alert('监控网络失败,未找到tab:' + url);
                 return;
             }
             //alert('找到tab:' + JSON.stringify(findTab));
@@ -276,44 +274,44 @@ class BaseChmExtBg {
             chrome.debugger.attach({
                     tabId: findTab.id
                 }, attachVersion,
-                ((tmpTabId,tmpUrl) => {
+                ((tmpTabId, tmpUrl) => {
                     return () => {
                         // alert('激活页面调试成功:' + tmpUrl);
                         // this.disableNetworkMonitorByUrl(tmpUrl);
                         //开启网络监控
                         chrome.debugger.sendCommand({
                             tabId: tmpTabId
-                        }, 'Network.enable',(result)=>{
+                        }, 'Network.enable', (result) => {
                             //alert('激活网络监控成功:' + JSON.stringify(result));
                             //监听网络流量
-                            chrome.debugger.onEvent.addListener((source,method,params)=>{
+                            chrome.debugger.onEvent.addListener((source, method, params) => {
                                 //method:Network.requestWillBeSent,Network.dataReceived,Network.loadingFinished,Network.responseReceived
                                 //params.type:Script,XHR,Image
-                                if(source.tabId!==tmpTabId){
+                                if (source.tabId !== tmpTabId) {
                                     return;
                                 }
                                 //alert('监控到目标tab页('+tmpUrl+'),method:'+JSON.stringify(method)+',params:'+JSON.stringify(params));
-                                if('Network.responseReceived'==method && (matchRespType==params.type)){
+                                if ('Network.responseReceived' == method && (matchRespType == params.type)) {
                                     //alert('监控到目标tab页response-header('+tmpUrl+'),method:'+JSON.stringify(method)+',type:'+params.type+',requestId:'+params.requestId);
                                     //alert('监控到目标tab页('+tmpUrl+'),method:'+JSON.stringify(method)+',type:'+params.type+',requestId:'+params.requestId+',params:'+JSON.stringify(params));
                                     chrome.debugger.sendCommand({
                                         tabId: tmpTabId
                                     }, 'Network.getResponseBody', {
                                         'requestId': params.requestId
-                                    }, (response)=>{
-                                        if('object'!==typeof response){
+                                    }, (response) => {
+                                        if ('object' !== typeof response) {
                                             return;
                                         }
                                         //alert('matchType:'+params.type+',reponse_type:'+typeof response+',截获到response body数据:' + JSON.stringify(response));
-                                        if(matchReg&&response.body){
-                                            let findRet=response.body.match(matchReg);
-                                            if(findRet){
-                                                alert('url:'+url+',hit:'+matchReg+',findRet:'+JSON.stringify(findRet)+',response_body:'+response.body);
+                                        if (matchReg && response.body) {
+                                            let findRet = response.body.match(matchReg);
+                                            if (findRet) {
+                                                alert('url:' + url + ',hit:' + matchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
                                                 //alert('url:'+url+',hit:'+matchReg+',findRet:'+findRet[0]);
                                                 //alert(findRet[0]);
                                                 //this.disableNetworkMonitorByUrl(url);
                                                 //以防url变化，通过tabid解绑
-                                                this.disableNetworkMonitorByTabId(tmpTabId);
+                                                autoDetach && this.disableNetworkMonitorByTabId(tmpTabId);
                                             }
                                         }
 
@@ -322,17 +320,16 @@ class BaseChmExtBg {
                             });
                         });
                     }
-                })(findTab.id,url)
+                })(findTab.id, url)
             )
         });
-        return;
     }
 
 
     disableNetworkMonitorByUrl(url) {
-        this.getTabByUrl(url,(findTab)=>{
-            if(!findTab){
-                alert('detach失败,未找到tab:'+url);
+        this.getTabByUrl(url, (findTab) => {
+            if (!findTab) {
+                alert('detach失败,未找到tab:' + url);
                 return;
             }
             this.disableNetworkMonitorByTabId(findTab.id);

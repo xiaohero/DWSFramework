@@ -107,7 +107,7 @@ class DwsWebSocket {
     }
 
     sendMessage(data) {
-        if('object'!==typeof data||'undefined'===typeof data.data){
+        if('object'!==typeof data){
             //this.myLog('ws_send数据格式错误:'+JSON.stringify(data));
             return false;
         }
@@ -160,7 +160,7 @@ class DwsWebSocket {
         // this.isActiveClose=false;
         this.isCurRunInBg = this.isRunInBg();
         if (!this.isCurRunInBg) {
-            this.needJquery = ('undefined' == typeof jQuery ? 1 : 0);
+            this.needJquery = ('undefined' === typeof jQuery ? 1 : 0);
         }
         //ws enter path
         let webSocketHost = this.servHost + '/'+this.upPrjName+'/Main';
@@ -211,7 +211,7 @@ class DwsWebSocket {
         return [this.webSocket.readyState, wsReadyStates[this.webSocket.readyState][0], wsReadyStates[this.webSocket.readyState][1]];
     }
 
-    myLog(str, skipPage) {
+    myLog(str, skipPage=false) {
         if (!str) {
             return;
         }
@@ -225,12 +225,11 @@ class DwsWebSocket {
             return;
         }
         if(this.isCurRunInBg&&this.isRunInBg(this.targetUrl)){
-            'undefined'!=typeof dwsChmExtBg&&dwsChmExtBg.enableBgDebug ?alert(str):false;
+            'undefined'!==typeof dwsChmExtBg&&dwsChmExtBg.enableBgDebug ?alert(str):false;
             // alert(str);
             return;
         }
         str = (this.isCurRunInBg ? '后台(' + this.targetUrl + '):' : '前台(' + this.targetUrl + '):') + str;
-        skipPage = ('undefined' == typeof skipPage || !skipPage) ? false : true;
         let jsStr = "";
         if (!skipPage) {
             // if(document.getElementsByTagName('body').length>0){
