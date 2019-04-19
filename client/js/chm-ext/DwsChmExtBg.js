@@ -249,10 +249,9 @@ class DwsChmExtBg extends BaseChmExtBg {
         return servUrlList;
     }
 
-    getFrontJs() {
+    getFrontJs(notEncodeURI) {
         //notice: encodeURI must call before return
-        let frontJs = BaseChmExtFt.toString() + DwsChmExtFt.toString() +
-            ';var dwsChmExtFt=new DwsChmExtFt();';//var级别变量作用域更广，其它地方可以调用
+        let frontJs = super.getFrontJs(true) + DwsChmExtFt.toString() + ';var dwsChmExtFt=new DwsChmExtFt();';//var级别变量作用域更广，其它地方可以调用
         return encodeURI(frontJs);
     }
 

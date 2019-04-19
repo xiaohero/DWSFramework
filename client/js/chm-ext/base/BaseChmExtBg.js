@@ -71,8 +71,16 @@ class BaseChmExtBg {
     }
 
     getTabByUrl(tabUrl, callback, byCache) {
+        if ('function' !== typeof callback) {
+            return false;
+        }
+        if ('string' !== typeof tabUrl) {
+            callback(false);
+            return false;
+        }
         if (byCache && this.globalSenders[tabUrl] && this.globalSenders[tabUrl].tab) {
-            return callback(this.globalSenders[tabUrl].tab);
+            callback(this.globalSenders[tabUrl].tab);
+            return this.globalSenders[tabUrl].tab;
         }
         //'https://www.okex.com/spot/trade#product*'
         //注意:url种带有#的匹配不出来
@@ -95,7 +103,7 @@ class BaseChmExtBg {
                     // alert('all_tabs:' + JSON.stringify(tabs));
                 });
                 callback(false);
-                return;
+                return false;
             }
             //fixme:这里可以再更新一下缓存内容
             callback(targetTab);
@@ -147,9 +155,11 @@ class BaseChmExtBg {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    getFrontJs() {
-        let frontJs = BaseChmExtFt.toString() + ';var baseChmExtFt=new BaseChmExtFt();';//var级别变量作用域更广，其它地方可以调用
-        frontJs = encodeURI(frontJs);
+    getFrontJs(notEncodeURI) {
+        notEncodeURI= 'undefined'===typeof notEncodeURI? false:notEncodeURI;
+        // let frontJs = BaseChmExtFt.toString() + ';var baseChmExtFt=new BaseChmExtFt();';//var级别变量作用域更广，其它地方可以调用
+        let frontJs = BaseChmExtFt.toString();//var级别变量作用域更广，其它地方可以调用
+        !notEncodeURI?frontJs = encodeURI(frontJs):false;
         return frontJs;
     }
 
@@ -245,5 +255,88 @@ class BaseChmExtBg {
             //blocking:表明同步阻塞，以便能控制请求cancel或redirect
             // ['blocking','requestBody']
         );
+    }
+
+
+    enableNetworkMonitorByUrl(url,matchRespType,matchReg) {
+        //要匹配的资源类型
+        if('undefined'===typeof matchRespType){
+            matchRespType='XHR';
+        }
+        matchReg = ('string' === typeof matchReg && matchReg) ? new RegExp(matchReg) : '';
+        //alert('匹配类型:'+matchRespType+',关键词:'+matchReg+',目标url:'+url);
+        this.getTabByUrl(url,(findTab)=>{
+            if(!findTab){
+                alert('监控网络失败,未找到tab:'+url);
+                return;
+            }
+            //alert('找到tab:' + JSON.stringify(findTab));
+            let attachVersion = '1.0';
+            //激活调试当前tab
+            chrome.debugger.attach({
+                    tabId: findTab.id
+                }, attachVersion,
+                ((tmpTabId,tmpUrl) => {
+                    return () => {
+                        //alert('激活页面调试成功:' + tmpUrl);
+                        //this.disableNetworkMonitorByUrl(tmpUrl);
+                        //开启网络监控
+                        chrome.debugger.sendCommand({
+                            tabId: tmpTabId
+                        }, 'Network.enable',(result)=>{
+                            //alert('激活网络监控成功:' + JSON.stringify(result));
+                            //监听网络流量
+                            chrome.debugger.onEvent.addListener((source,method,params)=>{
+                                //method:Network.requestWillBeSent,Network.dataReceived,Network.loadingFinished,Network.responseReceived
+                                //params.type:Script,XHR,Image
+                                if(source.tabId!==tmpTabId){
+                                    return;
+                                }
+                                //alert('监控到目标tab页('+tmpUrl+'),method:'+JSON.stringify(method)+',params:'+JSON.stringify(params));
+                                if('Network.responseReceived'==method && (matchRespType==params.type)){
+                                    //alert('监控到目标tab页response-header('+tmpUrl+'),method:'+JSON.stringify(method)+',type:'+params.type+',requestId:'+params.requestId);
+                                    //alert('监控到目标tab页('+tmpUrl+'),method:'+JSON.stringify(method)+',type:'+params.type+',requestId:'+params.requestId+',params:'+JSON.stringify(params));
+                                    chrome.debugger.sendCommand({
+                                        tabId: tmpTabId
+                                    }, 'Network.getResponseBody', {
+                                        'requestId': params.requestId
+                                    }, function (response) {
+                                        if('object'!==typeof response){
+                                            return;
+                                        }
+                                        //alert('matchType:'+params.type+',reponse_type:'+typeof response+',截获到response body数据:' + JSON.stringify(response));
+                                        if(matchReg&&response.body){
+                                            let findRet=response.body.match(matchReg);
+                                            if(findRet){
+                                                alert('url:'+url+',hit:'+matchReg+',findRet:'+JSON.stringify(findRet)+',response_body:'+response.body);
+                                                //todo: 命中后关闭tab调试
+                                                this.disableNetworkMonitorByUrl(url);
+                                            }
+                                        }
+
+                                    });
+                                }
+                            });
+                        });
+                    }
+                })(findTab.id,url)
+            )
+        });
+        return;
+    }
+
+
+    disableNetworkMonitorByUrl(url) {
+        this.getTabByUrl(url,(findTab)=>{
+            if(!findTab){
+                alert('detach失败,未找到tab:'+url);
+                return;
+            }
+            chrome.debugger.detach({
+                tabId: findTab.id
+            }, () => {
+                alert('关闭调试成功!');
+            });
+        });
     }
 }
