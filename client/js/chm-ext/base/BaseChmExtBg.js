@@ -278,8 +278,8 @@ class BaseChmExtBg {
                 }, attachVersion,
                 ((tmpTabId,tmpUrl) => {
                     return () => {
-                        //alert('激活页面调试成功:' + tmpUrl);
-                        //this.disableNetworkMonitorByUrl(tmpUrl);
+                        // alert('激活页面调试成功:' + tmpUrl);
+                        // this.disableNetworkMonitorByUrl(tmpUrl);
                         //开启网络监控
                         chrome.debugger.sendCommand({
                             tabId: tmpTabId
@@ -300,7 +300,7 @@ class BaseChmExtBg {
                                         tabId: tmpTabId
                                     }, 'Network.getResponseBody', {
                                         'requestId': params.requestId
-                                    }, function (response) {
+                                    }, (response)=>{
                                         if('object'!==typeof response){
                                             return;
                                         }
@@ -309,8 +309,11 @@ class BaseChmExtBg {
                                             let findRet=response.body.match(matchReg);
                                             if(findRet){
                                                 alert('url:'+url+',hit:'+matchReg+',findRet:'+JSON.stringify(findRet)+',response_body:'+response.body);
-                                                //todo: 命中后关闭tab调试
-                                                this.disableNetworkMonitorByUrl(url);
+                                                //alert('url:'+url+',hit:'+matchReg+',findRet:'+findRet[0]);
+                                                //alert(findRet[0]);
+                                                //this.disableNetworkMonitorByUrl(url);
+                                                //以防url变化，通过tabid解绑
+                                                this.disableNetworkMonitorByTabId(tmpTabId);
                                             }
                                         }
 
@@ -332,11 +335,15 @@ class BaseChmExtBg {
                 alert('detach失败,未找到tab:'+url);
                 return;
             }
-            chrome.debugger.detach({
-                tabId: findTab.id
-            }, () => {
-                alert('关闭调试成功!');
-            });
+            this.disableNetworkMonitorByTabId(findTab.id);
+        });
+    }
+
+    disableNetworkMonitorByTabId(tabId) {
+        chrome.debugger.detach({
+            tabId: tabId
+        }, () => {
+            //alert('关闭调试成功!');
         });
     }
 }

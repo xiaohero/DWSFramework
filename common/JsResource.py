@@ -84,11 +84,17 @@ class JsResource:
         if MyUtil.isFilePathExisted(jsFileLogicClient):
             # 载入框架基础js库
             fileContent += cls.getBaseJsContents(needJquery)
-            # 载入客户端基础业务类
-            jsFileLogicBase = '{}/js/logic/base/BaseClientService.js'.format(MyUtil.getDWSClientDir())
-            fileContent += MyUtil.readFileToStr(jsFileLogicBase, True).replace(
+            # 载入DWS客户端基础业务类
+            jsFileBaseClient = '{}/js/logic/base/BaseClientService.js'.format(MyUtil.getDWSClientDir())
+            fileContent += MyUtil.readFileToStr(jsFileBaseClient, True).replace(
                 'class BaseClientService', 'var BaseClientService=class BaseClientService'
             )
+            # 载入客户端实际业务基类(如果存在)
+            jsFileLogicCommonClient = '{}/js/logic/common/CommonClientService.js'.format(MyUtil.getProjectStaticDir(), siteCode)
+            if MyUtil.isFilePathExisted(jsFileLogicCommonClient):
+                fileContent += MyUtil.readFileToStr(jsFileLogicCommonClient, True).replace(
+                    'class CommonClientService', 'var CommonClientService=class CommonClientService'
+                )
             # 载入客户端实际业务类(todo: 下面delete语句可能需要去掉,以免引起clientService先前生命周期丢失)
             fileContent += ';delete clientService;' + MyUtil.readFileToStr(jsFileLogicClient, True).replace(
                 'class ClientService', 'var ClientService=class ClientService'
