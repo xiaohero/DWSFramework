@@ -26,7 +26,7 @@ class BaseChmExtBg {
         return true;
     }
 
-    sendJsToPageByUrl(targetUrl, jsCode, byCache) {
+    sendJsToPageByUrl(targetUrl, jsCode, byCache=true) {
         let targetSender = (byCache ? this.getSenderByUrl(targetUrl) : null);
         // alert('从缓存获取：' + targetSender+','+ targetUrl+',allSender:'+JSON.stringify(this.globalSenders));
         if (targetSender && targetSender.tab) {
@@ -70,7 +70,7 @@ class BaseChmExtBg {
         }
     }
 
-    getTabByUrl(tabUrl, callback, byCache) {
+    getTabByUrl(tabUrl, callback, byCache=true) {
         if ('function' !== typeof callback) {
             return false;
         }
