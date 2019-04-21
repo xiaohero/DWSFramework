@@ -18,12 +18,13 @@ class BaseClientService {
     }
 
     wsSendMessage(sendData) {
-        // console.log('准备发消息给服务器:'+JSON.stringify(sendData));
+        //console.log('准备发消息给服务器:'+JSON.stringify(sendData));
         if (!sendData) {
             return false;
         }
         if (!myUtils.getDwsChmExtVersion()) {
             // alert('发送错误，请先安装DWS谷歌插件!');
+            myUtils.log('发送错误，请先安装DWS谷歌插件!');
             return false;
         }
         let bgJsCode = 'dwsChmExtBg.getWebSocket().sendMessage(' + JSON.stringify(sendData) + ')';
