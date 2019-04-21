@@ -367,7 +367,7 @@ MyUtils.prototype.jsonpUploadServerData = function (clientData) {
 };
 
 /*jq辅助查找*/
-MyUtils.prototype.jqHelpFind = function (jqStr, getText) {
+MyUtils.prototype.jqHelpFind = function (jqStr, getText=false) {
     let isXpathStr = ('string' == typeof jqStr && jqStr.match(/^\/\//)) ? true : false;
     let funcName = isXpathStr ? 'xpath' : 'find';//同时兼容css和xpath选择器
     /*先搜索自身域*/
@@ -395,7 +395,7 @@ MyUtils.prototype.jqHelpFind = function (jqStr, getText) {
     } catch (e) {
 
     }
-    return [];
+    return getText ? '':[];
     // if(!isXpathStr){
     //     /*先搜索自身域*/
     //     if (MyUtils.prototype.getJQuery()(window.document).find(jqStr).length) {

@@ -257,7 +257,7 @@ class BaseChmExtBg {
     }
 
 
-    enableNetworkMonitorByUrl(url, matchRespType='XHR', matchReg='',autoDetach=true) {
+    enableNetworkMonitorByUrl(url, matchRespType='XHR', matchReg='',cbFunc,cbFuncParams={},autoDetach=true) {
         matchReg = ('string' === typeof matchReg && matchReg) ? new RegExp(matchReg) : '';
         if (!matchReg) {
             return false;
@@ -306,7 +306,8 @@ class BaseChmExtBg {
                                         if (matchReg && response.body) {
                                             let findRet = response.body.match(matchReg);
                                             if (findRet) {
-                                                alert('url:' + url + ',hit:' + matchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
+                                                //alert('url:' + url + ',hit:' + matchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
+                                                'function' === typeof cbFunc ? cbFunc(cbFuncParams,findRet[0]) : alert(findRet[0]);
                                                 //alert('url:'+url+',hit:'+matchReg+',findRet:'+findRet[0]);
                                                 //alert(findRet[0]);
                                                 //this.disableNetworkMonitorByUrl(url);

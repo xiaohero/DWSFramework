@@ -10,7 +10,7 @@ class UniversalHandle:
     基础服务类
     '''
 
-    def __init__(self, clsName, op, host,data,clientExtId):
+    def __init__(self, clsName, op, host,clientExtId,data,**kwargs):
         self.clsName = clsName
         self.op = op
         self.host = host
