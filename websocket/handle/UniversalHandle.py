@@ -22,3 +22,13 @@ class UniversalHandle:
     def initHandle(self, websocketAction):
         self.websocketAction=websocketAction
         return True
+
+    def comParamsCheck(self,dictObj,*keys):
+        if not (isinstance(dictObj,dict) and dictObj and keys):
+            return False
+        isOk=True
+        for k in keys:
+            if not (k in dictObj and dictObj[k]):
+                isOk = False
+                break
+        return isOk
