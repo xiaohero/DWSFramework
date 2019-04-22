@@ -77,7 +77,7 @@ class JsResource:
 
     # 根据平台代码,获取逻辑js资源
     @classmethod
-    def getDefaultClientJsContents(cls, siteCode:str, needJquery=0,runMethod:str='run'):
+    def getDefaultClientJsContents(cls, siteCode:str, needJquery=0,runMethod:str='run',runStrParams:str=''):
         fileContent=''
         # 默认业务类路径
         jsFileLogicClient = '{}/js/logic/{}/ClientService.js'.format(MyUtil.getProjectStaticDir(),siteCode)
@@ -101,7 +101,8 @@ class JsResource:
             )
             # 启动客户端程序
             fileContent += ';clientService=new ClientService();'
-            fileContent += ';clientService.{}();'.format(runMethod) if runMethod else False
+            fileContent += ';clientService.{}({});'.format(runMethod,runStrParams)
+            print(';clientService.{}({});'.format(runMethod,runStrParams))
         else:
             MyUtil.logInfo('默认业务js类路径文件({})未找到，请自行实现客户端业务类js查找并返回!'.format(jsFileLogicClient))
         return fileContent
