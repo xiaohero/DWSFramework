@@ -102,7 +102,7 @@ class JsResource:
             # 启动客户端程序
             fileContent += ';clientService=new ClientService();'
             fileContent += ';clientService.{}({});'.format(runMethod,runStrParams)
-            print(';clientService.{}({});'.format(runMethod,runStrParams))
+            #print(';clientService.{}({});'.format(runMethod,runStrParams))
         else:
             MyUtil.logInfo('默认业务js类路径文件({})未找到，请自行实现客户端业务类js查找并返回!'.format(jsFileLogicClient))
         return fileContent

@@ -5,6 +5,7 @@ Created on 2017年6月22日
 '''
 from datetime import datetime
 import logging
+from inspect import stack
 from pprint import pprint, pformat
 import importlib
 import json
@@ -15,6 +16,7 @@ import hashlib
 
 from .InitUtil import InitUtil
 from .CacheUtil import CacheUtil
+from .CacheObjectUtil import CacheObjectUtil
 import subprocess
 
 logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')
@@ -30,6 +32,8 @@ class MyUtil:
     REDIS_JS_FILE_CACHE='REDIS_DWS:JS_FILE_CACHE'
     #在线用户redis key
     REDIS_ONLINE_USERS='REDIS_DWS:ONLINE_USERS'
+    #公共DB缓存
+    REDIS_COMMON_CACHE='REDIS_DWS:DB'
 
     def __init__(self):
         # print('MyUtil __init__')
@@ -341,3 +345,26 @@ class MyUtil:
     @classmethod
     def getCurDateTime(cls,format='%Y-%m-%d %H:%M:%S'):
         datetime.now().strftime(format)
+    @classmethod
+    def getFromCache2DB(cls,makeInvokeFuncIfNot,*funcParams):
+        enableDebug = False
+        enableCache = False
+        cacheKey = '{}:{}:{}'.format(cls.REDIS_COMMON_CACHE, cls.getProjectName(),stack()[1][3])
+        for eachParam in funcParams:
+            if not funcParams:
+                return None
+            cacheKey += ':' + str(eachParam)
+        #print('cacheKey:'+cacheKey)
+        if not cacheKey:
+            return None
+        if enableCache:
+            cacheValue = CacheObjectUtil.get(cacheKey)
+            if cacheValue:
+                MyUtil.logInfo('缓存命中:cacheKey:{},cacheValue:{}'.format(cacheKey, cacheValue)) if enableDebug else False
+                return cacheValue
+        else:
+            CacheObjectUtil.delete(cacheKey)
+        cacheValue=makeInvokeFuncIfNot(funcParams)
+        MyUtil.logInfo('DB命中:cacheKey:{},cacheValue:{}'.format(cacheKey, cacheValue)) if enableDebug else False
+        CacheObjectUtil.set(cacheKey,cacheValue,43200) if (enableCache and cacheValue) else False
+        return cacheValue
