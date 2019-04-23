@@ -753,6 +753,29 @@ MyUtils.prototype.eventFire = function (el, etype) {
     }
 };
 
+/*模拟触发js原生click事件*/
+MyUtils.prototype.simulateClick = function (el) {
+    alert('cls_name:'+MyUtils.prototype.getClsName(el));
+    if('object'!==typeof el){
+       return false;
+    }
+    let evt = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+    });
+    el.dispatchEvent(evt);
+    return true;
+};
+
+MyUtils.prototype.getClsName = function (obj) {
+    if ('undefined' === typeof obj) {
+        return '';
+    }
+    return obj.constructor.name;
+};
+
+
 /*模拟触发js dom键盘输入事件*/
 MyUtils.prototype.simulateKeyPress = function (character) {
     jQuery.event.trigger({type: 'keypress', which: character.charCodeAt(0)});
