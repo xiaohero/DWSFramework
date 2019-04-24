@@ -368,18 +368,24 @@ MyUtils.prototype.jsonpUploadServerData = function (clientData) {
 
 /*jq辅助查找*/
 MyUtils.prototype.jqHelpFind = function (jqStr, getText=false) {
+    /*特殊支持$分隔后面跟属性名*/
+    let jqFieldStr='';
+    if (getText && -1 !== jqStr.indexOf('$') && 2 == jqStr.split('$').length) {
+        jqStr=jqStr.split('$')[0];
+        jqFieldStr=jqStr.split('$')[1];
+    }
     let isXpathStr = ('string' == typeof jqStr && jqStr.match(/^\/\//)) ? true : false;
     let funcName = isXpathStr ? 'xpath' : 'find';//同时兼容css和xpath选择器
     /*先搜索自身域*/
-    if (MyUtils.prototype.getJQuery()(window.document)[funcName](jqStr).length) {
-        return getText ? MyUtils.prototype.getJQuery()(window.document)[funcName](jqStr).text() : MyUtils.prototype.getJQuery()(window.document)[funcName](jqStr);
+    if (MyUtils.prototype.getJQuery(window.document)[funcName](jqStr).length) {
+        return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(window.document)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(window.document)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(window.document)[funcName](jqStr);
     }
     /*搜索子域*/
     if (window.frames.length > 0) {
         try {
             for (let idx = 0; idx < window.frames.length; idx++) {
-                if (MyUtils.prototype.getJQuery()(window.frames[idx].document)[funcName](jqStr).length) {
-                    return getText ? MyUtils.prototype.getJQuery()(window.frames[idx].document)[funcName](jqStr).text() : MyUtils.prototype.getJQuery()(window.frames[idx].document)[funcName](jqStr);
+                if (MyUtils.prototype.getJQuery(window.frames[idx].document)[funcName](jqStr).length) {
+                    return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(window.frames[idx].document)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(window.frames[idx].document)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(window.frames[idx].document)[funcName](jqStr);
                 }
             }
         } catch (e) {
@@ -389,8 +395,8 @@ MyUtils.prototype.jqHelpFind = function (jqStr, getText=false) {
     /*搜索父域*/
     try {
         /*捕获异常，有可能跨域不能访问*/
-        if (MyUtils.prototype.getJQuery()(window.parent.document)[funcName](jqStr).length) {
-            return getText ? MyUtils.prototype.getJQuery()(window.parent.document)[funcName](jqStr).text() : MyUtils.prototype.getJQuery()(window.parent.document)[funcName](jqStr);
+        if (MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr).length) {
+            return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr);
         }
     } catch (e) {
 
@@ -398,27 +404,53 @@ MyUtils.prototype.jqHelpFind = function (jqStr, getText=false) {
     return getText ? '':[];
     // if(!isXpathStr){
     //     /*先搜索自身域*/
-    //     if (MyUtils.prototype.getJQuery()(window.document).find(jqStr).length) {
-    //         return getText ? MyUtils.prototype.getJQuery()(window.document).find(jqStr).text() : MyUtils.prototype.getJQuery()(window.document).find(jqStr);
+    //     if (MyUtils.prototype.getJQuery(window.document).find(jqStr).length) {
+    //         return getText ? MyUtils.prototype.getJQuery(window.document).find(jqStr).text() : MyUtils.prototype.getJQuery(window.document).find(jqStr);
     //     }
     //     /*搜索子域*/
     //     if (window.frames.length > 0) {
     //         for (let idx = 0; idx < window.frames.length; idx++) {
-    //             if (MyUtils.prototype.getJQuery()(window.frames[idx].document).find(jqStr).length) {
-    //                 return getText ? MyUtils.prototype.getJQuery()(window.frames[idx].document).find(jqStr).text() : MyUtils.prototype.getJQuery()(window.frames[idx].document).find(jqStr);
+    //             if (MyUtils.prototype.getJQuery(window.frames[idx].document).find(jqStr).length) {
+    //                 return getText ? MyUtils.prototype.getJQuery(window.frames[idx].document).find(jqStr).text() : MyUtils.prototype.getJQuery(window.frames[idx].document).find(jqStr);
     //             }
     //         }
     //     }
     //     /*搜索父域*/
     //     try {
     //         /*捕获异常，有可能跨域不能访问*/
-    //         if (MyUtils.prototype.getJQuery()(window.parent.document).find(jqStr).length) {
-    //             return getText ? MyUtils.prototype.getJQuery()(window.parent.document).find(jqStr).text() : MyUtils.prototype.getJQuery()(window.parent.document).find(jqStr);
+    //         if (MyUtils.prototype.getJQuery(window.parent.document).find(jqStr).length) {
+    //             return getText ? MyUtils.prototype.getJQuery(window.parent.document).find(jqStr).text() : MyUtils.prototype.getJQuery(window.parent.document).find(jqStr);
     //         }
     //     } catch (e) {
     //
     //     }
     // }
+};
+
+
+/*jq辅助查找*/
+MyUtils.prototype.jqHelpInnerFind = function (jqTarget,jqStr, getText=false) {
+    /*特殊支持$分隔后面跟属性名*/
+    let jqFieldStr='';
+    if (getText && -1 !== jqStr.indexOf('$') && 2 == jqStr.split('$').length) {
+        jqFieldStr=jqStr.split('$')[1];
+        jqStr=jqStr.split('$')[0];
+    }
+    //console.log(jqStr+'=>'+jqStr.split('$').length+',jqStr:'+jqStr+',jqFieldStr:'+jqFieldStr);
+    let isXpathStr = ('string' == typeof jqStr && jqStr.match(/^\/\//)) ? true : false;
+    let funcName = isXpathStr ? 'xpath' : 'find';//同时兼容css和xpath选择器
+    if (MyUtils.prototype.getJQuery(jqTarget).length<1){
+        return getText ? '' : [];
+    }
+    /*自身dom查找*/
+    if(!jqStr){
+        return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(jqTarget).attr(jqFieldStr) : MyUtils.prototype.getJQuery(jqTarget).text()) : MyUtils.prototype.getJQuery(jqTarget);
+    }
+    /*搜索自身域*/
+    if (MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).length>0) {
+        return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr);
+    }
+    return getText ? '':[];
 };
 
 /*获取目标window对象变量或函数*/
@@ -620,7 +652,7 @@ MyUtils.prototype.afterAjaxSuccess = function (callbackFunc, jqStr) {
         }
     }
     jqStr = jqStr ? jqStr : document;
-    MyUtils.prototype.getJQuery()(jqStr).ajaxSuccess(callbackFunc);
+    MyUtils.prototype.getJQuery(jqStr).ajaxSuccess(callbackFunc);
 };
 
 /*拦截表单提交成功后消息*/
@@ -660,10 +692,10 @@ MyUtils.prototype.beforeIframeReload = function (jqObjIframe, callbackFunc) {
         if (callbackFunc) {
             callbackFunc(arguments);
         }
-        MyUtils.prototype.getJQuery()(jqObjIframe.get(0).contentWindow).off('beforeunload', tempFunc);
+        MyUtils.prototype.getJQuery(jqObjIframe.get(0).contentWindow).off('beforeunload', tempFunc);
         // jqObjIframe.off('unload', tempFunc);
     };
-    MyUtils.prototype.getJQuery()(jqObjIframe.get(0).contentWindow).on('beforeunload', tempFunc);
+    MyUtils.prototype.getJQuery(jqObjIframe.get(0).contentWindow).on('beforeunload', tempFunc);
     //    jqObjIframe.on('unload', tempFunc);
     // jqObjIframe.get(0).contentWindow.onbeforeunload=tempFunc;
 
@@ -704,7 +736,7 @@ MyUtils.prototype.dynExecuteReactJs = function (reactJsCode, newReactjsEleId) {
     // script.text = "ReactDOM.render( <h1>Hello, world!</h1>,document.getElementById('login'));";
     // script.text = "alert(111)";
     // script.async = true;
-    MyUtils.prototype.getJQuery()('body').append(script);
+    MyUtils.prototype.getJQuery('body').append(script);
 };
 
 
@@ -838,13 +870,17 @@ MyUtils.prototype.logTopPage = function (msg, fontColor) {
 };
 
 //获取jQuery全局对象
-MyUtils.prototype.getJQuery = function () {
-    return MyUtils.prototype.hasRealJquery() ? $ : jQuery;
+MyUtils.prototype.getJQuery = function (jqObj='') {
+    if(!MyUtils.prototype.hasRealJquery()){
+        return false;
+    }
+    return jqObj?$(jqObj):$;
+    // return jqObj?jQuery(jqObj):jQuery;
 };
 
 //判断是否含有真实jquery
 MyUtils.prototype.hasRealJquery = function (msg) {
-    return ('undefined' != typeof $ && 'undefined' != typeof jQuery && $ == jQuery) ? true : false;
+    return ('undefined' !== typeof $ && 'undefined' !== typeof jQuery && $ == jQuery) ? true : false;
 };
 
 //字符串首字母大写
@@ -992,7 +1028,7 @@ MyUtils.prototype.getDwsChmExtVersion = function () {
     if ('undefined' != typeof glbDwsChmExtVersion) {
         return glbDwsChmExtVersion;
     }
-    let dwsChmExtVersion = MyUtils.prototype.getJQuery()('body').attr('dwsVersion');
+    let dwsChmExtVersion = MyUtils.prototype.getJQuery('body').attr('dwsVersion');
     dwsChmExtVersion = dwsChmExtVersion ? dwsChmExtVersion : '';
     if (dwsChmExtVersion) {
         glbDwsChmExtVersion = dwsChmExtVersion;
