@@ -1049,6 +1049,21 @@ MyUtils.prototype.getXMLHttp = function () {
     }
 };
 
+MyUtils.prototype.convToTargetFullUrl = function (urlPath='') {
+    if(!urlPath){
+        // return MyUtils.prototype.getTargetFullHost();
+        return '';
+    }
+    if(urlPath.startsWith('http')){
+        return urlPath;
+    }
+    //自动修正补加host前缀
+    if(urlPath.startsWith('//')){
+        return window.location.protocol+urlPath;
+    }
+    return MyUtils.prototype.getTargetFullHost() + urlPath;
+};
+
 
 /*创建工具类对象*/
 //注意:使用let作用域会导致console控制台无法使用myUtils变量
