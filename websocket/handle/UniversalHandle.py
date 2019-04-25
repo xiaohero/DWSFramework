@@ -23,12 +23,15 @@ class UniversalHandle:
         self.websocketAction=websocketAction
         return True
 
-    def comParamsCheck(self,dictObj,*keys):
+    def comParamsCheck(self,dictObj,*keys,checkIsSetOnly=False):
         if not (isinstance(dictObj,dict) and dictObj and keys):
             return False
         isOk=True
         for k in keys:
-            if not (k in dictObj and dictObj[k]):
+            if not k in dictObj:
+                isOk = False
+                break
+            if not dictObj[k] and not checkIsSetOnly:
                 isOk = False
                 break
         return isOk

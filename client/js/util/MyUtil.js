@@ -1057,6 +1057,11 @@ MyUtils.prototype.convToTargetFullUrl = function (urlPath='') {
     if(urlPath.startsWith('http')){
         return urlPath;
     }
+    //特殊处理
+    if(-1!==urlPath.indexOf('url(')){
+        urlPath=urlPath.replace(/[\s\S]*url\("/,'').replace(/[\);]+/,'');
+        // console.log(urlPath.replace(/[\s\S]*url\(/,'').replace(/[\);]+/,''));
+    }
     //自动修正补加host前缀
     if(urlPath.startsWith('//')){
         return window.location.protocol+urlPath;
