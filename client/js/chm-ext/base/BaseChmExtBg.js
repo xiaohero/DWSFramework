@@ -63,9 +63,12 @@ class BaseChmExtBg {
         return this.globalSenders[tabUrl];
     }
 
-    //子类可重新改方法
+    //子类可重写改方法
     onSenderRecieve(sender) {
         if (sender && sender.url) {
+            if ('object' === typeof this.globalSenders[sender.url]) {
+                sender.nwEnable = ('boolean' === typeof this.globalSenders[sender.url].nwEnable && this.globalSenders[sender.url].nwEnable) ? true : false;
+            }
             this.globalSenders[sender.url] = sender;
         }
     }
@@ -257,10 +260,15 @@ class BaseChmExtBg {
     }
 
 
-    enableNetworkMonitorByUrl(url, matchRespType='XHR', matchReg='',cbFunc,cbFuncParams={},autoDetach=true) {
+    enableNetworkMonitorByUrl(url, matchRespType='XHR', matchReg='',cbFunc,autoDetach=true) {
         matchReg = ('string' === typeof matchReg && matchReg) ? new RegExp(matchReg) : '';
         if (!matchReg) {
             return false;
+        }
+        let curSender=this.getSenderByUrl(url);
+        if(curSender&&curSender.nwEnable){
+            alert('当前tab页已激活网络监控,跳过:'+JSON.stringify(curSender));
+            return;
         }
         //alert('匹配类型:'+matchRespType+',关键词:'+matchReg+',目标url:'+url);
         this.getTabByUrl(url, (findTab) => {
@@ -282,7 +290,7 @@ class BaseChmExtBg {
                         chrome.debugger.sendCommand({
                             tabId: tmpTabId
                         }, 'Network.enable', (result) => {
-                            //alert('激活网络监控成功:' + JSON.stringify(result));
+                            curSender ? this.globalSenders[url].nwEnable = true : false;
                             //监听网络流量
                             chrome.debugger.onEvent.addListener((source, method, params) => {
                                 //method:Network.requestWillBeSent,Network.dataReceived,Network.loadingFinished,Network.responseReceived
@@ -307,13 +315,19 @@ class BaseChmExtBg {
                                             let findRet = response.body.match(matchReg);
                                             if (findRet) {
                                                 //alert('url:' + url + ',hit:' + matchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
-                                                'function' === typeof cbFunc ? cbFunc(cbFuncParams,findRet[0]) : alert(findRet[0]);
+                                                'function' === typeof cbFunc ? cbFunc(url,findRet[0]) : alert(findRet[0]);
                                                 //alert('url:'+url+',hit:'+matchReg+',findRet:'+findRet[0]);
                                                 //alert(findRet[0]);
                                                 //this.disableNetworkMonitorByUrl(url);
                                                 //以防url变化，通过tabid解绑
-                                                autoDetach && this.disableNetworkMonitorByTabId(tmpTabId);
+                                                if (autoDetach) {
+                                                    this.disableNetworkMonitorByTabId(tmpTabId);
+                                                    curSender ? this.globalSenders[url].nwEnable = false : false;
+                                                }
                                             }
+                                            //已激活的标签页缓存下来
+                                            // let sender = this.getSenderByUrl(url);
+                                            // sender ? sender.nwEnable = nwCacheEnable : false;
                                         }
 
                                     });
@@ -327,20 +341,21 @@ class BaseChmExtBg {
     }
 
 
-    disableNetworkMonitorByUrl(url) {
+    disableNetworkMonitorByUrl(url,cbFunc=()=>{}) {
         this.getTabByUrl(url, (findTab) => {
             if (!findTab) {
                 alert('detach失败,未找到tab:' + url);
                 return;
             }
-            this.disableNetworkMonitorByTabId(findTab.id);
+            this.disableNetworkMonitorByTabId(findTab.id,cbFunc);
         });
     }
 
-    disableNetworkMonitorByTabId(tabId) {
+    disableNetworkMonitorByTabId(tabId,cbFunc=()=>{}) {
         chrome.debugger.detach({
             tabId: tabId
         }, () => {
+            cbFunc();
             //alert('关闭调试成功!');
         });
     }

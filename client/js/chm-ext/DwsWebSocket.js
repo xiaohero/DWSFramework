@@ -106,9 +106,9 @@ class DwsWebSocket {
         return ('OPEN'==this.getReadyState()[1]||'CONNECTING'==this.getReadyState()[1])?true:false;
     }
 
-    sendMessage(data) {
+    sendMessage(data,debugLog=false) {
         if('object'!==typeof data){
-            //this.myLog('ws_send数据格式错误:'+JSON.stringify(data));
+            debugLog&&this.myLog('ws_send数据格式错误:'+JSON.stringify(data));
             return false;
         }
         if (!this.isOpened()) {
@@ -117,7 +117,7 @@ class DwsWebSocket {
         if (!this.isCurRunInBg && !this.webSocket) {
             //后台模式发送消息链接到后台(注意:此时运行环境处于前台)
             let bgJsCode = 'dwsChmExtBg.getWebSocket().sendMessage(' + JSON.stringify(data) + ')';
-            this.myLog('转发到后台js:'+bgJsCode);
+            debugLog&&this.myLog('转发到后台js:'+bgJsCode);
             this.extExeGlobalJs(bgJsCode, (result) => {
             });
             return;
@@ -125,7 +125,7 @@ class DwsWebSocket {
         //自动引入clientExtId
         data.clientExtId=this.isCurRunInBg?dwsChmExtBg.getClientExtId():'';
         data.data = JSON.stringify(data.data);
-        //this.myLog('发送消息给服务器:' + JSON.stringify(data));
+        debugLog&&this.myLog('发送消息给服务器:' + JSON.stringify(data));
         this.webSocket.send(JSON.stringify(data));
     }
 

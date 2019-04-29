@@ -290,7 +290,7 @@ class DwsChmExtBg extends BaseChmExtBg {
                     //修正真正的frameId
                     sender.frameId = frameInfo.frameId;
                     sender.frameInfo = frameInfo;
-                    this.globalSenders[sender.url] = sender;
+                    super.onSenderRecieve(sender);
                     // alert('检测到iframe嵌套，sender错误,自动修正后:' + JSON.stringify(sender));
                     this.globalSenders[frameInfo.url] = sender;//根据iframe真实url再缓存一份记录(以便后期前后台映射通信)
                 } else {
