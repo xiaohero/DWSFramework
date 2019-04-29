@@ -267,8 +267,8 @@ class BaseChmExtBg {
         }
         let curSender=this.getSenderByUrl(url);
         if(curSender&&curSender.nwEnable){
-            alert('当前tab页已激活网络监控,跳过:'+JSON.stringify(curSender));
-            return;
+            //alert('当前tab页已激活网络监控,跳过:'+JSON.stringify(curSender));
+            return true;
         }
         //alert('匹配类型:'+matchRespType+',关键词:'+matchReg+',目标url:'+url);
         this.getTabByUrl(url, (findTab) => {
