@@ -11,9 +11,13 @@ class InitUtil:
     @classmethod
     def initCheck(cls):
         logDir=cls.getProjectLogDir()
+        dataDir=cls.getProjectDataDir()
         if not cls.isFilePathExisted(logDir):
-            print('auto create log dir:'+logDir)
-            os.makedirs(cls.getProjectLogDir())
+            print('auto create logs dir:'+logDir)
+            os.makedirs(logDir)
+        if not cls.isFilePathExisted(dataDir):
+            print('auto create datas dir:'+dataDir)
+            os.makedirs(dataDir)
 
     @classmethod
     def getDWSRootDir(cls):
@@ -30,6 +34,10 @@ class InitUtil:
     @classmethod
     def getProjectLogDir(cls):
         return  os.path.abspath(os.path.join(cls.getProjectRootDir(), 'logs'))
+
+    @classmethod
+    def getProjectDataDir(cls):
+        return  os.path.abspath(os.path.join(cls.getProjectRootDir(), 'datas'))
 
     @classmethod
     def getDIRECTORY_SEPARATOR(cls):

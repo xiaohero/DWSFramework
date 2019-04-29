@@ -318,6 +318,10 @@ class MyUtil:
         return  InitUtil.getProjectLogDir()
 
     @classmethod
+    def getProjectDataDir(cls):
+        return  InitUtil.getProjectDataDir()
+
+    @classmethod
     def getOsName(cls):
         return InitUtil.getOsName()
 
@@ -368,3 +372,23 @@ class MyUtil:
         MyUtil.logInfo('DB命中:cacheKey:{},cacheValue:{}'.format(cacheKey, cacheValue)) if enableDebug else False
         CacheObjectUtil.set(cacheKey,cacheValue,43200) if (enableCache and cacheValue) else False
         return cacheValue
+
+    @classmethod
+    def writeDataFile(cls, strMsg: str, targetFileName: str = '', outConsole: bool = False, logAddTime: bool = True):
+        #当前时间:2019-03-17 12:13:28
+        # datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        import os
+        targetFileName = 'debug_default_{}.log'.format(datetime.now().strftime('%Y-%m-%d')) if not targetFileName else targetFileName
+        targetFilePath = os.path.join(cls.getProjectDataDir(), targetFileName)
+        if not os.path.exists(os.path.dirname(targetFilePath)):
+            try:
+                os.makedirs(os.path.dirname(targetFilePath))
+            except OSError as e:
+                import errno
+                if e.errno != errno.EEXIST:
+                    print('error:创建日志目录({}),失败:{}'.format(os.path.abspath(targetFilePath), e))
+                    return
+        with open(targetFilePath, 'a', encoding='utf-8') as out:
+            out.write((datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ':' if logAddTime else '') + strMsg + '\n')
+        if outConsole:
+            print(strMsg)
