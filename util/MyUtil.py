@@ -374,7 +374,8 @@ class MyUtil:
         return cacheValue
 
     @classmethod
-    def writeDataFile(cls, strMsg: str, targetFileName: str = '', outConsole: bool = False, logAddTime: bool = True):
+    def writeDataFile(cls, strMsg: str, targetFileName: str = '', outConsole: bool = False, logAddTime: bool = True,overwrite=False):
+        strMsg=str(strMsg)
         #当前时间:2019-03-17 12:13:28
         # datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         import os
@@ -388,7 +389,7 @@ class MyUtil:
                 if e.errno != errno.EEXIST:
                     print('error:创建日志目录({}),失败:{}'.format(os.path.abspath(targetFilePath), e))
                     return
-        with open(targetFilePath, 'a', encoding='utf-8') as out:
+        with open(targetFilePath, 'w' if overwrite else 'a', encoding='utf-8') as out:
             out.write((datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ':' if logAddTime else '') + strMsg + '\n')
         if outConsole:
             print(strMsg)

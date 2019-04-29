@@ -41,8 +41,9 @@ class BaseFileAction(BaseHttpAction):
         file = open(filePath, 'rb')
         response = HttpResponse(file, content_type='application/force-download')
         # 注意输出的文件名要进行url_encode不然会中文乱码
-        fileName='test'
-        # fixme: 正则提取文件名
+        fileName=os.path.basename(filePath)
+        #print(os.path.splitext(fileName))
+        #('4', '.m3u8')
         response['Content-Disposition'] = 'attachment; filename={}'.format(urllib.parse.quote(fileName))
         return response
 

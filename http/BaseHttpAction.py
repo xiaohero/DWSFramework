@@ -14,7 +14,7 @@ from django.utils.decorators import method_decorator
 
 class BaseHttpAction(View):
     '''
-    辅助页面
+    辅助页面BaseHttpAction
     '''
     __actionName=None#定义出来，为防止下面self.__actionName首次访问报错
     #登录拦截
