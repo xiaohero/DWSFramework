@@ -61,8 +61,8 @@ class HttpUtil:
         urlInfos = urlparse(fullUrl)
         if not urlInfos:
             return ''
-        # if urlInfos and getattr(urlInfos, 'netloc', None):
-        #     domain = getattr(urlInfos, 'netloc')
-        #     if getLv1 and re.findall('.com|cn|net', domain) and len(domain.split('.')) > 2:
-        #         domain = '{}.{}'.format(domain.split('.')[-2], domain.split('.')[-1])
         return '{}://{}{}'.format(urlInfos.scheme,urlInfos.netloc,urlInfos.path)
+
+    @classmethod
+    def getOnlyUrlHost(cls, fullUrl):
+        return cls.getOnlyUrl(fullUrl).replace('http://','').replace('https://','')
