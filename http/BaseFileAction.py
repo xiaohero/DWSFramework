@@ -37,14 +37,18 @@ class BaseFileAction(BaseHttpAction):
         filePath = os.path.join(settings.BASE_DIR, 'tools', fileName)
         return self.outputFileStream(filePath)
 
-    def outputFileStream(self, filePath):
+    def outputFileStream(self, filePath,conType=''):
         file = open(filePath, 'rb')
-        response = HttpResponse(file, content_type='application/force-download')
+        if conType:
+            response = HttpResponse(file, content_type=conType)
+        else:
+            response = HttpResponse(file, content_type='application/force-download')
         # 注意输出的文件名要进行url_encode不然会中文乱码
         fileName=os.path.basename(filePath)
         #print(os.path.splitext(fileName))
         #('4', '.m3u8')
-        response['Content-Disposition'] = 'attachment; filename={}'.format(urllib.parse.quote(fileName))
+        if not conType:
+            response['Content-Disposition'] = 'attachment; filename={}'.format(urllib.parse.quote(fileName))
         return response
 
 

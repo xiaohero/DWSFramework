@@ -1028,7 +1028,7 @@ MyUtils.prototype.getDwsChmExtVersion = function () {
     if ('undefined' != typeof glbDwsChmExtVersion) {
         return glbDwsChmExtVersion;
     }
-    let dwsChmExtVersion = MyUtils.prototype.getJQuery('body').attr('dwsVersion');
+    let dwsChmExtVersion = MyUtils.prototype.getJQuery('html').attr('dwsVersion');
     dwsChmExtVersion = dwsChmExtVersion ? dwsChmExtVersion : '';
     if (dwsChmExtVersion) {
         glbDwsChmExtVersion = dwsChmExtVersion;
