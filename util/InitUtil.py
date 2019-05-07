@@ -8,8 +8,12 @@ import platform
 
 
 class InitUtil:
+    __dataPath=''
+    __logPath=''
     @classmethod
-    def initCheck(cls):
+    def initCheck(cls,dataPath:str='',logPath:str=''):
+        cls.__dataPath=dataPath if dataPath else False
+        cls.__logPath=logPath if logPath else False
         logDir=cls.getProjectLogDir()
         dataDir=cls.getProjectDataDir()
         if not cls.isFilePathExisted(logDir):
@@ -33,11 +37,11 @@ class InitUtil:
 
     @classmethod
     def getProjectLogDir(cls):
-        return  os.path.abspath(os.path.join(cls.getProjectRootDir(), 'logs'))
+        return  cls.__logPath if cls.__logPath else os.path.abspath(os.path.join(cls.getProjectRootDir(), 'logs'))
 
     @classmethod
     def getProjectDataDir(cls):
-        return  os.path.abspath(os.path.join(cls.getProjectRootDir(), 'datas'))
+        return  cls.__dataPath if cls.__dataPath else os.path.abspath(os.path.join(cls.getProjectRootDir(), 'datas'))
 
     @classmethod
     def getDIRECTORY_SEPARATOR(cls):
