@@ -324,7 +324,7 @@ class BaseChmExtBg {
                                                 //alert('url:' + url + ',hit:' + matchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
                                                 'function' === typeof cbFunc ? cbFunc(url,findRet[0]) : alert(findRet[0]);
                                                 //alert('url:'+url+',hit:'+matchReg+',findRet:'+findRet[0]);
-                                                //alert(findRet[0]);
+                                                //this.logToCurSender(findRet[0]);
                                                 //this.disableNetworkMonitorByUrl(url);
                                                 //以防url变化，通过tabid解绑
                                                 if (autoDetach) {
