@@ -348,7 +348,7 @@ class MyUtil:
 
     @classmethod
     def getCurDateTime(cls,format='%Y-%m-%d %H:%M:%S'):
-        datetime.now().strftime(format)
+        return datetime.now().strftime(format)
     @classmethod
     def getFromCache2DB(cls,makeInvokeFuncIfNot,*funcParams):
         enableDebug = False
@@ -376,10 +376,8 @@ class MyUtil:
     @classmethod
     def writeDataFile(cls, strMsg: str, targetFileName: str = '', outConsole: bool = False, logAddTime: bool = True,overwrite=False):
         strMsg=str(strMsg)
-        #当前时间:2019-03-17 12:13:28
-        # datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         import os
-        targetFileName = 'debug_default_{}.log'.format(datetime.now().strftime('%Y-%m-%d')) if not targetFileName else targetFileName
+        targetFileName = 'debug_default_{}.log'.format(MyUtil.getCurDateTime('%Y-%m-%d')) if not targetFileName else targetFileName
         targetFilePath = os.path.join(cls.getProjectDataDir(), targetFileName)
         if not os.path.exists(os.path.dirname(targetFilePath)):
             try:
@@ -390,6 +388,6 @@ class MyUtil:
                     print('error:创建日志目录({}),失败:{}'.format(os.path.abspath(targetFilePath), e))
                     return
         with open(targetFilePath, 'w' if overwrite else 'a', encoding='utf-8') as out:
-            out.write((datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ':' if logAddTime else '') + strMsg + '\n')
+            out.write((MyUtil.getCurDateTime() + ':' if logAddTime else '') + strMsg + '\n')
         if outConsole:
             print(strMsg)

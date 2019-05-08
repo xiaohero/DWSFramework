@@ -22,8 +22,15 @@ class BaseChmExtBg {
         if (!this.curSender || !this.curSender.tab) {
             return false;
         }
-        this.sendJsToPage(this.curSender.tab.id, this.curSender.frameId, jsCode);
-        return true;
+        return this.sendJsToPage(this.curSender.tab.id, this.curSender.frameId, jsCode);
+    }
+
+    logToCurSender(logMsg) {
+        let jsCode = "console.log('后台调试:" + logMsg + "');";
+        if (!this.curSender || !this.curSender.tab) {
+            return false;
+        }
+        return this.sendJsToPage(this.curSender.tab.id, this.curSender.frameId, jsCode);
     }
 
     sendJsToPageByUrl(targetUrl, jsCode, byCache=true) {
