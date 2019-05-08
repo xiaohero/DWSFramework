@@ -619,7 +619,11 @@ MyUtils.prototype.closeCurrentPage = function () {
 
 
 /*页面跳转*/
-MyUtils.prototype.redirectUrl = function (url, iframeName) {
+MyUtils.prototype.redirectUrl = function (url, iframeName,newTab=false) {
+    if (newTab && MyUtils.prototype.getDwsChmExtVersion()) {
+        MyUtils.prototype.extExeGlobalJs('chrome.tabs.create({url: "'+url+'"});',()=>{});
+        return;
+    }
     let whichWindow = MyUtils.prototype.isIframeSupport(iframeName) ? window.frames[iframeName].window : window;
     whichWindow.location = url;
 };
