@@ -390,3 +390,12 @@ class MyUtil:
             out.write((MyUtil.getCurDateTime() + ':' if logAddTime else '') + strMsg + '\n')
         if outConsole:
             print(strMsg)
+
+
+    @classmethod
+    def getCurServerIp(cls,innetAddr=False):
+        if not cls.isOnlineEnv():
+            return cls.getLocalIp() if innetAddr else '127.0.0.1'
+        from .HttpUtil import HttpUtil
+        ret=HttpUtil.get('http://ifconf.me')
+        return ret.strip() if ret else ''

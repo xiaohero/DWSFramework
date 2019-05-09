@@ -14,12 +14,13 @@ import re
 
 class HttpUtil:
     @classmethod
-    def get(cls, url,params={}):
+    def get(cls, url,params={},returnJson=False):
         retData=None
         if params:
             url = url + '?' + urlencode(params)
-        retData = json.loads(urlopen(url).read())
-        return retData
+        retData = urlopen(url).read()
+        retData=retData.decode('utf-8') if isinstance(retData,bytes) else False
+        return json.loads(retData) if returnJson else retData
 
     @classmethod
     def curlGet(cls, url,params={}):
