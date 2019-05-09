@@ -171,8 +171,7 @@ class MyUtil:
                 '--output',
                 newPath
             ])
-        path=Path(filePath)
-        if False and getattr(path,'read_text',None):
+        if False and getattr(Path(filePath),'read_text',None):
             data=Path(filePath).read_text('utf-8')
         else:#兼容非python3.6环境
             with open(filePath, 'r',encoding='utf-8') as myFile:
