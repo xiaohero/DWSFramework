@@ -275,7 +275,7 @@ class BaseChmExtBg {
         }
         let curSender=this.getSenderByUrl(dstUrl);
         if(curSender&&curSender.nwEnable){
-            //alert('当前tab页已激活网络监控,跳过:'+JSON.stringify(curSender));
+            this.logToCurSender('当前tab页已激活网络监控,跳过:'+JSON.stringify(curSender));
             return true;
         }
         //记录需要捕获流量的requestId
