@@ -267,20 +267,23 @@ class BaseChmExtBg {
     }
 
 
-    enableNetworkMonitorByUrl(url, matchRespType='XHR', matchReg='',cbFunc,autoDetach=true) {
-        matchReg = ('string' === typeof matchReg && matchReg) ? new RegExp(matchReg) : '';
-        if (!matchReg) {
+    enableNetworkMonitorByUrl(dstUrl, requestMatchReg='', responseMatchReg='',cbFunc,autoDetach=true) {
+        requestMatchReg = ('string' === typeof requestMatchReg && requestMatchReg) ? new RegExp(requestMatchReg) : '';
+        responseMatchReg = ('string' === typeof responseMatchReg && responseMatchReg) ? new RegExp(responseMatchReg) : '';
+        if (!dstUrl||!requestMatchReg||!responseMatchReg) {
             return false;
         }
-        let curSender=this.getSenderByUrl(url);
+        let curSender=this.getSenderByUrl(dstUrl);
         if(curSender&&curSender.nwEnable){
             //alert('当前tab页已激活网络监控,跳过:'+JSON.stringify(curSender));
             return true;
         }
-        //alert('匹配类型:'+matchRespType+',关键词:'+matchReg+',目标url:'+url);
-        this.getTabByUrl(url, (findTab) => {
+        //记录需要捕获流量的requestId
+        let targetRequestIds={};
+        //alert('匹配requestMatchReg:'+requestMatchReg+',responseMatchReg:'+responseMatchReg+',目标url:'+dstUrl);
+        this.getTabByUrl(dstUrl, (findTab) => {
             if (!findTab) {
-                alert('监控网络失败,未找到tab:' + url);
+                alert('监控网络失败,未找到tab:' + dstUrl);
                 return;
             }
             //alert('找到tab:' + JSON.stringify(findTab));
@@ -291,13 +294,12 @@ class BaseChmExtBg {
                 }, attachVersion,
                 ((tmpTabId, tmpUrl) => {
                     return () => {
-                        // alert('激活页面调试成功:' + tmpUrl);
                         // this.disableNetworkMonitorByUrl(tmpUrl);
                         //开启网络监控
                         chrome.debugger.sendCommand({
                             tabId: tmpTabId
                         }, 'Network.enable', (result) => {
-                            curSender ? this.globalSenders[url].nwEnable = true : false;
+                            curSender ? this.globalSenders[dstUrl].nwEnable = true : false;
                             //监听网络流量
                             chrome.debugger.onEvent.addListener((source, method, params) => {
                                 //method:Network.requestWillBeSent,Network.dataReceived,Network.loadingFinished,Network.responseReceived
@@ -305,10 +307,15 @@ class BaseChmExtBg {
                                 if (source.tabId !== tmpTabId) {
                                     return;
                                 }
-                                //alert('监控到目标tab页('+tmpUrl+'),method:'+JSON.stringify(method)+',params:'+JSON.stringify(params));
-                                if ('Network.responseReceived' == method && (matchRespType == params.type)) {
-                                    //alert('监控到目标tab页response-header('+tmpUrl+'),method:'+JSON.stringify(method)+',type:'+params.type+',requestId:'+params.requestId);
-                                    //alert('监控到目标tab页('+tmpUrl+'),method:'+JSON.stringify(method)+',type:'+params.type+',requestId:'+params.requestId+',params:'+JSON.stringify(params));
+                                //过滤标示需要捕获流量的requestId
+                                if ('Network.requestWillBeSent' == method && 'request' in params && 'url' in params.request && params.request.url) {
+                                    let urlMatchRet=params.request.url.match(requestMatchReg);
+                                    urlMatchRet ? targetRequestIds[params.requestId] = params.requestId : false;
+                                    //urlMatchRet && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+urlMatchRet[0]+',requestId:'+params.requestId);
+                                }
+                                //网络加载完成后再去获取数据，否则可能抓取的数据不全(丢失部分)
+                                if ('Network.loadingFinished' == method && params.requestId in targetRequestIds) {
+                                    //this.logToCurSender('loadingFinished:'+JSON.stringify(params)+',requestId:'+params.requestId);
                                     chrome.debugger.sendCommand({
                                         tabId: tmpTabId
                                     }, 'Network.getResponseBody', {
@@ -318,22 +325,21 @@ class BaseChmExtBg {
                                             return;
                                         }
                                         //alert('matchType:'+params.type+',reponse_type:'+typeof response+',截获到response body数据:' + JSON.stringify(response));
-                                        if (matchReg && response.body) {
-                                            let findRet = response.body.match(matchReg);
+                                        if (responseMatchReg && response.body) {
+                                            let findRet = response.body.match(responseMatchReg);
                                             if (findRet) {
-                                                //alert('url:' + url + ',hit:' + matchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
-                                                'function' === typeof cbFunc ? cbFunc(url,findRet[0]) : alert(findRet[0]);
-                                                //alert('url:'+url+',hit:'+matchReg+',findRet:'+findRet[0]);
+                                                //alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
+                                                'function' === typeof cbFunc ? cbFunc(dstUrl,findRet[0]) : alert(findRet[0]);
+                                                //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet[0]);
                                                 //this.logToCurSender(findRet[0]);
-                                                //this.disableNetworkMonitorByUrl(url);
                                                 //以防url变化，通过tabid解绑
                                                 if (autoDetach) {
                                                     this.disableNetworkMonitorByTabId(tmpTabId);
-                                                    curSender ? this.globalSenders[url].nwEnable = false : false;
+                                                    curSender ? this.globalSenders[dstUrl].nwEnable = false : false;
                                                 }
                                             }
                                             //已激活的标签页缓存下来
-                                            // let sender = this.getSenderByUrl(url);
+                                            // let sender = this.getSenderByUrl(dstUrl);
                                             // sender ? sender.nwEnable = nwCacheEnable : false;
                                         }
 
@@ -342,7 +348,7 @@ class BaseChmExtBg {
                             });
                         });
                     }
-                })(findTab.id, url)
+                })(findTab.id, dstUrl)
             )
         });
     }
