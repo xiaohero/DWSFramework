@@ -7,7 +7,7 @@ class BaseChmExtBg {
         this.globalSenders = {};
         this.globalVars = {};
         this.curSender = null;
-        this.bgListenEvent();
+        this.initListenEvent();
 
         //控制https转http开关
         this.enableHttpstoHttp = false;
@@ -120,7 +120,8 @@ class BaseChmExtBg {
         });
     }
 
-    bgListenEvent() {
+    initListenEvent() {
+        //监听后台事件
         chrome.runtime.onMessage.addListener((request, sender, callback) => {
             // alert('chrome_ext_bg 收到页面消息:' + JSON.stringify(request) + ' 执行函数:' + request.funcName + ',typeof:' + typeof this[request.funcName]);
             if ('function' != typeof this[request.funcName]) {
@@ -142,6 +143,15 @@ class BaseChmExtBg {
             // alert('chrome_ext_bg:' + request.funcName + ':result:' + JSON.stringify(exeResult)+',type:'+typeof exeResult);
             //注意这里讲返回值json_encode,以便前台eval参数解析为js变量
             callback(JSON.stringify(exeResult));
+        });
+        //监听页面关闭事件,清理globalSenders缓存
+        chrome.tabs.onRemoved.addListener( (tabId, removeInfo)=>{
+            for (let eachUrl in this.globalSenders) {
+                if(tabId==this.globalSenders[eachUrl].tab.id){
+                    delete this.globalSenders[eachUrl];
+                    break;
+                }
+            }
         });
     }
 

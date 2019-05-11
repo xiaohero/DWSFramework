@@ -931,6 +931,10 @@ MyUtils.prototype.isEmptyObject = function (obj) {
     // return JSON.stringify(obj) === JSON.stringify({});
 };
 
+MyUtils.prototype.getObjectLength = function (obj) {
+    return Object.keys(obj).length;
+};
+
 MyUtils.prototype.isIframeSupport = function (iframeName) {
     let isOk = null;
     if ('string' == typeof iframeName && iframeName) {
