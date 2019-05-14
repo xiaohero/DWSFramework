@@ -47,13 +47,13 @@ class HttpUtil:
         pass
 
     @classmethod
-    def getDomainByUrl(cls, url,getLv1=False):
+    def getDomainByUrl(cls, url,getLv1=False,suffixLv1='com|cn|net|ws'):
         domain=''
         if url and isinstance(url,str):
             urlInfos=urlparse(url)
             if urlInfos and getattr(urlInfos,'netloc',None):
                 domain=getattr(urlInfos,'netloc')
-                if getLv1 and re.findall('.com|cn|net', domain) and len(domain.split('.'))>2:
+                if getLv1 and re.findall('.{}'.format(suffixLv1), domain) and len(domain.split('.'))>2:
                     domain='{}.{}'.format(domain.split('.')[-2],domain.split('.')[-1])
         return domain
 
