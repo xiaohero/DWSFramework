@@ -146,7 +146,7 @@ class MyUtil:
 
 
     @classmethod
-    def readFileToStr(cls, filePath, noCache=False):
+    def readFileToStr(cls, filePath, noCache=False,appenDemicolon=True):
         '''
         :param filePath:
         :param getFromCache:
@@ -155,7 +155,7 @@ class MyUtil:
         isOnlineEnv=MyUtil.isOnlineEnv()
         oldPath=filePath
         newPath=filePath.replace('.js', '_Protected.js')
-        #线上代码混淆后新文件名
+        #线上代码混淆后新文件名readFileToStr
         if not ('third-party' in filePath or 'AjaxUtil' in filePath or 'ChmExtFt' in filePath) and isOnlineEnv and '.js' in filePath:
             filePath = newPath
         enableJsFileCache= (True if 'Y'==CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False)
@@ -178,7 +178,7 @@ class MyUtil:
                 data = myFile.read()
         #全局缓存
         cls.__caches[filePath]=data
-        return data
+        return data+';' if (appenDemicolon and data) else data
 
     @classmethod
     def getProjectName(cls):
