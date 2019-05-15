@@ -321,11 +321,11 @@ class BaseChmExtBg {
                                 if ('Network.requestWillBeSent' == method && 'request' in params && 'url' in params.request && params.request.url) {
                                     let urlMatchRet=params.request.url.match(requestMatchReg);
                                     urlMatchRet ? targetRequestIds[params.requestId] = params.requestId : false;
-                                    urlMatchRet && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+urlMatchRet[0]+',requestId:'+params.requestId+',responseMatchReg:'+responseMatchReg);
+                                    //urlMatchRet && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+urlMatchRet[0]+',requestId:'+params.requestId+',responseMatchReg:'+responseMatchReg);
                                 }
                                 //网络加载完成后再去获取数据，否则可能抓取的数据不全(丢失部分)
                                 if ('Network.loadingFinished' == method && params.requestId in targetRequestIds) {
-                                    this.logToCurSender('loadingFinished:'+JSON.stringify(params)+',requestId:'+params.requestId);
+                                    //this.logToCurSender('loadingFinished:'+JSON.stringify(params)+',requestId:'+params.requestId);
                                     chrome.debugger.sendCommand({
                                         tabId: tmpTabId
                                     }, 'Network.getResponseBody', {
@@ -335,9 +335,12 @@ class BaseChmExtBg {
                                             return;
                                         }
                                         if (responseMatchReg && response.body) {
-                                            this.logToCurSender('getResponseBody:'+response.body+',requestId:'+params.requestId);
+                                            //this.logToCurSender('getResponseBody:'+response.body+',requestId:'+params.requestId);
+                                            this.logToCurSender('111');
                                             let findRet = response.body.match(responseMatchReg);
+                                            this.logToCurSender('222');
                                             if (findRet) {
+                                                this.logToCurSender('333');
                                                 //alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
                                                 'function' === typeof cbFunc ? cbFunc(dstUrl,findRet[0]) : alert(findRet[0]);
                                                 //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet[0]);
