@@ -42,28 +42,20 @@ class BaseChmExtFt {
     }
 
 
-    invokeGlobalJs(jsStr, callback= ()=>{}) {
-        // 'function' === typeof callback ?
-        //     this.invokeGlobalFun({
-        //             type: 'FROM_PAGE',
-        //             funcName: 'nothing',
-        //             varName: 'jsCode',
-        //             varValue: jsStr,
-        //             callback: encodeURI(callback.toString())
-        //         }
-        //     ) : this.invokeGlobalFun({
-        //         type: 'FROM_PAGE',
-        //         funcName: 'nothing',
-        //         varName: 'jsCode',
-        //         varValue: jsStr
-        //     }
-        // );
-        this.invokeGlobalFun({
+    invokeGlobalJs(jsStr, callback) {
+        'function' === typeof callback ?
+            this.invokeGlobalFun({
+                    type: 'FROM_PAGE',
+                    funcName: 'nothing',
+                    varName: 'jsCode',
+                    varValue: jsStr,
+                    callback: encodeURI(callback.toString())
+                }
+            ) : this.invokeGlobalFun({
                 type: 'FROM_PAGE',
                 funcName: 'nothing',
                 varName: 'jsCode',
-                varValue: jsStr,
-                callback: encodeURI(callback.toString())
+                varValue: jsStr
             }
         );
     }
