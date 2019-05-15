@@ -336,12 +336,10 @@ class BaseChmExtBg {
                                         }
                                         if (responseMatchReg && response.body) {
                                             //this.logToCurSender('getResponseBody:'+response.body+',requestId:'+params.requestId);
-                                            this.logToCurSender('111');
                                             let findRet = response.body.match(responseMatchReg);
-                                            this.logToCurSender('222');
                                             if (findRet) {
-                                                this.logToCurSender('333');
-                                                //alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
+                                                alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
+                                                alert(cbFunc);
                                                 'function' === typeof cbFunc ? cbFunc(dstUrl,findRet[0]) : alert(findRet[0]);
                                                 //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet[0]);
                                                 //this.logToCurSender(findRet[0]);
