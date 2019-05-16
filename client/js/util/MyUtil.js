@@ -308,11 +308,10 @@ MyUtils.prototype.toDataURL = function (src, callback, outputFormat) {
     img.onload = function () {
         let canvas = document.createElement('CANVAS');
         let ctx = canvas.getContext('2d');
-        let dataURL;
         canvas.height = this.naturalHeight;
         canvas.width = this.naturalWidth;
         ctx.drawImage(this, 0, 0);
-        dataURL = canvas.toDataURL(outputFormat);
+        let dataURL = canvas.toDataURL(outputFormat);
         callback(dataURL);
     };
     img.src = src;
@@ -325,7 +324,7 @@ MyUtils.prototype.toDataURL = function (src, callback, outputFormat) {
 // <yzmImg id="preview" src="http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG">
 // <canvas id="myCanvas" />
 /*本地img图片转base64*/
-MyUtils.prototype.imgLabelToBase64 = function (jqStrImg, removeHeader) {
+MyUtils.prototype.imgLabelToBase64 = function (jqStrImg, removeHeader=false) {
     if (MyUtils.prototype.jqHelpFind('#myCanvas').length < 1) {
         MyUtils.prototype.jqHelpFind('body').append("<canvas id='myCanvas'></canvas>");
     }
