@@ -1,4 +1,4 @@
-// javascript-obfuscator:disable
+/* javascript-obfuscator:disable */
 /**DWS chrome通用插件: 前台**/
 class DwsChmExtFt extends BaseChmExtFt{
     constructor() {
@@ -28,4 +28,4 @@ class DwsChmExtFt extends BaseChmExtFt{
        });
     }
 }
-// javascript-obfuscator:enable
+/* javascript-obfuscator:enable */

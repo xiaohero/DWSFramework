@@ -1,4 +1,4 @@
-// javascript-obfuscator:disable
+/* javascript-obfuscator:disable */
 /**chrome扩展动态js注入工具类(通用前台基类)**/
 class BaseChmExtFt {
     constructor() {
@@ -61,4 +61,4 @@ class BaseChmExtFt {
         );
     }
 }
-// javascript-obfuscator:enable
+/* javascript-obfuscator:enable */
