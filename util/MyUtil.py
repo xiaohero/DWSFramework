@@ -177,8 +177,9 @@ class MyUtil:
             with open(filePath, 'r',encoding='utf-8') as myFile:
                 data = myFile.read()
         #全局缓存
+        data= (data+';') if (appenDemicolon and data) else data
         cls.__caches[filePath]=data
-        return data+';' if (appenDemicolon and data) else data
+        return data
 
     @classmethod
     def getProjectName(cls):
