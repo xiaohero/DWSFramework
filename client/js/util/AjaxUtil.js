@@ -1,3 +1,4 @@
+// javascript-obfuscator:disable
 /**Ajax辅助类(不依赖jquery)**/
 class AjaxUtil {
     constructor() {
@@ -62,4 +63,5 @@ class AjaxUtil {
         }
         this.send(url, callback, 'POST', query.join('&'), async)
     };
-};
+}
+// javascript-obfuscator:enable

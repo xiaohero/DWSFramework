@@ -339,7 +339,6 @@ class BaseChmExtBg {
                                             let findRet = response.body.match(responseMatchReg);
                                             if (findRet) {
                                                 // alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
-                                                alert(cbFunc);
                                                 'function' === typeof cbFunc ? cbFunc(dstUrl,findRet[0]) : alert(findRet[0]);
                                                 //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet[0]);
                                                 //this.logToCurSender(findRet[0]);
