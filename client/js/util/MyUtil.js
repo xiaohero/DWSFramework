@@ -1091,7 +1091,7 @@ MyUtils.prototype.getFloatValue = function (value, toFixedNum = 9) {
 
 MyUtils.prototype.getFloatBits = function (value) {
     let valueBits = 0;
-    if (-1 !== value.indexOf('.')) {
+    if (value && -1 !== value.indexOf('.')) {
         valueBits = value.substr(value.indexOf('.') + 1).length;
     }
     //myUtils.log('调试:jqStr:' + jqStr + ',值:' + newValue + ',小数位数:' + valueBits);
@@ -1099,11 +1099,11 @@ MyUtils.prototype.getFloatBits = function (value) {
 };
 
 MyUtils.prototype.getFloatValueByJqStr = function (jqStr, toFixedNum = 9) {
-    return MyUtils.prototype.getFloatValue('undefined'!==typeof MyUtils.prototype.jqHelpFind(jqStr).val() ? MyUtils.prototype.jqHelpFind(jqStr).val() : MyUtils.prototype.jqHelpFind(jqStr).text(), toFixedNum);
+    return MyUtils.prototype.getFloatValue(MyUtils.prototype.jqHelpFind(jqStr) ? MyUtils.prototype.jqHelpFind(jqStr).text() : MyUtils.prototype.jqHelpFind(jqStr).val(), toFixedNum);
 };
 
 MyUtils.prototype.getFloatBitsByJqStr = function (jqStr) {
-    let value = 'undefined'!==typeof MyUtils.prototype.jqHelpFind(jqStr).val() ? MyUtils.prototype.jqHelpFind(jqStr).val() : MyUtils.prototype.jqHelpFind(jqStr).text();
+    let value = MyUtils.prototype.jqHelpFind(jqStr) ? MyUtils.prototype.jqHelpFind(jqStr).text() : MyUtils.prototype.jqHelpFind(jqStr).val();
     let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
     let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
     if (!matchRet) {
