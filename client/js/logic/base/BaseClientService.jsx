@@ -40,37 +40,4 @@ class BaseClientService {
     getCurPageUUID(){
         return '';
     }
-
-    getFloatValue(value) {
-        let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
-        let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
-        if (!matchRet) {
-            // myUtils.log('警告，未提取到浮点型数值!');
-            return 0;
-        }
-        newValue = matchRet[0];
-        newValue = parseFloat(newValue).toFixed(9);
-        return newValue;
-    }
-
-    getFloatValueByJqStr(jqStr) {
-        return this.getFloatValue(myUtils.jqHelpFind(jqStr).text() ? myUtils.jqHelpFind(jqStr).text() : myUtils.jqHelpFind(jqStr).val());
-    }
-
-    getFloatBitsByJqStr(jqStr) {
-        let value = myUtils.jqHelpFind(jqStr).text() ? myUtils.jqHelpFind(jqStr).text() : myUtils.jqHelpFind(jqStr).val();
-        let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
-        let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
-        if (!matchRet) {
-            myUtils.log('警告，未提取到浮点型数值!');
-            return 0;
-        }
-        newValue = matchRet[0];
-        let valueBits = 0;
-        if (-1 !== newValue.indexOf('.')) {
-            valueBits = newValue.substr(newValue.indexOf('.') + 1).length;
-        }
-        myUtils.log('调试:jqStr:' + jqStr + ',值:' + newValue + ',小数位数:' + valueBits);
-        return valueBits;
-    }
 }

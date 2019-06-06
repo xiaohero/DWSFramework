@@ -177,7 +177,7 @@ MyUtils.prototype.exit = function (status) {
         window.stop();
     }
     throw '';
-}
+};
 
 
 /*等待某元素出现(可见)*/
@@ -192,7 +192,7 @@ MyUtils.prototype.waitForElementVisible = function (jqStrElement, callbackFunc, 
             callbackFunc(false);
             return;
         }
-        let jqFindObj = myUtils.jqHelpFind(jqStrElement);
+        let jqFindObj = MyUtils.prototype.jqHelpFind(jqStrElement);
         if (jqFindObj.length && jqFindObj.is(':visible')) {
             // myUtils.log('检测到可见元素:' + jqStrElement);
             // jqFindObj.click();
@@ -214,7 +214,7 @@ MyUtils.prototype.waitForElementAndClick = function (jqStrElement, clickModel, a
             'function' == typeof callbackFunc ? callbackFunc(findJqObj) : false;
             return;
         }
-        'event' == clickModel ? myUtils.eventFire(findJqObj.get(0), 'click') : findJqObj.click();
+        'event' == clickModel ? MyUtils.prototype.eventFire(findJqObj.get(0), 'click') : findJqObj.click();
         MyUtils.prototype.log(afterClickLog);
         'function' == typeof callbackFunc ? callbackFunc(findJqObj) : false;
     }, msTimeout)
@@ -1075,6 +1075,44 @@ MyUtils.prototype.convToTargetFullUrl = function (urlPath='') {
     }
     return MyUtils.prototype.getTargetFullHost() + urlPath;
 };
+
+
+MyUtils.prototype.getFloatValue = function (value, toFixedNum = 9) {
+    let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
+    let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
+    if (!matchRet) {
+        // myUtils.log('警告，未提取到浮点型数值!');
+        return 0;
+    }
+    newValue = matchRet[0];
+    newValue = parseFloat(newValue).toFixed(toFixedNum);
+    return newValue;
+};
+
+MyUtils.prototype.getFloatBits = function (value) {
+    let valueBits = 0;
+    if (-1 !== value.indexOf('.')) {
+        valueBits = value.substr(value.indexOf('.') + 1).length;
+    }
+    //myUtils.log('调试:jqStr:' + jqStr + ',值:' + newValue + ',小数位数:' + valueBits);
+    return valueBits;
+};
+
+MyUtils.prototype.getFloatValueByJqStr = function (jqStr, toFixedNum = 9) {
+    return MyUtils.prototype.getFloatValue('undefined'!==typeof MyUtils.prototype.jqHelpFind(jqStr).val() ? MyUtils.prototype.jqHelpFind(jqStr).val() : MyUtils.prototype.jqHelpFind(jqStr).text(), toFixedNum);
+};
+
+MyUtils.prototype.getFloatBitsByJqStr = function (jqStr) {
+    let value = 'undefined'!==typeof MyUtils.prototype.jqHelpFind(jqStr).val() ? MyUtils.prototype.jqHelpFind(jqStr).val() : MyUtils.prototype.jqHelpFind(jqStr).text();
+    let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
+    let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
+    if (!matchRet) {
+        //MyUtils.prototype.log('警告，未提取到浮点型数值!');
+        return 0;
+    }
+    return MyUtils.prototype.getFloatBits(matchRet[0]);
+};
+
 
 
 /*创建工具类对象*/
