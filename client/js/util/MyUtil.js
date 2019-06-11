@@ -1077,20 +1077,20 @@ MyUtils.prototype.convToTargetFullUrl = function (urlPath='') {
 };
 
 
-MyUtils.prototype.getFloatValue = function (value, toFixedNum = 9) {
+MyUtils.prototype.getFloatValue = function (value, toFixedNum = 9, returnFalseIfNot = false) {
     let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
     let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
     if (!matchRet) {
         // myUtils.log('警告，未提取到浮点型数值!');
-        return 0;
+        return returnFalseIfNot ? false : 0;
     }
     newValue = matchRet[0];
     newValue = parseFloat(newValue).toFixed(toFixedNum);
     return newValue;
 };
 
-MyUtils.prototype.getFloatBits = function (value) {
-    let valueBits = 0;
+MyUtils.prototype.getFloatBits = function (value, returnFalseIfNot = false) {
+    let valueBits = returnFalseIfNot ? false : 0;
     if (value && -1 !== value.indexOf('.')) {
         valueBits = value.substr(value.indexOf('.') + 1).length;
     }
@@ -1098,19 +1098,19 @@ MyUtils.prototype.getFloatBits = function (value) {
     return valueBits;
 };
 
-MyUtils.prototype.getFloatValueByJqStr = function (jqStr, toFixedNum = 9) {
-    return MyUtils.prototype.getFloatValue(MyUtils.prototype.jqHelpFind(jqStr) ? MyUtils.prototype.jqHelpFind(jqStr).text() : MyUtils.prototype.jqHelpFind(jqStr).val(), toFixedNum);
+MyUtils.prototype.getFloatValueByJqStr = function (jqStr, toFixedNum = 9, returnFalseIfNot = false) {
+    return MyUtils.prototype.getFloatValue(MyUtils.prototype.jqHelpFind(jqStr) ? MyUtils.prototype.jqHelpFind(jqStr).text() : MyUtils.prototype.jqHelpFind(jqStr).val(), toFixedNum,returnFalseIfNot);
 };
 
-MyUtils.prototype.getFloatBitsByJqStr = function (jqStr) {
+MyUtils.prototype.getFloatBitsByJqStr = function (jqStr, returnFalseIfNot = false) {
     let value = MyUtils.prototype.jqHelpFind(jqStr) ? MyUtils.prototype.jqHelpFind(jqStr).text() : MyUtils.prototype.jqHelpFind(jqStr).val();
     let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
     let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
     if (!matchRet) {
         //MyUtils.prototype.log('警告，未提取到浮点型数值!');
-        return 0;
+        return returnFalseIfNot ? false : 0;
     }
-    return MyUtils.prototype.getFloatBits(matchRet[0]);
+    return MyUtils.prototype.getFloatBits(matchRet[0],returnFalseIfNot);
 };
 
 
