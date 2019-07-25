@@ -33,7 +33,6 @@ class DwsChmExtBg extends BaseChmExtBg {
         return this.bgWebSocket;
     }
 
-
     setExtErrMsg(request) {
         return dwsStatusInfo['errTxt'] = request['varValue'];
     }
@@ -57,8 +56,6 @@ class DwsChmExtBg extends BaseChmExtBg {
             break;
         }
     }
-
-
 
     getWebSocket() {
         return this.bgWebSocket;
@@ -87,7 +84,6 @@ class DwsChmExtBg extends BaseChmExtBg {
             }
         });
     }
-
 
     getFrameByTabIdFrameName(tabId, frameName, callback) {
         if (!tabId || !frameName || !callback) {
@@ -120,7 +116,6 @@ class DwsChmExtBg extends BaseChmExtBg {
         });
     }
 
-
     ajaxGetSync(url, data) {
         // alert('chrome_ext_bg:收到同步任务请求:'+url);
         let retResult = null;
@@ -146,7 +141,6 @@ class DwsChmExtBg extends BaseChmExtBg {
     getBgWebSocketStatus() {
         return this.bgWebSocket ? this.bgWebSocket.getReadyState()[2] : '未初始化';
     }
-
 
     createContextMenus(request) {
         //创建插件图标右键菜单
@@ -224,7 +218,6 @@ class DwsChmExtBg extends BaseChmExtBg {
         });
     }
 
-
     flushAllTabs(request) {
         return glbFlushAllTabs(request);
     }
@@ -299,7 +292,6 @@ class DwsChmExtBg extends BaseChmExtBg {
             });
         }
     }
-
 
     /////////////////////////业务相关方法////////////////
 }

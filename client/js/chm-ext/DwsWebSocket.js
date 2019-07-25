@@ -67,8 +67,6 @@ class DwsWebSocket {
         }
     }
 
-
-
     onMessage(event) {
         /*this.myLog('收到服务器原始数据:'+event.data);*/
         let data = JSON.parse(event.data);

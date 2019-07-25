@@ -276,7 +276,6 @@ class BaseChmExtBg {
         );
     }
 
-
     enableNetworkMonitorByUrl(dstUrl, requestMatchReg='', responseMatchReg='',cbFunc,autoDetach=true) {
         requestMatchReg = ('string' === typeof requestMatchReg && requestMatchReg) ? new RegExp(requestMatchReg) : '';
         responseMatchReg = ('string' === typeof responseMatchReg && responseMatchReg) ? new RegExp(responseMatchReg) : '';
@@ -362,7 +361,6 @@ class BaseChmExtBg {
             )
         });
     }
-
 
     disableNetworkMonitorByUrl(url,cbFunc=()=>{}) {
         this.getTabByUrl(url, (findTab) => {

@@ -5,7 +5,6 @@ class BaseChmExtFt {
         this.ftListenEvent();
     }
 
-
     ftListenEvent() {
         //2.全局通信封装
         window.addEventListener('message', (event) => {
@@ -28,7 +27,6 @@ class BaseChmExtFt {
         });
     }
 
-
     invokeGlobalFun(eventData) {
         // console.log('chrome_ext_front 调试:invokeGlobalFun:' + JSON.stringify(eventData)+',callback:'+typeof eventData.callback);
         chrome.runtime.sendMessage(eventData, (result) => {
@@ -41,7 +39,6 @@ class BaseChmExtFt {
             }
         });
     }
-
 
     invokeGlobalJs(jsStr, callback) {
         'function' === typeof callback ?
