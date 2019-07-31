@@ -2,7 +2,7 @@
 class DwsChmExtBg extends BaseChmExtBg {
     constructor() {
         super();
-        this.upPrjName = ('undefined' !== dwsServPrjName ? dwsServPrjName : 'DJXXX');
+        this.upPrjName = ('undefined' !== typeof dwsServPrjName ? dwsServPrjName : 'DJXXX');
         this.bgWebSocket = null;
 
         //其它业务参数
@@ -135,7 +135,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     getCurServUrl() {
-        return getCurServInfo()[0];
+        return 'function'===typeof getCurServInfo ? getCurServInfo()[0]:"";
     }
 
     getBgWebSocketStatus() {
@@ -239,7 +239,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     getServUrlList() {
-        return servUrlList;
+        return 'undefined' === typeof servUrlList ? {} : servUrlList;
     }
 
     getFrontJs(notEncodeURI) {

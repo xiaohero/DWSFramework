@@ -187,14 +187,12 @@ class BaseChmExtBg {
     }
 
     genRandomToken(keyLen) {
-        // E.g. 8 * 32 = 256 bits token
         let randomPool = new Uint8Array(keyLen);
         crypto.getRandomValues(randomPool);
         let hex = '';
         for (let i = 0; i < randomPool.length; ++i) {
             hex += randomPool[i].toString(16);
         }
-        // E.g. db18458e2782b2b77e36769c569e263a53885a9944dd0a861e5064eac16f1a
         return hex;
     }
 
@@ -272,7 +270,7 @@ class BaseChmExtBg {
             {urls: ['<all_urls>'], types: ['main_frame', 'xmlhttprequest', 'websocket']},
             ['blocking']
             //blocking:表明同步阻塞，以便能控制请求cancel或redirect
-            // ['blocking','requestBody']
+            //['blocking','requestBody']
         );
     }
 
