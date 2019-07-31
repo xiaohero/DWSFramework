@@ -333,7 +333,7 @@ class BaseChmExtBg {
                                         }
                                         if (responseMatchReg && response.body) {
                                             //this.logToCurSender('getResponseBody:'+response.body+',requestId:'+params.requestId);
-                                            let findRet = response.body.match(responseMatchReg);
+                                            let findRet = (true === responseMatchReg ? [response.body] : response.body.match(responseMatchReg));
                                             if (findRet) {
                                                 // alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
                                                 'function' === typeof cbFunc ? cbFunc(dstUrl,findRet[0]) : alert(findRet[0]);
