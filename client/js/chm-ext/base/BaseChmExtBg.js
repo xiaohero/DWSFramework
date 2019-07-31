@@ -274,7 +274,7 @@ class BaseChmExtBg {
         );
     }
 
-    enableNetworkMonitorByUrl(dstUrl, requestMatchReg='', responseMatchReg='',cbFunc,autoDetach=true) {
+    enableNetworkMonitorByUrl(dstUrl, requestMatchReg='', responseMatchReg='',cbFunc,autoDetach=true,returnUrlEncode=true) {
         requestMatchReg = ('string' === typeof requestMatchReg && requestMatchReg) ? new RegExp(requestMatchReg) : '';
         responseMatchReg = ('string' === typeof responseMatchReg && responseMatchReg) ? new RegExp(responseMatchReg) : '';
         if (!dstUrl||!requestMatchReg||!responseMatchReg) {
@@ -333,12 +333,13 @@ class BaseChmExtBg {
                                         }
                                         if (responseMatchReg && response.body) {
                                             //this.logToCurSender('getResponseBody:'+response.body+',requestId:'+params.requestId);
-                                            let findRet = (true === responseMatchReg ? [response.body] : response.body.match(responseMatchReg));
+                                            let findRet = ('/true/' === '' + responseMatchReg) ? [response.body] : response.body.match(responseMatchReg);
+                                            // alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
                                             if (findRet) {
-                                                // alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
-                                                'function' === typeof cbFunc ? cbFunc(dstUrl,findRet[0]) : alert(findRet[0]);
-                                                //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet[0]);
-                                                //this.logToCurSender(findRet[0]);
+                                                findRet = returnUrlEncode ? encodeURI(findRet[0]) : findRet[0];
+                                                'function' === typeof cbFunc ? cbFunc(dstUrl,findRet) : alert(findRet);
+                                                //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet);
+                                                //this.logToCurSender(findRet);
                                                 //以防url变化，通过tabid解绑
                                                 if (autoDetach) {
                                                     this.disableNetworkMonitorByTabId(tmpTabId);

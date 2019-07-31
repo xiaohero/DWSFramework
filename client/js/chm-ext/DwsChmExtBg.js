@@ -34,7 +34,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     setExtErrMsg(request) {
-        return dwsStatusInfo['errTxt'] = request['varValue'];
+        return 'undefined' !== typeof dwsStatusInfo ? dwsStatusInfo['errTxt'] = request['varValue'] : false;
     }
 
     flushParentWindowByFrameUrl(frameUrl) {
