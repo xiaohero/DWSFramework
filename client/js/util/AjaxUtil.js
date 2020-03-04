@@ -63,5 +63,26 @@ class AjaxUtil {
         }
         this.send(url, callback, 'POST', query.join('&'), async)
     };
+
+    fetchGet(url, data, callback, async) {
+        fetch(url, {
+            method: 'GET',
+            mode: 'no-cors',//no-cors,cors
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+                //'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+            },
+            body: data
+        }).then(function (res) {
+            console.log('Response succeeded:', JSON.stringify(res.ok));
+            console.log(JSON.stringify(res));
+            callback(res);
+        }).catch(function (e) {
+            console.log('fetch fail:', JSON.stringify(e));
+        });
+    }
+
+
 }
+
 // javascript-obfuscator:enable

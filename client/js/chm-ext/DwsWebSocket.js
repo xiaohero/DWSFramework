@@ -2,7 +2,7 @@
 class DwsWebSocket {
     constructor(servHost, targetUrl, needJquery,upPrjName) {
         this.upPrjName=upPrjName;
-        this.servHost = servHost ? servHost : 'ws://127.0.0.1:8000';
+        this.servHost = servHost;
         this.targetUrl = targetUrl ? targetUrl : window.location.href;
         this.needJquery = needJquery ? needJquery : 0;
         this.recnCounts = 0;
@@ -34,7 +34,7 @@ class DwsWebSocket {
 
     onOpen(event) {
         //this.recnCounts=0;
-        //this.myLog('连接成功....');
+        this.myLog('连接服务器成功');
         /*发送进入游戏消息*/
         //已加载的也要重新加载，以防服务器有改动
         // if (this.isEnterJsLoaded) {
@@ -45,10 +45,12 @@ class DwsWebSocket {
     }
 
     getEnterJs(targetUrl,needJquery) {
+        //后台不获取主程序
         if(!targetUrl||this.isRunInBg(targetUrl)){
+            this.myLog('后台跳过主程序载入');
             return;
         }
-        //alert('getEnterJs:'+targetUrl);
+        //this.myLog('准备载入主程序:getEnterJs:'+targetUrl);
         this.sendMessage({
             clsName: 'MainHandle',
             op: 'getScript',
@@ -56,7 +58,7 @@ class DwsWebSocket {
             data: {
                 needJquery: needJquery?1:(this.needJquery?1:0)
             }
-        });
+        },true);
         this.allEnterJsParams[targetUrl]=needJquery;//保存参数
     }
 
@@ -171,7 +173,7 @@ class DwsWebSocket {
         } catch (e) {
             // this.wsCheckOk= (-1!==e.toString().indexOf('insecure')?false:true);//fixme: may be like this?
             this.wsCheckOk = (-1 !== e.toString().indexOf('insecure') ? false : this.wsCheckOk);
-            //alert('连接服务器异常:'+e);
+            this.myLog('warn:连接服务器异常:'+JSON.stringify(e));
         } finally {
             //alert('服务器连接结果:'+this.isOpened());
             //this.wsCheckOk=false;//测试参数
@@ -224,7 +226,8 @@ class DwsWebSocket {
         }
         if(this.isCurRunInBg&&this.isRunInBg(this.targetUrl)){
             'undefined'!==typeof dwsChmExtBg&&dwsChmExtBg.enableBgDebug ?alert(str):false;
-            // alert(str);
+            //本地调试用,记得关闭
+            console.log(str);
             return;
         }
         str = (this.isCurRunInBg ? '后台(' + this.targetUrl + '):' : '前台(' + this.targetUrl + '):') + str;

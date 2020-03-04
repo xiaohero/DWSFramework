@@ -62,14 +62,12 @@ MyUtils.prototype.accAdd = function (arg1, arg2) {
     let r1, r2, m;
     try {
         r1 = arg1.toString().split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
         r1 = 0;
     }
     try {
         r2 = arg2.toString().split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
         r2 = 0;
     }
     m = Math.pow(10, Math.max(r1, r2));
@@ -84,14 +82,12 @@ MyUtils.prototype.accSub = function (arg1, arg2) {
     let r1, r2, m, n;
     try {
         r1 = arg1.toString().split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
         r1 = 0;
     }
     try {
         r2 = arg2.toString().split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
         r2 = 0;
     }
     m = Math.pow(10, Math.max(r1, r2));
@@ -112,13 +108,11 @@ MyUtils.prototype.accMul = function (arg1, arg2) {
     let m = 0, s1 = arg1.toString(), s2 = arg2.toString();
     try {
         m += s1.split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
     }
     try {
         m += s2.split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
     }
     return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
 };
@@ -131,13 +125,11 @@ MyUtils.prototype.accDiv = function (arg1, arg2) {
     let t1 = 0, t2 = 0, r1, r2;
     try {
         t1 = arg1.toString().split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
     }
     try {
         t2 = arg2.toString().split(".")[1].length;
-    }
-    catch (e) {
+    } catch (e) {
     }
 
     r1 = Number(arg1.toString().replace(".", ""));
@@ -253,7 +245,7 @@ MyUtils.prototype.waitAndPageReloadClick = function (jqStrElement, jqObjIframe, 
 
 /*睡眠N毫秒,同步阻塞进程*/
 MyUtils.prototype.sleepSync = async function (ms) {
-    for (let t = Date.now(); Date.now() - t <= ms;);
+    for (let t = Date.now(); Date.now() - t <= ms;) ;
     // (async ()=>{return MyUtils.prototype.log('xxx');await MyUtils.prototype.sleepSyncPromise(5000);})();
 
 };
@@ -324,7 +316,7 @@ MyUtils.prototype.toDataURL = function (src, callback, outputFormat) {
 // <yzmImg id="preview" src="http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG">
 // <canvas id="myCanvas" />
 /*本地img图片转base64*/
-MyUtils.prototype.imgLabelToBase64 = function (jqStrImg, removeHeader=false) {
+MyUtils.prototype.imgLabelToBase64 = function (jqStrImg, removeHeader = false) {
     if (MyUtils.prototype.jqHelpFind('#myCanvas').length < 1) {
         MyUtils.prototype.jqHelpFind('body').append("<canvas id='myCanvas'></canvas>");
     }
@@ -366,12 +358,12 @@ MyUtils.prototype.jsonpUploadServerData = function (clientData) {
 };
 
 /*jq辅助查找*/
-MyUtils.prototype.jqHelpFind = function (jqStr, getText=false) {
+MyUtils.prototype.jqHelpFind = function (jqStr, getText = false) {
     /*特殊支持$分隔后面跟属性名*/
-    let jqFieldStr='';
+    let jqFieldStr = '';
     if (getText && -1 !== jqStr.indexOf('$') && 2 == jqStr.split('$').length) {
-        jqStr=jqStr.split('$')[0];
-        jqFieldStr=jqStr.split('$')[1];
+        jqStr = jqStr.split('$')[0];
+        jqFieldStr = jqStr.split('$')[1];
     }
     let isXpathStr = ('string' == typeof jqStr && jqStr.match(/^\/\//)) ? true : false;
     let funcName = isXpathStr ? 'xpath' : 'find';//同时兼容css和xpath选择器
@@ -400,7 +392,7 @@ MyUtils.prototype.jqHelpFind = function (jqStr, getText=false) {
     } catch (e) {
 
     }
-    return getText ? '':[];
+    return getText ? '' : [];
     // if(!isXpathStr){
     //     /*先搜索自身域*/
     //     if (MyUtils.prototype.getJQuery(window.document).find(jqStr).length) {
@@ -428,28 +420,28 @@ MyUtils.prototype.jqHelpFind = function (jqStr, getText=false) {
 
 
 /*jq辅助查找*/
-MyUtils.prototype.jqHelpInnerFind = function (jqTarget,jqStr, getText=false) {
+MyUtils.prototype.jqHelpInnerFind = function (jqTarget, jqStr, getText = false) {
     /*特殊支持$分隔后面跟属性名*/
-    let jqFieldStr='';
+    let jqFieldStr = '';
     if (getText && -1 !== jqStr.indexOf('$') && 2 == jqStr.split('$').length) {
-        jqFieldStr=jqStr.split('$')[1];
-        jqStr=jqStr.split('$')[0];
+        jqFieldStr = jqStr.split('$')[1];
+        jqStr = jqStr.split('$')[0];
     }
     //console.log(jqStr+'=>'+jqStr.split('$').length+',jqStr:'+jqStr+',jqFieldStr:'+jqFieldStr);
     let isXpathStr = ('string' == typeof jqStr && jqStr.match(/^\/\//)) ? true : false;
     let funcName = isXpathStr ? 'xpath' : 'find';//同时兼容css和xpath选择器
-    if (MyUtils.prototype.getJQuery(jqTarget).length<1){
+    if (MyUtils.prototype.getJQuery(jqTarget).length < 1) {
         return getText ? '' : [];
     }
     /*自身dom查找*/
-    if(!jqStr){
+    if (!jqStr) {
         return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(jqTarget).attr(jqFieldStr) : MyUtils.prototype.getJQuery(jqTarget).text()) : MyUtils.prototype.getJQuery(jqTarget);
     }
     /*搜索自身域*/
-    if (MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).length>0) {
+    if (MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).length > 0) {
         return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr);
     }
-    return getText ? '':[];
+    return getText ? '' : [];
 };
 
 /*获取目标window对象变量或函数*/
@@ -618,9 +610,10 @@ MyUtils.prototype.closeCurrentPage = function () {
 
 
 /*页面跳转*/
-MyUtils.prototype.redirectUrl = function (url, iframeName,newTab=false) {
+MyUtils.prototype.redirectUrl = function (url, iframeName, newTab = false) {
     if (newTab && MyUtils.prototype.getDwsChmExtVersion()) {
-        MyUtils.prototype.extExeGlobalJs('chrome.tabs.create({url: "'+url+'"});',()=>{});
+        MyUtils.prototype.extExeGlobalJs('chrome.tabs.create({url: "' + url + '"});', () => {
+        });
         return;
     }
     let whichWindow = MyUtils.prototype.isIframeSupport(iframeName) ? window.frames[iframeName].window : window;
@@ -742,6 +735,54 @@ MyUtils.prototype.dynExecuteReactJs = function (reactJsCode, newReactjsEleId) {
     MyUtils.prototype.getJQuery('body').append(script);
 };
 
+/*播放音乐*/
+MyUtils.prototype.playMusic = function (musicUrl = '') {
+    if (!musicUrl) {
+        MyUtils.prototype.log('警告:未提供音乐播放url,播放失败....');
+        return false;
+    }
+    let musicObj = MyUtils.prototype.jqHelpFind('#objMusic');
+    if (!musicObj.length) {
+        /*注入播放控件*/
+        let htmlPlayMusic = '<audio id="objMusic" src="">你的浏览器暂不支持音乐播放,请升级</audio>';
+        if (MyUtils.prototype.jqHelpFind('body').append(htmlPlayMusic)) {
+            MyUtils.prototype.log('注入音乐播放控件成功....');
+        } else {
+            MyUtils.prototype.log('警告:注入音乐播放控件失败....');
+            return false;
+        }
+    }
+    musicObj = MyUtils.prototype.jqHelpFind('#objMusic');
+    if (musicObj.length) {
+        musicObj = musicObj.get(0);
+        let isPlaying = !musicObj.paused;
+        /*正反面播放不同音乐*/
+        let oldMusicUrl = musicObj.src;
+        if (oldMusicUrl == musicUrl && isPlaying) {
+            //重复播放跳过
+            MyUtils.prototype.log('重复歌曲正在播放,跳过:' + musicUrl);
+            return true;
+        }
+        MyUtils.prototype.log('开始播放音乐:' + musicUrl);
+        musicObj.src = musicUrl;
+        musicObj.play();
+    } else {
+        MyUtils.prototype.log('没找到音乐控件,播放音乐失败');
+    }
+};
+
+/*停止音乐*/
+MyUtils.prototype.stopMusic = function () {
+    let musicObj = MyUtils.prototype.jqHelpFind('#objMusic');
+    if (!musicObj.length) {
+        MyUtils.prototype.log('未找到音乐控件,可能尚未播放,无需停止....');
+        return true;
+    }
+    musicObj = musicObj.get(0);
+    musicObj.pause();
+    musicObj.currentTime = 0;
+    MyUtils.prototype.log('停止音乐播放:' + musicObj.src);
+};
 
 /*动态执行Reactjs代码*/
 MyUtils.prototype.loadJsFromUrl = function (jsUrl, jsOnload, jsOnreadystatechange, jsInjectLocation) {
@@ -768,6 +809,19 @@ MyUtils.prototype.dynExecuteJsbyUrl = function (url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 };
 
+/*停止音乐*/
+MyUtils.prototype.hmsToSecondsOnly = function (timeStr) {
+    if (!timeStr) {
+        return false;
+    }
+    let p = timeStr.split(':'), s = 0, m = 1;
+    while (p.length > 0) {
+        s += m * parseInt(p.pop(), 10);
+        m *= 60;
+    }
+    return s;
+};
+
 /*获取当前函数名*/
 MyUtils.prototype.getCurFuncName = function () {
     let stack = new Error().stack;
@@ -790,9 +844,9 @@ MyUtils.prototype.eventFire = function (el, etype) {
 
 /*模拟触发js原生click事件*/
 MyUtils.prototype.simulateClick = function (el) {
-    alert('cls_name:'+MyUtils.prototype.getClsName(el));
-    if('object'!==typeof el){
-       return false;
+    alert('cls_name:' + MyUtils.prototype.getClsName(el));
+    if ('object' !== typeof el) {
+        return false;
     }
     let evt = new MouseEvent('click', {
         bubbles: true,
@@ -873,11 +927,11 @@ MyUtils.prototype.logTopPage = function (msg, fontColor) {
 };
 
 //获取jQuery全局对象
-MyUtils.prototype.getJQuery = function (jqObj='') {
-    if(!MyUtils.prototype.hasRealJquery()){
+MyUtils.prototype.getJQuery = function (jqObj = '') {
+    if (!MyUtils.prototype.hasRealJquery()) {
         return false;
     }
-    return jqObj?$(jqObj):$;
+    return jqObj ? $(jqObj) : $;
     // return jqObj?jQuery(jqObj):jQuery;
 };
 
@@ -1050,28 +1104,27 @@ MyUtils.prototype.checkDwsChmExtRunInBg = function () {
 MyUtils.prototype.getXMLHttp = function () {
     try {
         return XPCNativeWrapper(new window.wrappedJSObject.XMLHttpRequest());
-    }
-    catch (evt) {
+    } catch (evt) {
         return new XMLHttpRequest();
     }
 };
 
-MyUtils.prototype.convToTargetFullUrl = function (urlPath='') {
-    if(!urlPath){
+MyUtils.prototype.convToTargetFullUrl = function (urlPath = '') {
+    if (!urlPath) {
         // return MyUtils.prototype.getTargetFullHost();
         return '';
     }
-    if(urlPath.startsWith('http')){
+    if (urlPath.startsWith('http')) {
         return urlPath;
     }
     //特殊处理
-    if(-1!==urlPath.indexOf('url(')){
-        urlPath=urlPath.replace(/[\s\S]*url\("/,'').replace(/[\);]+/,'');
+    if (-1 !== urlPath.indexOf('url(')) {
+        urlPath = urlPath.replace(/[\s\S]*url\("/, '').replace(/[\);]+/, '');
         // console.log(urlPath.replace(/[\s\S]*url\(/,'').replace(/[\);]+/,''));
     }
     //自动修正补加host前缀
-    if(urlPath.startsWith('//')){
-        return window.location.protocol+urlPath;
+    if (urlPath.startsWith('//')) {
+        return window.location.protocol + urlPath;
     }
     return MyUtils.prototype.getTargetFullHost() + urlPath;
 };
@@ -1099,7 +1152,7 @@ MyUtils.prototype.getFloatBits = function (value, returnFalseIfNot = false) {
 };
 
 MyUtils.prototype.getFloatValueByJqStr = function (jqStr, toFixedNum = 9, returnFalseIfNot = false) {
-    return MyUtils.prototype.getFloatValue(MyUtils.prototype.jqHelpFind(jqStr) ? MyUtils.prototype.jqHelpFind(jqStr).text() : MyUtils.prototype.jqHelpFind(jqStr).val(), toFixedNum,returnFalseIfNot);
+    return MyUtils.prototype.getFloatValue(MyUtils.prototype.jqHelpFind(jqStr) ? MyUtils.prototype.jqHelpFind(jqStr).text() : MyUtils.prototype.jqHelpFind(jqStr).val(), toFixedNum, returnFalseIfNot);
 };
 
 MyUtils.prototype.getFloatBitsByJqStr = function (jqStr, returnFalseIfNot = false) {
@@ -1110,9 +1163,8 @@ MyUtils.prototype.getFloatBitsByJqStr = function (jqStr, returnFalseIfNot = fals
         //MyUtils.prototype.log('警告，未提取到浮点型数值!');
         return returnFalseIfNot ? false : 0;
     }
-    return MyUtils.prototype.getFloatBits(matchRet[0],returnFalseIfNot);
+    return MyUtils.prototype.getFloatBits(matchRet[0], returnFalseIfNot);
 };
-
 
 
 /*创建工具类对象*/

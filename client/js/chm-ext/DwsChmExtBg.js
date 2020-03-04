@@ -25,6 +25,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         }
         //fixme:考虑上次的链接是否需要手工断开?
         curServUrl = curServUrl.replace('http:', 'ws:');
+        //后台连接ws服务器
         this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0, this.upPrjName);
         this.bgWebSocket.init();
     }
