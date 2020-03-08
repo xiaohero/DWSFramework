@@ -1,4 +1,4 @@
-Django==2.0
+Django==2.2.4
 channels==1.1.8
 asgi_redis==1.4.3
 django-allauth==0.34.0
