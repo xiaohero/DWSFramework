@@ -8,7 +8,7 @@ django_redis==4.8.0
 mysqlclient==1.3.13
 #web服务器
 uwsgi==2.0.17
-#dj-static
+dj-static=0.0.6
 #WhiteNoise
 #注意报错:mysql_config: command not found(解决方案:yum install python-devel mysql-devel)
 #注意报错:raiser.c:4:20: fatal error: Python.h: No such file or directory(解决方案针对python3.4:yum install python34-devel)
