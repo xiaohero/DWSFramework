@@ -41,7 +41,7 @@ class BaseHttpAction(View):
         return self.__actionName
 
     def getDefaultTplName(self):
-        return '{}/{}.html'.format(MyUtil.getClassSimpleName(self), self.__actionName)
+        return '{}/{}.html'.format(MyUtil.getClassSimpleName(self).replace('Action', ''), self.__actionName)
 
     def geDefaultRender(self, context=None):
         response = render(self.request, self.getDefaultTplName(), context)
