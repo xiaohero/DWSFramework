@@ -22,14 +22,16 @@ class BaseHttpAction(View):
     @method_decorator(login_required)
     @never_cache
     def get(self, request, *args, **kwargs):
-        if not getattr(self, self.getActionName(), None):
+        # methodName=self.getActionName()
+        methodName = self.getMethodName()
+        if not getattr(self, methodName, None):
             return HttpResponseNotFound('<h1>Page not found2</h1>')
-        return getattr(self, self.getActionName())(request)
+        return getattr(self, methodName)(request)
 
     # 登录拦截
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
-        return getattr(self, self.getActionName())(request)
+        return getattr(self, self.getMethodName())(request)
 
     def getActionName(self):
         # print('path:'+self.request.path)
@@ -40,8 +42,16 @@ class BaseHttpAction(View):
         # print('__actionName:'+self.__actionName)
         return self.__actionName
 
+    def getMethodName(self):
+        params = self.request.path.split('/')
+        if len(params) < 1:
+            self.__actionName = ''
+        else:
+            self.__actionName = params[-1]
+        return self.__actionName
+
     def getDefaultTplName(self):
-        return '{}/{}.html'.format(MyUtil.getClassSimpleName(self).replace('Action', ''), self.__actionName)
+        return '{}/{}.html'.format(MyUtil.getClassSimpleName(self), self.__actionName)
 
     def geDefaultRender(self, context=None):
         response = render(self.request, self.getDefaultTplName(), context)

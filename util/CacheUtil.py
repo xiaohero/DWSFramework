@@ -9,22 +9,23 @@ from django_redis import get_redis_connection
 class CacheUtil:
     redisConnect = get_redis_connection('default')
     redisConnectPool = redisConnect.connection_pool
+
     @classmethod
-    def push(cls,queueName,val):
+    def push(cls, queueName, val):
         # redisConnect=RedisCache()#代码提示用
         # print(con.connection_pool)
         # redisConnectPool=redisConnect.connection_pool
-        return cls.redisConnect.lpush(queueName,val)
+        return cls.redisConnect.lpush(queueName, val)
 
     @classmethod
-    def pop(cls,queueName):
-        oriVal=cls.redisConnect.rpop(queueName)
+    def pop(cls, queueName):
+        oriVal = cls.redisConnect.rpop(queueName)
         if not oriVal:
             return oriVal
         return eval(oriVal.decode('utf-8'))
 
     @classmethod
-    def len(cls,queueName):
+    def len(cls, queueName):
         return cls.redisConnect.llen(queueName)
 
     @classmethod
@@ -36,7 +37,7 @@ class CacheUtil:
         return cls.redisConnect.hmset(hashKey, mapping)
 
     @classmethod
-    def expire(cls,name, time):
+    def expire(cls, name, time):
         return cls.redisConnect.expire(name, time)
 
     @classmethod
@@ -72,19 +73,17 @@ class CacheUtil:
     @classmethod
     def hgetall(cls, hashKey):
         return cls.__decodeDictBytesToDict(cls.redisConnect.hgetall(hashKey))
-        #解码方式二
+        # 解码方式二
         # oriVal = cls.redisConnect.hgetall(hashKey)
         # if not oriVal:
         #     return oriVal
-        #自动解码
+        # 自动解码
         # retVal={}
         # for key, value in oriVal.items():
         #     key = key.decode('utf-8')
         #     value = value.decode('utf-8')
         #     retVal[key]=eval(value)
         # return retVal
-
-
 
     @classmethod
     def hkeys(cls, hashKey):
@@ -97,18 +96,17 @@ class CacheUtil:
             return oriVal
         return eval(oriVal.decode('utf-8'))
 
-
     @classmethod
     def keys(cls, keys):
         return cls.__decodeDictBytesToDict(cls.redisConnect.keys(keys))
 
     @classmethod
-    def incr(cls, key,amount=1):
-        return cls.redisConnect.incr(key,amount)
+    def incr(cls, key, amount=1):
+        return cls.redisConnect.incr(key, amount)
 
     @classmethod
-    def set(cls, key,val,expireSeconds=3600):
-        return cls.redisConnect.set(key,val,expireSeconds)
+    def set(cls, key, val, expireSeconds=3600):
+        return cls.redisConnect.set(key, val, expireSeconds)
 
     @classmethod
     def get(cls, key):
@@ -120,15 +118,15 @@ class CacheUtil:
 
     @classmethod
     def deleteByKeyPrefix(cls, keyPrefix):
-        keyLikes = cls.keys(keyPrefix+'*')
-        delKeys=[]
+        keyLikes = cls.keys(keyPrefix + '*')
+        delKeys = []
         for eachHashKey in keyLikes:
             delKeys.append(eachHashKey)
             cls.delete(eachHashKey)
         return delKeys
 
     @classmethod
-    def __decodeDictBytesToDict(cls,data):
+    def __decodeDictBytesToDict(cls, data):
         if isinstance(data, bytes):
             return data.decode()
         if isinstance(data, (str, int)):
