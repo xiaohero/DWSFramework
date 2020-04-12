@@ -18,102 +18,104 @@ from .InitUtil import InitUtil
 from .CacheUtil import CacheUtil
 from .CacheObjectUtil import CacheObjectUtil
 import subprocess
+import time
 
 logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')
 
+
 class MyUtil:
-    #全局缓存器
-    __caches={}
-    #用作存储
-    REDIS_STORE='REDIS_DWS:STORE'
-    #重复值检测key前缀
-    REDIS_CHECK_DUP_KEY_VALUE='REDIS_DWS:CHECK_DUP_KEY_VALUE'
-    #是否开启js缓存
-    REDIS_JS_FILE_CACHE='REDIS_DWS:JS_FILE_CACHE'
-    #在线用户redis key
-    REDIS_ONLINE_USERS='REDIS_DWS:ONLINE_USERS'
-    #公共DB缓存
-    REDIS_COMMON_CACHE='REDIS_DWS:DB'
+    # 全局缓存器
+    __caches = {}
+    # 用作存储
+    REDIS_STORE = 'REDIS_DWS:STORE'
+    # 重复值检测key前缀
+    REDIS_CHECK_DUP_KEY_VALUE = 'REDIS_DWS:CHECK_DUP_KEY_VALUE'
+    # 是否开启js缓存
+    REDIS_JS_FILE_CACHE = 'REDIS_DWS:JS_FILE_CACHE'
+    # 在线用户redis key
+    REDIS_ONLINE_USERS = 'REDIS_DWS:ONLINE_USERS'
+    # 公共DB缓存
+    REDIS_COMMON_CACHE = 'REDIS_DWS:DB'
 
     def __init__(self):
         # print('MyUtil __init__')
         pass
-    
-    
+
     @classmethod
-    def recordRequest(cls, request:object) -> None:
-        #调试类日志默认日志等级关闭的
+    def recordRequest(cls, request: object) -> None:
+        # 调试类日志默认日志等级关闭的
         cls.logInstance().debug('记录客户端request参数:{}'.format(pformat(vars(request))))
-    
+
     @classmethod
-    def getClassFullName(cls, obj:object) -> str:
+    def getClassFullName(cls, obj: object) -> str:
         module = obj.__class__.__module__
         if module is None or module == str.__class__.__module__:
             return obj.__class__.__name__
         return module + '.' + obj.__class__.__name__
-    
+
     @classmethod
-    def logDebug(cls, msg:str) -> None:
+    def logDebug(cls, msg: str) -> None:
         logger.debug(msg)
 
     @classmethod
-    def logInfo(cls, msg:str) -> None:
+    def logInfo(cls, msg: str) -> None:
         logger.info(msg)
 
     @classmethod
-    def logWarning(cls, msg:str) -> None:
+    def logWarning(cls, msg: str) -> None:
         logger.warning(msg)
-    
+
     @classmethod
-    def logError(cls, msg:str) -> None:
+    def logError(cls, msg: str) -> None:
         logger.error(msg)
-    
+
     @classmethod
-    def logCritical(cls, msg:str) -> None:
+    def logCritical(cls, msg: str) -> None:
         logger.critical(msg)
-    
+
     @classmethod
-    def logException(cls, msg:str) -> None:
-        logger.exception(msg)   
-    
+    def logException(cls, msg: str) -> None:
+        logger.exception(msg)
+
     @classmethod
-    def logPrint(cls, msg:str) -> None:
-        pprint('{}-输出-{}'.format(datetime.utcnow(),msg))
-    
+    def logPrint(cls, msg: str) -> None:
+        pprint('{}-输出-{}'.format(datetime.utcnow(), msg))
+
     @classmethod
-    def logObjInfo(cls, msg:object) -> None:
-        if getattr(msg, '__dict__',0):
+    def logObjInfo(cls, msg: object) -> None:
+        if getattr(msg, '__dict__', 0):
             logger.info(pformat(vars(msg)))
         else:
             logger.info(pformat(msg))
-    
+
     @classmethod
     def logInstance(cls):
         return logger
 
     @classmethod
-    def getClassByStrName(cls,strModuleName,strClasName):
-        moduleExisted=True if importlib.util.find_spec(strModuleName) is not None else False
+    def getClassByStrName(cls, strModuleName, strClasName):
+        moduleExisted = True if importlib.util.find_spec(strModuleName) is not None else False
         if not moduleExisted:
             return False
         module = importlib.import_module(strModuleName)
-        findCls = getattr(module, strClasName,None)
+        findCls = getattr(module, strClasName, None)
         return findCls
 
     @classmethod
     def getClassMethodByStrName(cls, targetCls, strMethodName):
-        findMethod=getattr(targetCls, strMethodName,None)
+        findMethod = getattr(targetCls, strMethodName, None)
         return findMethod if callable(findMethod) else None
-    
+
     @classmethod
     def jsonToObject(cls, jsonStr):
-        obj=lambda:None
-        obj.__dict__=json.loads(jsonStr)
-        #obj = json.loads(jsonStr, object_hook=lambda d: Namespace(**d))
+        obj = lambda: None
+        obj.__dict__ = json.loads(jsonStr)
+        # obj = json.loads(jsonStr, object_hook=lambda d: Namespace(**d))
         return obj
+
     @classmethod
-    def jsonToObject2(cls, jsonStr,className='DynObject'):
-        obj=json.loads(jsonStr, object_hook=lambda d: namedtuple(className, d.keys())(*d.values()))
+    def jsonToObject2(cls, jsonStr, className='DynObject'):
+        obj = json.loads(jsonStr, object_hook=lambda d: namedtuple(className, d.keys())(*d.values()))
         return obj
 
     '''新语法特性
@@ -144,41 +146,40 @@ class MyUtil:
             return instance
     '''
 
-
     @classmethod
-    def readFileToStr(cls, filePath, noCache=False,appenDemicolon=True):
+    def readFileToStr(cls, filePath, noCache=False, appenDemicolon=True):
         '''
         :param filePath:
         :param getFromCache:
         :return:
         '''
-        isOnlineEnv=MyUtil.isOnlineEnv()
-        oldPath=filePath
-        newPath=filePath.replace('.js', '_Protected.js')
-        #线上代码混淆后新文件名readFileToStr
+        isOnlineEnv = MyUtil.isOnlineEnv()
+        oldPath = filePath
+        newPath = filePath.replace('.js', '_Protected.js')
+        # 线上代码混淆后新文件名readFileToStr
         if not ('third-party' in filePath) and isOnlineEnv and '.js' in filePath:
             filePath = newPath
-        enableJsFileCache= (True if 'Y'==CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False)
+        enableJsFileCache = (True if 'Y' == CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False)
         # 线上默认开启文件缓存
         if filePath in cls.__caches and enableJsFileCache:
             return cls.__caches[filePath]
-        #判断是否需要混淆
-        if newPath==filePath:
-            #执行代码混淆，生成新文件
+        # 判断是否需要混淆
+        if newPath == filePath:
+            # 执行代码混淆，生成新文件
             exeResult = subprocess.call([
                 'javascript-obfuscator',
                 oldPath,
                 '--output',
                 newPath
             ])
-        if False and getattr(Path(filePath),'read_text',None):
-            data=Path(filePath).read_text('utf-8')
-        else:#兼容非python3.6环境
-            with open(filePath, 'r',encoding='utf-8') as myFile:
+        if False and getattr(Path(filePath), 'read_text', None):
+            data = Path(filePath).read_text('utf-8')
+        else:  # 兼容非python3.6环境
+            with open(filePath, 'r', encoding='utf-8') as myFile:
                 data = myFile.read()
-        #全局缓存
-        data= (data+';') if (appenDemicolon and data) else data
-        cls.__caches[filePath]=data
+        # 全局缓存
+        data = (data + ';') if (appenDemicolon and data) else data
+        cls.__caches[filePath] = data
         return data
 
     @classmethod
@@ -186,10 +187,10 @@ class MyUtil:
         if 'upPrjName' in cls.__caches and cls.__caches['upPrjName']:
             return cls.__caches['upPrjName']
         prjRootDirList = cls.getProjectRootDir().split(cls.getDIRECTORY_SEPARATOR())
-        upPrjName=prjRootDirList[-1] if len(prjRootDirList) > 1 else ''
-        cls.__caches['upPrjName']=upPrjName
+        upPrjName = prjRootDirList[-1] if len(prjRootDirList) > 1 else ''
+        cls.__caches['upPrjName'] = upPrjName
         return upPrjName
-        #return settings.PROJECT_NAME
+        # return settings.PROJECT_NAME
 
     @classmethod
     def getWsRoomName(cls):
@@ -200,17 +201,16 @@ class MyUtil:
         if 'fwPrjName' in cls.__caches:
             return cls.__caches['fwPrjName']
         fwPrjRootDirList = cls.getDWSRootDir().split(cls.getDIRECTORY_SEPARATOR())
-        fwPrjName=fwPrjRootDirList[-1] if len(fwPrjRootDirList) > 1 else ''
-        cls.__caches['fwPrjName']=fwPrjName
+        fwPrjName = fwPrjRootDirList[-1] if len(fwPrjRootDirList) > 1 else ''
+        cls.__caches['fwPrjName'] = fwPrjName
         return fwPrjName
-
 
     @classmethod
     def getClassSimpleName(cls, obj):
         return obj.__class__.__name__
 
     @classmethod
-    def decodeDictBytesToDict2(cls,data):
+    def decodeDictBytesToDict2(cls, data):
         data_type = type(data)
         if data_type == bytes:
             return data.decode()
@@ -221,7 +221,7 @@ class MyUtil:
         return data_type(map(cls.decodeDictBytesToDict2, data))
 
     @classmethod
-    def isfloat(cls,value):
+    def isfloat(cls, value):
         try:
             float(value)
             return True
@@ -231,19 +231,18 @@ class MyUtil:
     @classmethod
     def forceToFloat(cls, value):
         try:
-            fValue=float(value)
+            fValue = float(value)
             return fValue
         except ValueError:
             return 0
 
     @classmethod
-    def isJson(cls,str):
+    def isJson(cls, str):
         try:
             jsonObj = json.loads(str)
         except ValueError as e:
             return False
         return True
-
 
     @classmethod
     def getLocalIp(cls):
@@ -254,7 +253,7 @@ class MyUtil:
         return settings.IS_ONLINE_ENV
 
     @classmethod
-    def getDjClientIp(cls,request):
+    def getDjClientIp(cls, request):
         xForwardedFor = request.META.get('HTTP_X_FORWARDED_FOR')
         if xForwardedFor:
             ip = xForwardedFor.split(',')[0]
@@ -263,47 +262,47 @@ class MyUtil:
         return ip
 
     @classmethod
-    def md5(cls,strValue):
+    def md5(cls, strValue):
         m = hashlib.md5()
         m.update(strValue.encode('utf-8'))
         return m.hexdigest()
 
     @classmethod
-    def checkDuplicate(cls,key,value):
-        cacheKey='{}:{}'.format('REDIS_{}:CHECK_DUP_KEY_VALUE'.format(settings.PROJECT_NAME),key)
-        oldValue=CacheUtil.get(cacheKey)
-        if value==oldValue:
+    def checkDuplicate(cls, key, value):
+        cacheKey = '{}:{}'.format('REDIS_{}:CHECK_DUP_KEY_VALUE'.format(settings.PROJECT_NAME), key)
+        oldValue = CacheUtil.get(cacheKey)
+        if value == oldValue:
             return True
         CacheUtil.set(cacheKey, value)
-        return  False
+        return False
 
     @classmethod
-    def getDuplicateCheckOldValue(cls,key):
-        cacheKey='{}:{}'.format(cls.REDIS_CHECK_DUP_KEY_VALUE,key)
-        oldValue=CacheUtil.get(cacheKey)
-        return  oldValue
+    def getDuplicateCheckOldValue(cls, key):
+        cacheKey = '{}:{}'.format(cls.REDIS_CHECK_DUP_KEY_VALUE, key)
+        oldValue = CacheUtil.get(cacheKey)
+        return oldValue
 
     @classmethod
-    def getDictSortOne(cls,varDict,sortKey,reverse=False):
-        retDict=sorted(varDict.items(), key=lambda d: float(d[1][sortKey]),reverse=reverse)
+    def getDictSortOne(cls, varDict, sortKey, reverse=False):
+        retDict = sorted(varDict.items(), key=lambda d: float(d[1][sortKey]), reverse=reverse)
         return retDict[0]
 
     @classmethod
-    def getDictSort(cls,varDict,sortKey,reverse=False):
-        retDict=sorted(varDict.items(), key=lambda d: float(d[1][sortKey]),reverse=reverse)
+    def getDictSort(cls, varDict, sortKey, reverse=False):
+        retDict = sorted(varDict.items(), key=lambda d: float(d[1][sortKey]), reverse=reverse)
         return retDict
 
     @classmethod
     def getJsFileCacheStatus(cls):
-        return True if 'Y'==CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False
+        return True if 'Y' == CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False
 
     @classmethod
-    def setJsFileCacheStatus(cls,enable):
+    def setJsFileCacheStatus(cls, enable):
         return CacheUtil.set(cls.REDIS_JS_FILE_CACHE, enable)
 
     @classmethod
     def getDWSRootDir(cls):
-        return  InitUtil.getDWSRootDir()
+        return InitUtil.getDWSRootDir()
 
     @classmethod
     def getDWSClientDir(cls):
@@ -311,15 +310,15 @@ class MyUtil:
 
     @classmethod
     def getProjectRootDir(cls):
-        return  InitUtil.getProjectRootDir()
+        return InitUtil.getProjectRootDir()
 
     @classmethod
     def getProjectLogDir(cls):
-        return  InitUtil.getProjectLogDir()
+        return InitUtil.getProjectLogDir()
 
     @classmethod
     def getProjectDataDir(cls):
-        return  InitUtil.getProjectDataDir()
+        return InitUtil.getProjectDataDir()
 
     @classmethod
     def getOsName(cls):
@@ -336,29 +335,39 @@ class MyUtil:
     @classmethod
     def getProjectStaticDir(cls):
         return settings.STATICFILES_DIRS[0]
-        #return os.path.abspath(os.path.join(cls.getProjectRootDir,'static'))
+        # return os.path.abspath(os.path.join(cls.getProjectRootDir,'static'))
 
     @classmethod
-    def isFilePathExisted(cls,filePath):
+    def isFilePathExisted(cls, filePath):
         return InitUtil.isFilePathExisted(filePath)
 
     @classmethod
-    def dictRemoveEmptyItems(cls,oldDict):
+    def dictRemoveEmptyItems(cls, oldDict):
         return {k: v for k, v in oldDict.items() if v}
 
     @classmethod
-    def getCurDateTime(cls,format='%Y-%m-%d %H:%M:%S'):
+    def getCurDateTime(cls, format='%Y-%m-%d %H:%M:%S'):
         return datetime.now().strftime(format)
+
     @classmethod
-    def getFromCache2DB(cls,makeInvokeFuncIfNot,*funcParams):
+    def convTimeToDateTime(cls, timeStamp, format='%Y-%m-%d %H:%M:%S'):
+        return time.strftime(format, time.localtime(int(timeStamp)))
+
+    @classmethod
+    def convDateTimeToTime(cls, dateTime, format='%Y-%m-%d %H:%M:%S'):
+        dateTime = str(dateTime)[:19]
+        return int(time.mktime(time.strptime(dateTime, format)))
+
+    @classmethod
+    def getFromCache2DB(cls, makeInvokeFuncIfNot, *funcParams):
         enableDebug = False
         enableCache = False
-        cacheKey = '{}:{}:{}'.format(cls.REDIS_COMMON_CACHE, cls.getProjectName(),stack()[1][3])
+        cacheKey = '{}:{}:{}'.format(cls.REDIS_COMMON_CACHE, cls.getProjectName(), stack()[1][3])
         for eachParam in funcParams:
             if not funcParams:
                 return None
             cacheKey += ':' + str(eachParam)
-        #print('cacheKey:'+cacheKey)
+        # print('cacheKey:'+cacheKey)
         if not cacheKey:
             return None
         if enableCache:
@@ -368,16 +377,18 @@ class MyUtil:
                 return cacheValue
         else:
             CacheObjectUtil.delete(cacheKey)
-        cacheValue=makeInvokeFuncIfNot(funcParams)
+        cacheValue = makeInvokeFuncIfNot(funcParams)
         MyUtil.logInfo('DB命中:cacheKey:{},cacheValue:{}'.format(cacheKey, cacheValue)) if enableDebug else False
-        CacheObjectUtil.set(cacheKey,cacheValue,43200) if (enableCache and cacheValue) else False
+        CacheObjectUtil.set(cacheKey, cacheValue, 43200) if (enableCache and cacheValue) else False
         return cacheValue
 
     @classmethod
-    def writeDataFile(cls, strMsg: str, targetFileName: str = '', outConsole: bool = False, logAddTime: bool = True,overwrite=False):
-        strMsg=str(strMsg)
+    def writeDataFile(cls, strMsg: str, targetFileName: str = '', outConsole: bool = False, logAddTime: bool = True,
+                      overwrite=False):
+        strMsg = str(strMsg)
         import os
-        targetFileName = 'debug_default_{}.log'.format(MyUtil.getCurDateTime('%Y-%m-%d')) if not targetFileName else targetFileName
+        targetFileName = 'debug_default_{}.log'.format(
+            MyUtil.getCurDateTime('%Y-%m-%d')) if not targetFileName else targetFileName
         targetFilePath = os.path.join(cls.getProjectDataDir(), targetFileName)
         if not os.path.exists(os.path.dirname(targetFilePath)):
             try:
@@ -392,11 +403,10 @@ class MyUtil:
         if outConsole:
             print(strMsg)
 
-
     @classmethod
-    def getCurServerIp(cls,innetAddr=False):
+    def getCurServerIp(cls, innetAddr=False):
         if not cls.isOnlineEnv():
             return cls.getLocalIp() if innetAddr else '127.0.0.1'
         from .HttpUtil import HttpUtil
-        ret=HttpUtil.get('http://ifconf.me')
+        ret = HttpUtil.get('http://ifconf.me')
         return ret.strip() if ret else ''
