@@ -34,13 +34,7 @@ class BaseHttpAction(View):
         return getattr(self, self.getMethodName())(request)
 
     def getActionName(self):
-        # print('path:'+self.request.path)
-        # print('replace:/{}/{}/'.format(MyUtil.getProjectName(), MyUtil.getClassSimpleName(self)))
-        self.__actionName = self.__actionName if self.__actionName else self.request.path.replace(
-            '/{}/{}/'.format(MyUtil.getProjectName(), MyUtil.getClassSimpleName(self).replace('Action', '')),
-            '').replace('/', '')
-        # print('__actionName:'+self.__actionName)
-        return self.__actionName
+        return self.getMethodName()
 
     def getMethodName(self):
         params = self.request.path.split('/')
