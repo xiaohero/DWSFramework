@@ -37,7 +37,8 @@ class BaseHttpAction(View):
         return self.getMethodName()
 
     def getMethodName(self):
-        params = self.request.path.split('/')
+        pathInfo = self.request.path[:-1] if self.request.path.endswith('/') else self.request.path
+        params = pathInfo.split('/')
         if len(params) < 1:
             self.__actionName = ''
         else:
