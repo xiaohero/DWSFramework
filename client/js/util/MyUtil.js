@@ -61,23 +61,49 @@ MyUtils.prototype.formatCSTDate = function (strDate, format) {
 };
 
 /*加法函数*/
-MyUtils.prototype.accAdd = function (arg1, arg2) {
+MyUtils.prototype.accAdd = function (arg1, arg2, autoFixed = false) {
+    let calcRet = 0;
     if ('object' === typeof math && 'function' === typeof math.add) {
-        return math.add(arg1, arg2);
+        calcRet = math.add(arg1, arg2);
+    } else {
+        let r1, r2, m;
+        try {
+            r1 = arg1.toString().split(".")[1].length;
+        } catch (e) {
+            r1 = 0;
+        }
+        try {
+            r2 = arg2.toString().split(".")[1].length;
+        } catch (e) {
+            r2 = 0;
+        }
+        m = Math.pow(10, Math.max(r1, r2));
+        calcRet = (arg1 * m + arg2 * m) / m;
     }
-    let r1, r2, m;
-    try {
-        r1 = arg1.toString().split(".")[1].length;
-    } catch (e) {
-        r1 = 0;
+    if (autoFixed) {
+        //查找最大小数位
+        function findDec(f1) {
+            function isInt(n) {
+                return typeof n === 'number' &&
+                    parseFloat(n) == parseInt(n, 10) && !isNaN(n);
+            }
+
+            let a = Math.abs(f1);
+            f1 = a, count = 1;
+            while (!isInt(f1) && isFinite(f1)) {
+                f1 = a * Math.pow(10, count++);
+            }
+            return count - 1;
+        }
+
+        //Determine the greatest number of decimal places
+        let dec1 = findDec(arg1);
+        let dec2 = findDec(arg2);
+        let fixed = dec1 > dec2 ? dec1 : dec2;
+        //calcRet = calcRet.toFixed(fixed);
+        calcRet = parseFloat(calcRet.toFixed(fixed));
     }
-    try {
-        r2 = arg2.toString().split(".")[1].length;
-    } catch (e) {
-        r2 = 0;
-    }
-    m = Math.pow(10, Math.max(r1, r2));
-    return (arg1 * m + arg2 * m) / m;
+    return calcRet;
 };
 
 /*减法函数*/
