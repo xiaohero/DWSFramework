@@ -1,0 +1,15 @@
+Django==2.2.12
+djangorestframework==3.11.0
+django-filter==2.2.0
+#注意:channels 2.x已经大升级,不兼容此框架
+channels==1.1.8
+asgi_redis==1.4.3
+django-allauth==0.41.0
+celery==4.3.0
+django-celery-beat==1.5.0
+django_redis==4.10.0
+mysqlclient==1.4.4
+dj-static==0.0.6
+#WhiteNoise
+#注意报错:mysql_config: command not found(解决方案:yum install python-devel mysql-devel)
+#注意报错:raiser.c:4:20: fatal error: Python.h: No such file or directory(解决方案针对python3.4:yum install python34-devel)

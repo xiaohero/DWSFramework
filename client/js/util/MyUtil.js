@@ -60,6 +60,44 @@ MyUtils.prototype.formatCSTDate = function (strDate, format) {
     return MyUtils.prototype.formatDate(new Date(strDate), format);
 };
 
+/*url提取参数,返回json对象*/
+MyUtils.prototype.getJsonFromUrl = function (url = '') {
+    url || (url = location.href);
+    let question = url.indexOf("?");
+    let hash = url.indexOf("#");
+    let result = {};
+    if (hash == -1 && question == -1) {
+        return result;
+    }
+    (hash == -1) && (hash = url.length);
+    let query = question == -1 || hash == question + 1 ? url.substring(hash) :
+        url.substring(question + 1, hash);
+    query.split("&").forEach(function (part) {
+        if (!part) {
+            return;
+        }
+        part = part.split("+").join(" "); // replace every + with space, regexp-free version
+        let eq = part.indexOf("=");
+        let key = eq > -1 ? part.substr(0, eq) : part;
+        let val = eq > -1 ? decodeURIComponent(part.substr(eq + 1)) : "";
+        let from = key.indexOf("[");
+        if (from == -1) {
+            result[decodeURIComponent(key)] = val;
+        } else {
+            let to = key.indexOf("]", from);
+            let index = decodeURIComponent(key.substring(from + 1, to));
+            key = decodeURIComponent(key.substring(0, from));
+            (!result[key]) && (result[key] = []);
+            if (!index) {
+                result[key].push(val);
+            } else {
+                result[key][index] = val;
+            }
+        }
+    });
+    return result;
+};
+
 /*加法函数*/
 MyUtils.prototype.accAdd = function (arg1, arg2, autoFixed = false) {
     let calcRet = 0;
