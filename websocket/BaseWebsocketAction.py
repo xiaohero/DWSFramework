@@ -99,9 +99,6 @@ class BaseWebsocketAction(UniversalWebsocket):
     @classmethod
     def getDefaultRouteConf(cls):
         from channels.routing import route_class
-        # return route_class(
-        #     cls, path=r'^/{}/Main'.format(MyUtil.getProjectName())
-        # )
         return route_class(
-            BaseWebsocketAction, path=r'^/{}/Main'.format(MyUtil.getProjectName())
+            BaseWebsocketAction, path=r'^/{}/WsMain'.format(MyUtil.getProjectName())
         )
