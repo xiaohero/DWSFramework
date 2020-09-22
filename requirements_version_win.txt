@@ -5,7 +5,7 @@ django-filter==2.2.0
 channels==1.1.8
 asgi_redis==1.4.3
 django-allauth==0.41.0
-celery==4.3.0
+celery==4.3.1
 django-celery-beat==1.5.0
 django_redis==4.10.0
 mysqlclient==1.4.4
