@@ -163,7 +163,7 @@ class DwsWebSocket {
             this.needJquery = ('undefined' === typeof jQuery ? 1 : 0);
         }
         //ws enter path
-        let webSocketHost = this.servHost + '/'+this.upPrjName+'/WsMain';
+        let webSocketHost = this.servHost + '/'+this.upPrjName+'/Main';
         this.myLog('服务器地址:' + webSocketHost + ',目标网站地址:' + this.targetUrl + ',needJquery:' + this.needJquery + ',开始连接服务器', true);
         this.wsCheckOk = false;
         try {
