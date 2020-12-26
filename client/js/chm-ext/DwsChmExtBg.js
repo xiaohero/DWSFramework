@@ -7,6 +7,8 @@ class DwsChmExtBg extends BaseChmExtBg {
 
         //其它业务参数
         this.enableBgDebug = false;
+        //others
+        this.ajaxUtil=ajaxUtil;
         //初始化
         this.init();
     }
@@ -120,7 +122,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     ajaxGetSync(url, data) {
         // alert('chrome_ext_bg:收到同步任务请求:'+url);
         let retResult = null;
-        ajaxUtil.get(url, 'object' == typeof data ? data : {}, (result) => {
+        this.ajaxUtil.get(url, 'object' == typeof data ? data : {}, (result) => {
             retResult = result;
         }, false);
         return retResult;
@@ -129,11 +131,20 @@ class DwsChmExtBg extends BaseChmExtBg {
     ajaxPostSync(url, data) {
         // alert('chrome_ext_bg:收到同步任务请求:'+url+',data:'+JSON.stringify(data));
         let retResult = null;
-        ajaxUtil.post(url, 'object' == typeof data ? data : {}, (result) => {
+        this.ajaxUtil.post(url, 'object' == typeof data ? data : {}, (result) => {
             retResult = result;
         }, false);
         return retResult;
     }
+
+    httpGet(url, data, callback, async = true) {
+        url = (url.includes('http://') || url.includes('https://')) ? url : (this.bgWebSocket.servAddr + url);
+        return this.ajaxUtil.get(url, data, callback, async);
+    };
+
+    httpPost(url, data, callback, async = true) {
+        return this.ajaxUtil.post(url, data, callback, async);
+    };
 
     getCurServUrl() {
         return 'function'===typeof getCurServInfo ? getCurServInfo()[0]:"";

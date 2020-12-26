@@ -3,6 +3,7 @@ class DwsWebSocket {
     constructor(servHost, targetUrl, needJquery,upPrjName) {
         this.upPrjName=upPrjName;
         this.servHost = servHost;
+        this.servAddr = this.servHost.replace('wss','https').replace('ws','http') + '/' + this.upPrjName;
         this.targetUrl = targetUrl ? targetUrl : window.location.href;
         this.needJquery = needJquery ? needJquery : 0;
         this.recnCounts = 0;
