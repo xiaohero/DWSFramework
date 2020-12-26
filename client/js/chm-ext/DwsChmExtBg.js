@@ -146,7 +146,13 @@ class DwsChmExtBg extends BaseChmExtBg {
     createContextMenus(request) {
         //创建插件图标右键菜单
         // chrome.contextMenus.removeAll();
-
+        // 先移除老菜单
+        //chrome.contextMenus.remove('dwsHomePage');
+        //chrome.contextMenus.remove('reOpenClientPages');
+        //chrome.contextMenus.remove('bgWsStatus');
+        //chrome.contextMenus.remove('switchBgDebug');
+        //chrome.contextMenus.remove('enableHttpstoHttp');
+        //chrome.contextMenus.remove('disableHttpstoHttp');
         chrome.contextMenus.create({
             id: 'dwsHomePage',
             type: 'normal',
