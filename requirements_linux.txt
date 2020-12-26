@@ -1,4 +1,6 @@
 Django
+djangorestframework
+django-filter
 channels==1.1.8
 asgi_redis
 django-allauth
