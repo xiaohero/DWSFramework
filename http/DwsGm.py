@@ -8,12 +8,13 @@ import json
 from django.conf import settings
 from django.http.response import HttpResponse
 
+from .BaseHttpAction import BaseHttpAction
 from ..common.OnlineUsers import OnlineUsers
 from ..common.store.StoreService import StoreService
-from .BaseHttpAction import BaseHttpAction
 from ..util.CacheUtil import CacheUtil
 from ..util.MyUtil import MyUtil
 from ..websocket.WebsocketUtil import WebsocketUtil
+
 
 class DwsGm(BaseHttpAction):
     '''
@@ -32,6 +33,13 @@ class DwsGm(BaseHttpAction):
             return ''
         return super().getActionName()
 
+    def bindSessionByBid(self, request):
+        bid = request.GET.get('bid')
+        if not (bid and isinstance(bid, str)):
+            return HttpResponse('参数错误')
+        #print('绑定已登录用户bid:{},uid:{}'.format(bid,request.user.id))
+        CacheUtil.set("session:bid:{}".format(bid), request.user.id, 86400)
+        return HttpResponse('success')
 
     def clearRedisCache(self,request):
         StoreService.getStoreCls().clearAll(MyUtil.REDIS_ONLINE_USERS)

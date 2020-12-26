@@ -5,6 +5,10 @@ Created on 2017年7月3日
 '''
 import functools
 import json
+
+#from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
+from DWSFramework.util.CacheUtil import CacheUtil
 from ..util.WebsocketUtil import WebsocketUtil
 from channels.auth import  http_session_user,channel_and_http_session_user_from_http
 from ..util.MyUtil import MyUtil
@@ -61,7 +65,7 @@ class AnnoUser(object):
             else:
                 return func(*args, **kw)
         return wrapper
-    
+
     @classmethod
     def channelLoginRequired(cls, func):
         '''
@@ -79,14 +83,35 @@ class AnnoUser(object):
             needSkipCheck= True if ('127.0.0.1'==brwClientIp and 'chrome-extension://' in str(message.content)) else False
             if not needSkipCheck and 'clientInfo' in message.channel_session:
                 needSkipCheck= True if '127.0.0.1'==message.channel_session['clientInfo']['ip'][0] else False
+            #暂时废除老机制
+            needSkipCheck=False
             loginErr=None
             if not message.user.is_authenticated:
-                loginErr='请先登录!'
-            elif not message.user.is_active:
+                #print(message.content)
+                bid = str(message.content['query_string']).replace("b'bid=",'').replace("'",'') if 'query_string' in message.content else ''
+                uid = 0
+                if bid:
+                    #尝试根据bid自动识别已登陆用户
+                    uid = CacheUtil.get("session:bid:{}".format(bid))
+                    #继续兼容根据channel连接保持session登陆状态
+                    CacheUtil.set("session:rc:{}".format(message.reply_channel), uid, 86400) if (uid and message.reply_channel) else 0
+                elif message.reply_channel:
+                    #尝试根据rc自动识别已登陆用户
+                    uid = CacheUtil.get("session:rc:{}".format(message.reply_channel))
+                    #print('xxx:{}  {}'.format(message.reply_channel,uid))
+                #自动识别到已登录用户
+                if uid:
+                    message.user=User.objects.get(id=uid)
+                    #login(request, user)
+                    #aUser=authenticate(username=message.user.username, password=message.user.password)
+                    #MyUtil.logInfo("自动识别到已登陆用户:bid({}),rc:{},uid:{},is_authenticated:{},is_active:{}".format(bid,message.reply_channel,uid,message.user.is_authenticated,message.user.is_active))
+                else:
+                    loginErr = '请先登录!'
+            if not loginErr and not message.user.is_active:
                 loginErr='用户未激活，请联系管理员激活!'
             if loginErr:
                 if needSkipCheck and not MyUtil.isCurWindowsSystem():
-                    print('warn:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format('本地chrome后台环境测试,临时跳过登录验证',message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username,message.reply_channel, brwClientIp))
+                    MyUtil.logInfo('warn:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format('本地chrome后台环境测试,临时跳过登录验证',message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username,message.reply_channel, brwClientIp))
                 else:
                     MyUtil.logInfo('error:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format(loginErr, message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username, message.reply_channel, brwClientIp))
                     # 踢掉未登录客户端

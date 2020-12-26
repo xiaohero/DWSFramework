@@ -16,6 +16,8 @@ class DwsWebSocket {
         this.MAX_REC_TIMES = 10;//最大重连次数
         this.allEnterJsParams={};
         this.isLogined=null;
+        //////////////////
+        this.bid=0;
     }
 
     isRunInBg(url){
@@ -34,7 +36,7 @@ class DwsWebSocket {
 
     onOpen(event) {
         //this.recnCounts=0;
-        this.myLog('连接服务器成功');
+        //this.myLog('连接服务器成功');
         /*发送进入游戏消息*/
         //已加载的也要重新加载，以防服务器有改动
         // if (this.isEnterJsLoaded) {
@@ -47,7 +49,7 @@ class DwsWebSocket {
     getEnterJs(targetUrl,needJquery) {
         //后台不获取主程序
         if(!targetUrl||this.isRunInBg(targetUrl)){
-            this.myLog('后台跳过主程序载入');
+            //this.myLog('后台跳过主程序载入');
             return;
         }
         //this.myLog('准备载入主程序:getEnterJs:'+targetUrl);
@@ -58,7 +60,7 @@ class DwsWebSocket {
             data: {
                 needJquery: needJquery?1:(this.needJquery?1:0)
             }
-        },true);
+        },false);
         this.allEnterJsParams[targetUrl]=needJquery;//保存参数
     }
 
@@ -101,7 +103,7 @@ class DwsWebSocket {
     isClosed(){
         return ('CLOSING'==this.getReadyState()[1]||'CLOSED'==this.getReadyState()[1])?true:false;
     }
-    
+
     isOpened(){
         return ('OPEN'==this.getReadyState()[1]||'CONNECTING'==this.getReadyState()[1])?true:false;
     }
@@ -156,15 +158,16 @@ class DwsWebSocket {
         }
     }
 
-    init() {
+    async init() {
         // this.isActiveClose=false;
         this.isCurRunInBg = this.isRunInBg();
         if (!this.isCurRunInBg) {
             this.needJquery = ('undefined' === typeof jQuery ? 1 : 0);
         }
+        this.bid = ('function' == typeof biri ? await biri() : 0);
         //ws enter path
-        let webSocketHost = this.servHost + '/'+this.upPrjName+'/Main';
-        this.myLog('服务器地址:' + webSocketHost + ',目标网站地址:' + this.targetUrl + ',needJquery:' + this.needJquery + ',开始连接服务器', true);
+        let webSocketHost = this.servHost + '/' + this.upPrjName + '/Main?bid=' + this.bid;
+        //this.myLog('服务器地址:' + webSocketHost + ',目标网站地址:' + this.targetUrl + ',needJquery:' + this.needJquery + ',开始连接服务器', true);
         this.wsCheckOk = false;
         try {
             // this.webSocket ? delete this.webSocket : false;//先销毁先前对象
@@ -181,7 +184,7 @@ class DwsWebSocket {
                 this.myLog('mixed content混用错误,启动插件辅助!');
                 return;
             }
-            this.myLog('mixed content检测正常,准备进入游戏!');
+            //this.myLog('mixed content检测正常,准备进入游戏!');
             this.webSocket.onclose = (event) => {
                 this.onClose(event)
             };//用this去调
@@ -219,7 +222,7 @@ class DwsWebSocket {
         if (-1 !== str.indexOf('请先登录') && !this.isLogined) {//可能多次弹出登录提示
         // if (-1 !== str.indexOf('请先登录') && null===this.isLogined) {//确保只弹出一次登录提示
             this.isLogined=false;
-            let tmpJs = 'alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");';
+            let tmpJs = 'let resText = "";fetch("'+this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Gm/bindSessionByBid?bid='+this.bid+'").then(response => {return response.text()}).then(text => {resText=text}).finally(() => {if ("success"!=resText) {alert("检测到你尚未登录，即将为你自动跳转登录页面");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");}})';
             // this.isCurRunInBg?dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);
             window.eval(tmpJs);
             return;

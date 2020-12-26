@@ -21,7 +21,7 @@ class JsResource:
     # 根据平台代码,获取基础js资源
     #
     @classmethod
-    def getChmExtJsContents(cls, version='latest', secKey=''):
+    def getChmExtJsContents(cls, version='latest', secKey='', needBid=1):
         # todo: 1.后期根据version获取指定版本的js
         # todo: 2.后期根据secKey及过期时间控制js获取
         jsFileBaseChmExtBg = '{}/js/chm-ext/base/BaseChmExtBg.js'.format(MyUtil.getDWSClientDir())
@@ -29,7 +29,11 @@ class JsResource:
         jsFileDwsChmBbExt = '{}/js/chm-ext/DwsChmExtBg.js'.format(MyUtil.getDWSClientDir())
         jsFileDwsChmFtExt = '{}/js/chm-ext/DwsChmExtFt.js'.format(MyUtil.getDWSClientDir())
         jsFileWebSocket = '{}/js/chm-ext/DwsWebSocket.js'.format(MyUtil.getDWSClientDir())
-        fileContent = MyUtil.readFileToStr(jsFileBaseChmExtBg, True)+MyUtil.readFileToStr(jsFileBaseChmExtFt, True)
+        jsFileBiri = '{}/js/third-party/biri/0.4.0/biri.min.js'.format(MyUtil.getDWSClientDir())
+        fileContent = ''
+        if needBid:
+            fileContent += MyUtil.readFileToStr(jsFileBiri, True)
+        fileContent += MyUtil.readFileToStr(jsFileBaseChmExtBg, True)+MyUtil.readFileToStr(jsFileBaseChmExtFt, True)
         fileContent += MyUtil.readFileToStr(jsFileWebSocket, True)#提到前面引入
         fileContent += MyUtil.readFileToStr(jsFileDwsChmBbExt, True)
         fileContent += MyUtil.readFileToStr(jsFileDwsChmFtExt, True)
@@ -37,7 +41,7 @@ class JsResource:
 
     #获取基础js资源
     @classmethod
-    def getBaseJsContents(cls, needJquery=0, needJqueryXpath=0, needReact=0, needVue=0, needJqueryCookie=1):
+    def getBaseJsContents(cls, needJquery=0, needJqueryXpath=0, needReact=0, needVue=0, needJqueryCookie=1, needBid=1):
         fileContent = ''
         # fixme:正式上线后，如若js不再更改，可开启读文件缓存
         jsFileJquery = '{}/js/third-party/jquery/3.2.1/jquery.js'.format(MyUtil.getDWSClientDir())
@@ -46,6 +50,7 @@ class JsResource:
         jsFileReact = '{}/js/third-party/react/15.6.1/react.js'.format(MyUtil.getDWSClientDir())
         jsFileReactDom = '{}/js/third-party/react/15.6.1/react-dom.js'.format(MyUtil.getDWSClientDir())
         jsFileVue = '{}/js/third-party/vue/2.3.4/vue.js'.format(MyUtil.getDWSClientDir())
+        jsFileBiri = '{}/js/third-party/biri/0.4.0/biri.min.js'.format(MyUtil.getDWSClientDir())
         # jsFileBabel = '{}/js/third-party/babel-standalone/6.25.0/babel.js'.format(MyUtil.getDWSClientDir())
         # babel-polyfill，用于支持babel中的async,await
         # jsFileBabelPolyfill = '{}/js/third-party/babel-polyfill/7.0.0-alpha.15/polyfill.js'.format(MyUtil.getDWSClientDir())
@@ -66,6 +71,9 @@ class JsResource:
         # vue支持########################
         if needVue:
             fileContent += MyUtil.readFileToStr(jsFileVue, True)
+        # 指纹识别支持########################
+        if needBid:
+            fileContent += MyUtil.readFileToStr(jsFileBiri, True)
         # 其它相关支持########################
         # fileContent+=MyUtil.readFileToStr(jsFileBabel,True)#因为ide文件监听已经转换了ES6代码，所以客户端无需再引入了babel了
         # fileContent+=MyUtil.readFileToStr(jsFileBabelPolyfill,True)#babel转换过程去掉env参数后就不会转换ES5语法，新版chrome默认支持ES6
