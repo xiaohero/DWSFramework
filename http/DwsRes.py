@@ -4,7 +4,6 @@ Created on Jul 1, 2017
 @author: xiaoxi
 '''
 from DWSFramework.common.JsResource import JsResource
-from ..util.MyUtil import MyUtil
 from .BaseHttpAction import BaseHttpAction
 from django.http.response import HttpResponse
 from django.views.decorators.cache import never_cache
@@ -12,7 +11,7 @@ from django.http.response import  HttpResponseNotFound
 
 
 
-class Res(BaseHttpAction):
+class DwsRes(BaseHttpAction):
     '''
     辅助页面
     '''

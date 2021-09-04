@@ -8,6 +8,7 @@ import json
 from django.conf import settings
 from django.http.response import HttpResponse
 
+from .DwsRes import DwsRes
 from .BaseHttpAction import BaseHttpAction
 from ..common.OnlineUsers import OnlineUsers
 from ..common.store.StoreService import StoreService
@@ -131,7 +132,12 @@ class DwsGm(BaseHttpAction):
     @classmethod
     def getDefaultRouteConf(cls):
         from django.conf.urls import url
-        return url(r'^{}/DwsGm/'.format(MyUtil.getProjectName()), cls.as_view(), name='dwsGmIndex')
+        return [
+            # 引入 websocket chm-ext server端组件
+            url(r'^{}/DwsRes/'.format(MyUtil.getProjectName()), DwsRes.as_view(), name='dwsResIndex'),
+            # 引入 默认gm组件
+            url(r'^{}/DwsGm/'.format(MyUtil.getProjectName()), cls.as_view(), name='dwsGmIndex')
+        ]
 
     def test(self, request):
         1/0
