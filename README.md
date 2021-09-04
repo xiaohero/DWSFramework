@@ -10,7 +10,7 @@ Django+Websocket框架,纯OOP框架(java写法)，方便好用!
 #### 安装教程
 
 1. 将整个项目拷到你的工程根目录下
-2. 进入DWSFramework，安装所需依赖:pip3 install -r requirements_version_xx.txt
+2. 进入DWSFramework，安装所需依赖:pip3 install -i https://pypi.doubanio.com/simple -r requirements_version_xx.txt
 3. django配置文件中加入属性: PROJECT_NAME='xxx',然后就可以使用了
 
 #### 使用说明
