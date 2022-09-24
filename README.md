@@ -1,38 +1,26 @@
-# DWSFramework
+# DWSFramework（[English introduction](https://github.com/xiaohero/DWSFramework/blob/master/README.en.md)） (一个通用的基于django+websocket的web框架)
 
 #### 介绍
-Django+Websocket框架,纯OOP框架(java写法)，方便好用!
-
-#### 软件架构
-软件架构说明
-
-
-#### 安装教程
-
-1. 将整个项目拷到你的工程根目录下
-2. 进入DWSFramework，安装所需依赖:pip3 install -i https://pypi.doubanio.com/simple -r requirements_version_xx.txt
-3. django配置文件中加入属性: PROJECT_NAME='xxx',然后就可以使用了
-
-#### 使用说明
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 参与贡献
-1. 核心开发者: oodd123@126.com (xiaoxi)
-
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+* DWSFramework是一个通用的基于django+websocket的web框架,代码按照java的OOP风格编写(方便好用).
+ * 此框架是基于django封装,集成了websocket支持,常用来搭配谷歌浏览器扩展框架[DWSClient客户端](https://github.com/xiaohero/DWSFramework)使用.
+ * 集成并加强了谷歌浏览器的前端js功能，包括如下:
+   * 支持websocket实时通信，https转换为http，禁用服务器端iframe保护.
+   * 支持前端后台消息转发,后台全局变量存取.
+   * 支持http request,http response head,body等截取,还集成了常用第三方js库:如jquery,babel,react,vue等.
+   * 支持js代码保护(高强度加密混淆).
+   * 如需获取离线版版,不依赖[DWSFramework服务器端](https://github.com/xiaohero/DWSFramework),请联系作者(QQ:2130622841)
+   * 如需商业用途请咨询开发作者(QQ:2130622841)
+ * 同时还封装了django的http与websocket服务接口,集成了django的管理后台,可通过api接口推送js给前端浏览器执行.
 
 
-#### 码云特技
+#### 软件架构及原理
+* DWSClient运行原理是在启动时候，从服务器[DWSFramework](https://github.com/xiaohero/DWSFramework)获取核心js(代码经过高强度加密与混淆,保护插件代码的安全性)来执行.
+* DWSClient启动后,可在菜单里选择服务器地址,然后从服务器拉取最新的js核心代码，前端浏览器通过eval函数执行拉取的js代码。
+* DWSClient与服务器保持websocket实时通信，服务器可以实时推送js让前端浏览器执行.同时支持暴露api给第三方网站调用background js.
+* 支持支持https转http，支持去服务端iframe保护，支持http request,http response head,body等截取。
 
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+#### 安装及使用教程
+* 1. 将整个项目拷到你的工程根目录下
+* 2. 进入DWSFramework，安装所需依赖:pip3 install -r requirements_version_xx.txt
+* 3. django配置文件中加入属性: PROJECT_NAME='xxx',然后就可以使用了
