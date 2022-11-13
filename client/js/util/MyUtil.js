@@ -8,7 +8,7 @@ MyUtils.prototype.log = function (str, notLogToTopPage) {
         return;
     }
     let curDate = MyUtils.prototype.formatDate((new Date()), 'yyyy-MM-dd hh:mm:ss');
-    let tmpStr = MyUtils.prototype.checkDwsChmExtRunInBg() ? '后台:' : '前台:';
+    let tmpStr = MyUtils.prototype.checkDwsChmExtRunInBg() ? 'BGD:' : 'FTD:';
     // if('前台:'==tmpStr){//测试调试用代码
     //     return;
     // }
