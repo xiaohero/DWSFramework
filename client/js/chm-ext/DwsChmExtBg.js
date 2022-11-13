@@ -1,15 +1,15 @@
-/**DWS chrome通用插件: 后台**/
+/**DWS chrome universal extension: background**/
 class DwsChmExtBg extends BaseChmExtBg {
     constructor() {
         super();
         this.upPrjName = ('undefined' !== typeof dwsServPrjName ? dwsServPrjName : 'DJXXX');
         this.bgWebSocket = null;
 
-        //其它业务参数
+        //Other business parameters
         this.enableBgDebug = false;
         //others
         this.ajaxUtil=ajaxUtil;
-        //初始化
+        //init
         this.init();
     }
 
@@ -25,9 +25,9 @@ class DwsChmExtBg extends BaseChmExtBg {
         if (!curServUrl || '0' == curServUrl || 'string' != typeof curServUrl) {
             return;
         }
-        //fixme:考虑上次的链接是否需要手工断开?
+        //fixme:Consider whether the last connection needs to be manually disconnected?
         curServUrl = curServUrl.replace('http:', 'ws:');
-        //后台连接ws服务器
+        //Connect to the ws server in the background
         this.bgWebSocket = new DwsWebSocket(curServUrl, '', 0, this.upPrjName);
         this.bgWebSocket.init();
     }
@@ -50,7 +50,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         }
         for (let url in this.globalSenders) {
             if (url != frameUrl && frameSender == this.globalSenders[url]) {
-                // alert('找到目标tab刷新:'+JSON.stringify(this.globalSenders[url]));
+                // alert('Find the target tab refresh:'+JSON.stringify(this.globalSenders[url]));
                 chrome.tabs.update(this.globalSenders[url].tab.id, {
                     url: this.globalSenders[url].tab.url,
                     selected: this.globalSenders[url].tab.selected
@@ -76,7 +76,7 @@ class DwsChmExtBg extends BaseChmExtBg {
                 }, (results) => {
                     for (let idx in results) {
                         if (results[idx]) {
-                            // alert('正确返回值:' + results[idx]);
+                            // alert('correct return value:' + results[idx]);
                             return results[idx];
                         }
                     }
@@ -93,7 +93,7 @@ class DwsChmExtBg extends BaseChmExtBg {
             callback(false);
             return false;
         }
-        //1.先找到正确的目标url
+        //1.Find the correct target url first
         chrome.tabs.executeScript(tabId, {
             code: "(()=>{if('" + frameName + "'==window.name){return window.location.href;}})()",
             allFrames: true
@@ -106,7 +106,7 @@ class DwsChmExtBg extends BaseChmExtBg {
                             // alert('realTargetUrl:'+realTargetUrl+',frameUrl:'+results2[idx2].url+':'+ (realTargetUrl == results2[idx].url));
                             if (realTargetUrl == results2[idx2].url) {
                                 callback(results2[idx2]);
-                                // alert('目标url:'+realTargetUrl+',frameId:'+results2[idx2].frameId);
+                                // alert('target url:'+realTargetUrl+',frameId:'+results2[idx2].frameId);
                                 break;
                             }
                         }
@@ -120,7 +120,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     ajaxGetSync(url, data) {
-        // alert('chrome_ext_bg:收到同步任务请求:'+url);
+        // alert('chrome_ext_bg:Sync task request received:'+url);
         let retResult = null;
         this.ajaxUtil.get(url, 'object' == typeof data ? data : {}, (result) => {
             retResult = result;
@@ -129,7 +129,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     ajaxPostSync(url, data) {
-        // alert('chrome_ext_bg:收到同步任务请求:'+url+',data:'+JSON.stringify(data));
+        // alert('chrome_ext_bg:Sync task request received:'+url+',data:'+JSON.stringify(data));
         let retResult = null;
         this.ajaxUtil.post(url, 'object' == typeof data ? data : {}, (result) => {
             retResult = result;
@@ -155,9 +155,9 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     createContextMenus(request) {
-        //创建插件图标右键菜单
+        //Create extension icon right-click menu
         // chrome.contextMenus.removeAll();
-        // 先移除老菜单
+        // Remove the old menu first
         //chrome.contextMenus.remove('dwsHomePage');
         //chrome.contextMenus.remove('reOpenClientPages');
         //chrome.contextMenus.remove('bgWsStatus');
@@ -167,7 +167,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         chrome.contextMenus.create({
             id: 'dwsHomePage',
             type: 'normal',
-            title: '进入插件官网',
+            title: chrome.i18n.getMessage("gotoDwsHomePage"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
                 let curServUrl = this.getCurServUrl();
@@ -177,11 +177,11 @@ class DwsChmExtBg extends BaseChmExtBg {
                 window.open(curServUrl + '/'+this.upPrjName+'/');
             }
         });
-        //插件辅助
+        //extension assistance
         chrome.contextMenus.create({
             id: 'reOpenClientPages',
             type: 'normal',
-            title: '重开所有页面',
+            title: chrome.i18n.getMessage("reOpenAllPages"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
                 this.reOpenAllPages(2000);
@@ -191,44 +191,41 @@ class DwsChmExtBg extends BaseChmExtBg {
         chrome.contextMenus.create({
             id: 'bgWsStatus',
             type: 'normal',
-            title: '检测服务器状态',
+            title: chrome.i18n.getMessage("checkWsStatus"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
-                alert('当前服务器连接状态(' + this.getBgWebSocketStatus() + ')');
+                alert('current server connection status(' + this.getBgWebSocketStatus() + ')');
                 if ('已关闭' == this.getBgWebSocketStatus()) {
                     this.getBgWebSocket().reconnect(true);
                 }
             }
         });
 
-        //测试菜单
+        //test menu
         chrome.contextMenus.create({
             id: 'switchBgDebug',
             type: 'normal',
-            title: '切换插件调试模式',
+            title: chrome.i18n.getMessage("switchBgDebug"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
                 this.enableBgDebug = !this.enableBgDebug;
-                alert('切换成功,当前调试开关(' + this.enableBgDebug + '):'+this.getClientExtId());
+                alert('switch successful, the current debug switch(' + this.enableBgDebug + '):'+this.getClientExtId());
             }
         });
-
-        //https屏蔽工具(开启)
         chrome.contextMenus.create({
             id: 'enableHttpstoHttp',
             type: 'normal',
-            title: '开启https转http',
+            title: chrome.i18n.getMessage("enableHttpstoHttp"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
                 this.enableHttpstoHttp = true;
             }
         });
 
-        //https屏蔽工具(关闭)
         chrome.contextMenus.create({
             id: 'disableHttpstoHttp',
             type: 'normal',
-            title: '关闭https转http',
+            title: chrome.i18n.getMessage("disableHttpstoHttp"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
                 this.enableHttpstoHttp = false;
@@ -243,12 +240,12 @@ class DwsChmExtBg extends BaseChmExtBg {
     reOpenAllPages(sleepMs) {
         this.getAllTabs(async (tabs) => {
             if (tabs.length < 1) {
-                alert('当前没有发现页面,请手工刷新:');
+                alert('No page is currently found, please refresh manually:');
                 return;
             }
             for (let eachTab of tabs) {
                 chrome.tabs.remove([eachTab.id], () => {
-                });//支持批量关闭
+                });//Support batch shutdown
                 sleepMs ? await this.sleepSyncPromise(sleepMs) : false;
                 chrome.tabs.create({url: eachTab.url}, () => {
                 });
@@ -262,7 +259,7 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     getFrontJs(notEncodeURI) {
         //notice: encodeURI must call before return
-        let frontJs = super.getFrontJs(true) + DwsChmExtFt.toString() + ';var dwsChmExtFt=new DwsChmExtFt();';//var级别变量作用域更广，其它地方可以调用
+        let frontJs = super.getFrontJs(true) + DwsChmExtFt.toString() + ';var dwsChmExtFt=new DwsChmExtFt();';//Var-level variables have wider scope and can be called elsewhere
         return encodeURI(frontJs);
     }
 
@@ -278,39 +275,39 @@ class DwsChmExtBg extends BaseChmExtBg {
         return -1 !== window.location.href.indexOf(selfServUrlKeywords) ? true : 0;
     }
 
-    //重写父类方法，自动纠正主页面iframe嵌套的目标sender
+    //Rewrite the parent class method to automatically correct the target sender nested in the main page iframe
     onSenderRecieve(sender) {
         if (!sender || !sender.url || !sender.tab) {
             return false;
         }
         if (!this.isSelfServPage(sender.url)) {
-            return super.onSenderRecieve(sender);//非iframe嵌套的按照父类处理
+            return super.onSenderRecieve(sender);//Non-iframe nesting is handled according to the parent class
         }
         if (this.globalSenders[sender.url] && this.globalSenders[sender.url].tab.id == sender.tab.id && this.globalSenders[sender.url].frameId) {
             if ('loading' != sender.tab.status) {
-                //loading表示页面刷新了
-                // alert('无变化?:'+JSON.stringify(sender));
-                return true;//无变化,不作处理,直接返回
+                //loading means the page is refreshed
+                // alert('no change?:'+JSON.stringify(sender));
+                return true;//No change, no processing, return directly
             }
-            this.globalSenders[sender.url].frameId = 0;//重置frameId,刷新说明老frameId已失效
+            this.globalSenders[sender.url].frameId = 0;//Reset frameId, refresh indicates that the old frameId has expired
         }
         if (!sender.frameId) {
-            // alert('检测到iframe嵌套，sender错误!' + JSON.stringify(sender));
+            // alert('iframe nesting detected, sender error!' + JSON.stringify(sender));
             this.getFrameByTabIdFrameName(sender.tab.id, 'myIframe', (frameInfo) => {
                 if (frameInfo) {
-                    //修正真正的frameId
+                    //fix the real frameId
                     sender.frameId = frameInfo.frameId;
                     sender.frameInfo = frameInfo;
                     super.onSenderRecieve(sender);
-                    // alert('检测到iframe嵌套，sender错误,自动修正后:' + JSON.stringify(sender));
-                    this.globalSenders[frameInfo.url] = sender;//根据iframe真实url再缓存一份记录(以便后期前后台映射通信)
+                    // alert('Detected iframe nesting, sender error, after automatic correction:' + JSON.stringify(sender));
+                    this.globalSenders[frameInfo.url] = sender;//Cache another record according to the real url of the iframe (for later front-end and back-end mapping communication)
                 } else {
-                    // alert('未找到正确地址的frame!');
+                    // alert('frame with correct address not found!');
                 }
             });
         }
     }
 
-    /////////////////////////业务相关方法////////////////
+    /////////////////////////business related methods////////////////
 }
 dwsChmExtBg = new DwsChmExtBg();

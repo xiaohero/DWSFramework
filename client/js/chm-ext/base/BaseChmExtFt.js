@@ -1,18 +1,18 @@
 /* javascript-obfuscator:disable */
-/**chrome扩展动态js注入工具类(通用前台基类)**/
+/**Chrome extension dynamic js injection tool class (generic foreground base class)**/
 class BaseChmExtFt {
     constructor() {
         this.ftListenEvent();
     }
 
     ftListenEvent() {
-        //2.全局通信封装
+        //2.global communication encapsulation
         window.addEventListener('message', (event) => {
             // We only accept messages from ourselves
-            // console.log('事件详情：'+JSON.stringify(event));
+            // console.log('Event details：'+JSON.stringify(event));
             // console.dir(event);
             if (event.source != window) {
-                // console.log(window.location.href+'(收到消息),其它事件内容：'+JSON.stringify(event.data));
+                // console.log(window.location.href+'(message received), other event content：'+JSON.stringify(event.data));
                 // console.dir(event);
                 // return;
             }
@@ -22,13 +22,13 @@ class BaseChmExtFt {
             if ('string' != typeof event.data.funcName || 'string' != typeof event.data.varName) {
                 return;
             }
-            // console.log('chrome_ext_front 收到页面消息: ' + JSON.stringify(event.data));
+            // console.log('chrome_ext_front get page message: ' + JSON.stringify(event.data));
             this.invokeGlobalFun(event.data);
         });
     }
 
     invokeGlobalFun(eventData) {
-        // console.log('chrome_ext_front 调试:invokeGlobalFun:' + JSON.stringify(eventData)+',callback:'+typeof eventData.callback);
+        // console.log('chrome_ext_front debug:invokeGlobalFun:' + JSON.stringify(eventData)+',callback:'+typeof eventData.callback);
         chrome.runtime.sendMessage(eventData, (result) => {
             if ('string' == typeof eventData.callback) {
                 let exeJsCode = '(' + decodeURI(eventData.callback) + ')(' + result + ');';

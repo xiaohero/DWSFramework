@@ -1,4 +1,4 @@
-/**chrome扩展动态js注入工具类(通用后台基类)**/
+/**Chrome extension dynamic js injection tool class (generic background base class)**/
 class BaseChmExtBg {
     constructor() {
         // if (this.getFrontJs === BaseChmExtBg.prototype.getFrontJs) {
@@ -9,15 +9,15 @@ class BaseChmExtBg {
         this.curSender = null;
         this.initListenEvent();
 
-        //控制https转http开关
+        //Control https to http switch
         this.enableHttpstoHttp = false;
         this.latestHttpUrl = '';
-        //插件id
+        //Extension Id
         this.clientExtId = '';
         this.initClientExtId();
     }
 
-    //已过时:注意该函数有可能不准确
+    //Obsolete: Note that this function may be inaccurate
     sendJsToCurSender(jsCode) {
         if (!this.curSender || !this.curSender.tab) {
             return false;
@@ -26,7 +26,7 @@ class BaseChmExtBg {
     }
 
     logToCurSender(logMsg) {
-        let jsCode = "console.log('后台调试:" + logMsg + "');";
+        let jsCode = "console.log('bg debug:" + logMsg + "');";
         if (!this.curSender || !this.curSender.tab) {
             return false;
         }
@@ -35,12 +35,12 @@ class BaseChmExtBg {
 
     sendJsToPageByUrl(targetUrl, jsCode, byCache=true) {
         let targetSender = (byCache ? this.getSenderByUrl(targetUrl) : null);
-        // alert('从缓存获取：' + targetSender+','+ targetUrl+',allSender:'+JSON.stringify(this.globalSenders));
+        // alert('get from cache：' + targetSender+','+ targetUrl+',allSender:'+JSON.stringify(this.globalSenders));
         if (targetSender && targetSender.tab) {
             return this.sendJsToPage(targetSender.tab.id, targetSender.frameId, jsCode);
         }
         this.getTabByUrl(targetUrl, (tab) => {
-            // alert('从ext获取：'+ JSON.stringify(tab)+','+ targetUrl);
+            // alert('get from ext：'+ JSON.stringify(tab)+','+ targetUrl);
             if (tab) {
                 return this.sendJsToPage(tab.id, 0, jsCode);
             }
@@ -70,7 +70,7 @@ class BaseChmExtBg {
         return this.globalSenders[tabUrl];
     }
 
-    //子类可重写改方法
+    //Subclasses can override this method
     onSenderRecieve(sender) {
         if (sender && sender.url) {
             if ('object' === typeof this.globalSenders[sender.url]) {
@@ -92,38 +92,37 @@ class BaseChmExtBg {
             callback(this.globalSenders[tabUrl].tab);
             return this.globalSenders[tabUrl].tab;
         }
-        //'https://www.okex.com/spot/trade#product*'
-        //注意:url种带有#的匹配不出来
+        //Note: URLs with # cannot be matched
         let queryInfo = (-1 !== tabUrl.indexOf('#') ? {} : {url: tabUrl});
         chrome.tabs.query(queryInfo, (tabs) => {
             // alert('getTabByUrl:targetUrl:' + tabUrl + ',findTabs:' + JSON.stringify(tabs));
             let targetTab = null;
-            if (tabs && tabs.length > 0) {//有多个匹配的时候再跟进url完整匹配一次
+            if (tabs && tabs.length > 0) {//When there are multiple matches, complete the match again according to the url
                 for (let idx in tabs) {
                     if (tabUrl == tabs[idx].url) {
-                        //fixme:可能要考虑多个匹配的情况
+                        //fixme:Might want to consider multiple matches
                         targetTab = tabs[idx];
                         break;
                     }
                 }
             }
             if (!targetTab) {
-                // alert('未找到指定tab,目标url:' + tabUrl + ',query:' + JSON.stringify(queryInfo) + ',curSender:' + JSON.stringify(this.curSender));
+                // alert('The specified tab was not found, target url:' + tabUrl + ',query:' + JSON.stringify(queryInfo) + ',curSender:' + JSON.stringify(this.curSender));
                 this.getAllTabs((tabs) => {
                     // alert('all_tabs:' + JSON.stringify(tabs));
                 });
                 callback(false);
                 return false;
             }
-            //fixme:这里可以再更新一下缓存内容
+            //fixme:Here you can update the cache content again
             callback(targetTab);
         });
     }
 
     initListenEvent() {
-        //监听后台事件
+        //Listen to bg events
         chrome.runtime.onMessage.addListener((request, sender, callback) => {
-            // alert('chrome_ext_bg 收到页面消息:' + JSON.stringify(request) + ' 执行函数:' + request.funcName + ',typeof:' + typeof this[request.funcName]);
+            // alert('chrome_ext_bg get page message:' + JSON.stringify(request) + ' execute function:' + request.funcName + ',typeof:' + typeof this[request.funcName]);
             if ('function' != typeof this[request.funcName]) {
                 alert('chrome_ext_bg error:invoke unkown method:' + request.funcName + ',self:' + JSON.stringify(this));
                 callback('chrome_ext_bg error:invoke unkown method:' + request.funcName);
@@ -133,18 +132,18 @@ class BaseChmExtBg {
             this.curSender = sender;
             this.onSenderRecieve(sender);
             if ('jsCode' == request.varName) {
-                // alert('chrome_ext_bg动态执行js:'+request.varValue+',type:'+typeof request.varValue);
+                // alert('chrome_ext_bg execute js dynamically:'+request.varValue+',type:'+typeof request.varValue);
                 exeResult = window.eval(request.varValue);
-                // alert(request.varValue+',执行结果:'+exeResult);
+                // alert(request.varValue+',exe results:'+exeResult);
             } else {
                 // this[request.funcName].apply(this, request);
                 exeResult = this[request.funcName](request);
             }
             // alert('chrome_ext_bg:' + request.funcName + ':result:' + JSON.stringify(exeResult)+',type:'+typeof exeResult);
-            //注意这里讲返回值json_encode,以便前台eval参数解析为js变量
+            //Note that the value json_encode will be returned here, so that the foreground eval parameter is parsed as a js variable
             callback(JSON.stringify(exeResult));
         });
-        //监听页面关闭事件,清理globalSenders缓存
+        //Listen to the page close event and clear the globalSenders cache
         chrome.tabs.onRemoved.addListener( (tabId, removeInfo)=>{
             for (let eachUrl in this.globalSenders) {
                 if(tabId==this.globalSenders[eachUrl].tab.id){
@@ -168,7 +167,7 @@ class BaseChmExtBg {
     }
 
     nothing(request) {
-        //空壳函数，不能删
+        //Empty shell function, cannot be deleted
     }
 
     sleepSyncPromise(ms) {
@@ -176,8 +175,8 @@ class BaseChmExtBg {
     }
 
     getFrontJs(notEncodeURI=false) {
-        // let frontJs = BaseChmExtFt.toString() + ';var baseChmExtFt=new BaseChmExtFt();';//var级别变量作用域更广，其它地方可以调用
-        let frontJs = BaseChmExtFt.toString();//var级别变量作用域更广，其它地方可以调用
+        // let frontJs = BaseChmExtFt.toString() + ';var baseChmExtFt=new BaseChmExtFt();';//Var-level variables have wider scope and can be called elsewhere
+        let frontJs = BaseChmExtFt.toString();
         !notEncodeURI ? frontJs = encodeURI(frontJs) : false;
         return frontJs;
     }
@@ -238,12 +237,12 @@ class BaseChmExtBg {
     }
 
     redirectHttpsToHttp() {
-        //参考文档: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/onBeforeRequest
+        //Reference documentation: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/onBeforeRequest
         chrome.webRequest.onBeforeRequest.addListener((details) => {
                 //details.type:websocket,main_frame,xmlhttprequest,other
                 //details.tabId
                 //alert('Debug:' + JSON.stringify(details));
-                //返回值只能是{cancel:xx}或{redirectUrlOptional:xx}
+                //The return value can only be:{cancel:xx} or {redirectUrlOptional:xx}
                 if (this.enableHttpstoHttp) {
                     if (('object' === typeof details) && ('undefined' !== typeof details.type && 'undefined' !== typeof details.url)) {
                         let newUrl = details.url;
@@ -253,14 +252,14 @@ class BaseChmExtBg {
                             newUrl = newUrl.replace('wss://', 'ws://');
                         }
                         if (newUrl !== details.url) {
-                            //alert('老url:' + details.url + ',新url:' + newUrl+',上次url:'+this.latestHttpUrl);
-                            //判断此次跳转的url是否与上次相同，防止循环重定向
+                            //alert('old url:' + details.url + ',new url:' + newUrl+',last url:'+this.latestHttpUrl);
+                            //Determine whether the url of this jump is the same as the last time to prevent circular redirection
                             if (newUrl === this.latestHttpUrl) {
-                                //alert('检测到循环重定向，终止操作!');
+                                //alert('Circular redirect detected, terminate operation!');
                                 return;
                             }
                             // details.url=newUrl;
-                            //保存最近一次http url
+                            //save last http url
                             this.latestHttpUrl = newUrl;
                             return {redirectUrl: newUrl};
                         }
@@ -269,7 +268,7 @@ class BaseChmExtBg {
             },
             {urls: ['<all_urls>'], types: ['main_frame', 'xmlhttprequest', 'websocket']},
             ['blocking']
-            //blocking:表明同步阻塞，以便能控制请求cancel或redirect
+            //blocking:Indicates synchronous blocking so that the request can be controlled to cancel or redirect
             //['blocking','requestBody']
         );
     }
@@ -282,45 +281,45 @@ class BaseChmExtBg {
         }
         let curSender=this.getSenderByUrl(dstUrl);
         if(curSender&&curSender.nwEnable){
-            this.logToCurSender('当前tab页已激活网络监控,跳过:'+JSON.stringify(curSender));
+            this.logToCurSender('The current tab page has activated network monitoring, skip:'+JSON.stringify(curSender));
             return true;
         }
-        //记录需要捕获流量的requestId
+        //Record the traffic'requestId that needs to be captured
         let targetRequestIds={};
-        //alert('匹配requestMatchReg:'+requestMatchReg+',responseMatchReg:'+responseMatchReg+',目标url:'+dstUrl);
+        //alert('requestMatchReg:'+requestMatchReg+',responseMatchReg:'+responseMatchReg+',target url:'+dstUrl);
         this.getTabByUrl(dstUrl, (findTab) => {
             if (!findTab) {
-                alert('监控网络失败,未找到tab:' + dstUrl);
+                alert('Failed to monitor network, tab not found:' + dstUrl);
                 return;
             }
-            //alert('找到tab:' + JSON.stringify(findTab));
+            //alert('find tab:' + JSON.stringify(findTab));
             let attachVersion = '1.0';
-            //激活调试当前tab
+            //Activate debug current tab
             chrome.debugger.attach({
                     tabId: findTab.id
                 }, attachVersion,
                 ((tmpTabId, tmpUrl) => {
                     return () => {
                         // this.disableNetworkMonitorByUrl(tmpUrl);
-                        //开启网络监控
+                        //Enable network monitoring
                         chrome.debugger.sendCommand({
                             tabId: tmpTabId
                         }, 'Network.enable', (result) => {
                             curSender ? this.globalSenders[dstUrl].nwEnable = true : false;
-                            //监听网络流量
+                            //monitor network traffic
                             chrome.debugger.onEvent.addListener((source, method, params) => {
                                 //method:Network.requestWillBeSent,Network.dataReceived,Network.loadingFinished,Network.responseReceived
                                 //params.type:Script,XHR,Image
                                 if (source.tabId !== tmpTabId) {
                                     return;
                                 }
-                                //过滤标示需要捕获流量的requestId
+                                //Filter the requestId that identifies the traffic that needs to be captured
                                 if ('Network.requestWillBeSent' == method && 'request' in params && 'url' in params.request && params.request.url) {
                                     let urlMatchRet=params.request.url.match(requestMatchReg);
                                     urlMatchRet ? targetRequestIds[params.requestId] = params.requestId : false;
                                     //urlMatchRet && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+urlMatchRet[0]+',requestId:'+params.requestId+',responseMatchReg:'+responseMatchReg);
                                 }
-                                //网络加载完成后再去获取数据，否则可能抓取的数据不全(丢失部分)
+                                //Obtain the data after the network is loaded, otherwise the captured data may be incomplete (lost part)
                                 if ('Network.loadingFinished' == method && params.requestId in targetRequestIds) {
                                     //this.logToCurSender('loadingFinished:'+JSON.stringify(params)+',requestId:'+params.requestId);
                                     chrome.debugger.sendCommand({
@@ -340,13 +339,13 @@ class BaseChmExtBg {
                                                 'function' === typeof cbFunc ? cbFunc(dstUrl,findRet) : alert(findRet);
                                                 //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet);
                                                 //this.logToCurSender(findRet);
-                                                //以防url变化，通过tabid解绑
+                                                //In case the url changes, unbind by tabid
                                                 if (autoDetach) {
                                                     this.disableNetworkMonitorByTabId(tmpTabId);
                                                     curSender ? this.globalSenders[dstUrl].nwEnable = false : false;
                                                 }
                                             }
-                                            //已激活的标签页缓存下来
+                                            //Activated tabs are cached
                                             // let sender = this.getSenderByUrl(dstUrl);
                                             // sender ? sender.nwEnable = nwCacheEnable : false;
                                         }
@@ -364,7 +363,7 @@ class BaseChmExtBg {
     disableNetworkMonitorByUrl(url,cbFunc=()=>{}) {
         this.getTabByUrl(url, (findTab) => {
             if (!findTab) {
-                alert('detach失败,未找到tab:' + url);
+                alert('detach failed, tab not found:' + url);
                 return;
             }
             this.disableNetworkMonitorByTabId(findTab.id,cbFunc);
@@ -376,7 +375,7 @@ class BaseChmExtBg {
             tabId: tabId
         }, () => {
             cbFunc();
-            //alert('关闭调试成功!');
+            //alert('Close debugging successfully!');
         });
     }
 }

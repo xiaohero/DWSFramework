@@ -1,5 +1,5 @@
 /* javascript-obfuscator:disable */
-/**DWS chrome通用插件: 前台**/
+/**DWS chrome universal extension: front desk**/
 class DwsChmExtFt extends BaseChmExtFt{
     constructor() {
         super();
@@ -7,7 +7,7 @@ class DwsChmExtFt extends BaseChmExtFt{
     }
 
     init() {
-        //插件模式下,iframe上层主页面无需植入代码
+        //In extension mode, the main page above the iframe does not need to implant code
         this.removeIframeJsLimit();
         this.enterGame();
     }
@@ -18,13 +18,13 @@ class DwsChmExtFt extends BaseChmExtFt{
             el.textContent = "if (top !== self) {window.self = window.top;console.log('try to enable iframe nested...');}";
             // el.textContent = 'if (top !== self) {window.top = window.self;}';
             document.documentElement.appendChild(el);
-            return;//fixme:下面代码可能还需继续执行
+            return;//fixme:The following code may still need to be executed
         }
     }
 
     enterGame(){
        this.invokeGlobalJs('dwsChmExtBg.getBgWebSocket().getEnterJs("'+window.location.href+'",1)', (result) => {
-           // console.log('请求结果bg:' + result);
+           // console.log('bg request result:' + result);
        });
     }
 }
