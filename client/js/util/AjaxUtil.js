@@ -1,5 +1,5 @@
 // javascript-obfuscator:disable
-/**Ajax辅助类(不依赖jquery)**/
+/**Ajax helper class**/
 class AjaxUtil {
     constructor() {
     }
@@ -52,7 +52,7 @@ class AjaxUtil {
         for (var key in data) {
             query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
         }
-        // query.push('_='+new Date().getTime());//防止缓存
+        // query.push('_='+new Date().getTime());//prevent caching
         this.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, async);
     };
 

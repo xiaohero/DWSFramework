@@ -1,7 +1,7 @@
 class BaseClientService {
-    //构造函数
+    //Constructor
     constructor() {
-        //myUtils.log('进入 BaseClientService 构造方法');
+        //myUtils.log('Enter BaseClientService Constructor');
         if (this.constructor === BaseClientService) {
             // Error Type 1. Abstract class can not be constructed.
             throw new TypeError('Can not construct abstract class.');
@@ -12,18 +12,18 @@ class BaseClientService {
         }
     }
 
-    //入口程序，子类需实现该方法
+    //Entry program, subclasses need to implement this method
     run(){
         console.log('warning:client should implement this abstract method!');
     }
 
     wsSendMessage(sendData) {
-        // console.log('准备发消息给服务器:'+JSON.stringify(sendData));
+        // console.log('ready to send a message to the server:'+JSON.stringify(sendData));
         if (!sendData) {
             return false;
         }
         if (!myUtils.getDwsChmExtVersion()) {
-            // alert('发送错误，请先安装DWS谷歌插件!');
+            // alert('Sending error, please install DWS Google plugin first!');
             return false;
         }
         let bgJsCode = 'dwsChmExtBg.getWebSocket().sendMessage(' + JSON.stringify(sendData) + ')';
@@ -31,12 +31,12 @@ class BaseClientService {
         });
     }
 
-    //检测用户是否平台在线
+    //Check if the user is online on the platform
     checkUserlogged() {
         return false;
     }
 
-    //获取当前页面唯一uuid
+    //Get the unique uuid of the current page
     getCurPageUUID(){
         return '';
     }

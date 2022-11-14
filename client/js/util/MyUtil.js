@@ -1,19 +1,19 @@
-/**工具类**/
+/**Tools**/
 function MyUtils() {
 };
 
-/*日志工具*/
+/*logging tool*/
 MyUtils.prototype.log = function (str, notLogToTopPage) {
     if (!str) {
         return;
     }
     let curDate = MyUtils.prototype.formatDate((new Date()), 'yyyy-MM-dd hh:mm:ss');
     let tmpStr = MyUtils.prototype.checkDwsChmExtRunInBg() ? 'BGD:' : 'FTD:';
-    // if('前台:'==tmpStr){//测试调试用代码
+    // if('FTD:'==tmpStr){//code for testing and debugging
     //     return;
     // }
     console.log(curDate + '-->' + tmpStr + str);
-    //日志输出到页面
+    //log output to page
     if (!notLogToTopPage) {
         MyUtils.prototype.logTopPage(str);
     }
@@ -25,7 +25,7 @@ MyUtils.prototype.dir = function (obj) {
     console.dir(obj);
 };
 
-/*格式化日期:例子:formatDate((new Date()),'yyyy-M-d hh:mm:ss')*/
+/*format date:formatDate((new Date()),'yyyy-M-d hh:mm:ss')*/
 MyUtils.prototype.formatDate = function (date, format) {
     if (!format) {
         format = "yyyy-MM-dd hh:mm:ss";
@@ -55,12 +55,12 @@ MyUtils.prototype.formatDate = function (date, format) {
     return format;
 };
 
-/*格式化CST日期的字串*/
+/*A string to format a CST date*/
 MyUtils.prototype.formatCSTDate = function (strDate, format) {
     return MyUtils.prototype.formatDate(new Date(strDate), format);
 };
 
-/*url提取参数,返回json对象*/
+/*url extracts parameters and returns a json object*/
 MyUtils.prototype.getJsonFromUrl = function (url = '') {
     url || (url = location.href);
     let question = url.indexOf("?");
@@ -98,7 +98,7 @@ MyUtils.prototype.getJsonFromUrl = function (url = '') {
     return result;
 };
 
-/*加法函数*/
+/*Addition function*/
 MyUtils.prototype.accAdd = function (arg1, arg2, autoFixed = false) {
     let calcRet = 0;
     if ('object' === typeof math && 'function' === typeof math.add) {
@@ -119,7 +119,7 @@ MyUtils.prototype.accAdd = function (arg1, arg2, autoFixed = false) {
         calcRet = (arg1 * m + arg2 * m) / m;
     }
     if (autoFixed) {
-        //查找最大小数位
+        //Find the maximum number of decimal places
         function findDec(f1) {
             function isInt(n) {
                 return typeof n === 'number' &&
@@ -144,7 +144,7 @@ MyUtils.prototype.accAdd = function (arg1, arg2, autoFixed = false) {
     return calcRet;
 };
 
-/*减法函数*/
+/*subtraction function*/
 MyUtils.prototype.accSub = function (arg1, arg2) {
     if ('object' === typeof math && 'function' === typeof math.subtract) {
         return math.subtract(arg1, arg2);
@@ -162,19 +162,19 @@ MyUtils.prototype.accSub = function (arg1, arg2) {
     }
     m = Math.pow(10, Math.max(r1, r2));
     /*last modify by deeka
-     动态控制精度长度*/
+     Dynamic control precision length*/
     n = (r1 >= r2) ? r1 : r2;
     return ((arg1 * m - arg2 * m) / m).toFixed(n);
 };
 
-/*乘法函数*/
+/*Multiplication function*/
 MyUtils.prototype.accMul = function (arg1, arg2) {
     if ('object' === typeof math && 'function' === typeof math.multiply) {
         return math.multiply(arg1, arg2);
     }
-    MyUtils.prototype.log('警告:未引入math.js库，浮点型乘法计算可能存在误差!');
+    MyUtils.prototype.log('Warning: The math.js library has not been introduced, and floating-point multiplication may have errors!');
     return arg1 * arg2;
-    //下面网上流传的乘法函数有bug
+    //There is a bug in the multiplication function circulating on the Internet below
     let m = 0, s1 = arg1.toString(), s2 = arg2.toString();
     try {
         m += s1.split(".")[1].length;
@@ -187,7 +187,7 @@ MyUtils.prototype.accMul = function (arg1, arg2) {
     return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
 };
 
-/*除法函数*/
+/*division function*/
 MyUtils.prototype.accDiv = function (arg1, arg2) {
     if ('object' === typeof math && 'function' === typeof math.divide) {
         return math.divide(arg1, arg2);
@@ -242,21 +242,21 @@ MyUtils.prototype.exit = function (status) {
 };
 
 
-/*等待某元素出现(可见)*/
+/*wait for an element to appear (visible)*/
 MyUtils.prototype.waitForElementVisible = function (jqStrElement, callbackFunc, msTimeout) {
     msTimeout = parseInt(msTimeout) > 0 ? parseInt(msTimeout) : 30000;
     let tmpTimerCount = 0;
     let tmpTimerCheckGapMs = 10;
     let tmpTimer = setInterval(() => {
         if (++tmpTimerCount * tmpTimerCheckGapMs > msTimeout) {
-            // MyUtils.prototype.log('未检测到可见元素:' + jqStrElement + '(检测超时)!');
+            // MyUtils.prototype.log('Visible element not detected:' + jqStrElement + '(detection timeout)!');
             clearInterval(tmpTimer);
             callbackFunc(false);
             return;
         }
         let jqFindObj = MyUtils.prototype.jqHelpFind(jqStrElement);
         if (jqFindObj.length && jqFindObj.is(':visible')) {
-            // myUtils.log('检测到可见元素:' + jqStrElement);
+            // myUtils.log('Visible element detected:' + jqStrElement);
             // jqFindObj.click();
             clearInterval(tmpTimer);
             callbackFunc(jqFindObj);
@@ -264,11 +264,11 @@ MyUtils.prototype.waitForElementVisible = function (jqStrElement, callbackFunc, 
     }, tmpTimerCheckGapMs);
 };
 
-/*等待某元素出现(可见)*/
+/*wait for an element to appear (visible)*/
 MyUtils.prototype.waitForElementAndClick = function (jqStrElement, clickModel, afterClickLog, notFoundLog, msTimeout, callbackFunc) {
     clickModel = ('event' == clickModel ? clickModel : 'click');
-    afterClickLog = afterClickLog ? afterClickLog : '找到(' + jqStrElement + ')元素并点击';
-    notFoundLog = notFoundLog ? notFoundLog : '未找到(' + jqStrElement + ')元素(检测超时)';
+    afterClickLog = afterClickLog ? afterClickLog : 'found(' + jqStrElement + ')element and click';
+    notFoundLog = notFoundLog ? notFoundLog : 'not found(' + jqStrElement + ')element(detection timeout)';
     msTimeout = parseInt(msTimeout) > 0 ? parseInt(msTimeout) : 0;
     MyUtils.prototype.waitForElementVisible(jqStrElement, function (findJqObj) {
         if (!findJqObj) {
@@ -283,15 +283,15 @@ MyUtils.prototype.waitForElementAndClick = function (jqStrElement, clickModel, a
 };
 
 
-/*已废弃*/
+/*Obsolete*/
 MyUtils.prototype.waitAndPageReloadClick = function (jqStrElement, jqObjIframe, msTimeout, callbackFunc) {
     msTimeout = parseInt(msTimeout) > 0 ? parseInt(msTimeout) : 30;
     let timeCount = 0;
     let tmpTimer = setInterval(function () {
-        // MyUtils.prototype.log('页面是否重新加载:'+window.performance.navigation.type);
+        // MyUtils.prototype.log('Whether the page is reloaded:'+window.performance.navigation.type);
         timeCount += 1;
         if (timeCount > msTimeout) {
-            MyUtils.prototype.log('未发现:' + jqStrElement + '元素，请按F5刷新页面!');
+            MyUtils.prototype.log('not found:' + jqStrElement + 'element，Please press F5 to refresh the page!');
             clearInterval(tmpTimer);
             return;
         }
@@ -302,35 +302,35 @@ MyUtils.prototype.waitAndPageReloadClick = function (jqStrElement, jqObjIframe, 
             // }
             // clearInterval(tmpTimer);
             jqElement.click();
-            // MyUtils.prototype.log('点击次数：'+timeCount);
+            // MyUtils.prototype.log('click count：'+timeCount);
         }
     }, 10);
-    //检测点击事件是否已经造成页面刷新
+    //Check if the click event has caused the page to refresh
     MyUtils.prototype.beforeIframeReload(jqObjIframe, function () {
-        MyUtils.prototype.log('检测到页面刷新，点击成功，关闭定时器');
+        MyUtils.prototype.log('Detect page refresh, click success, close the timer');
         clearInterval(tmpTimer);
     });
 };
 
 
-/*睡眠N毫秒,同步阻塞进程*/
+/*Sleep for N milliseconds, synchronously blocking the process*/
 MyUtils.prototype.sleepSync = async function (ms) {
     for (let t = Date.now(); Date.now() - t <= ms;) ;
     // (async ()=>{return MyUtils.prototype.log('xxx');await MyUtils.prototype.sleepSyncPromise(5000);})();
 
 };
 
-/*睡眠N毫秒,同步不阻塞进程*/
+/*Sleep for N milliseconds, synchronization does not block the process*/
 MyUtils.prototype.sleepSyncPromise = function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 
-/*睡眠N毫秒,异步*/
+/*sleep N milliseconds, async*/
 MyUtils.prototype.sleepAsync = function (callbackFunc, ms) {
     setTimeout(callbackFunc, ms);
     // (function my_func() {
-    //     //正常逻辑代码
+    //     //normal logic code
     //     //xxxxxxxxx
     //     if(true){
     //         setTimeout(my_func, ms);
@@ -339,17 +339,17 @@ MyUtils.prototype.sleepAsync = function (callbackFunc, ms) {
 };
 
 
-/*字符串去所有空格*/
+/*String to remove all spaces*/
 MyUtils.prototype.strTrimAll = function (str) {
     return str.replace(/\s+/g, "");
 };
 
-/*字符串获取数字+字母*/
-MyUtils.prototype.strGetNumAlpha = function (str) {
+/*String remove numbers + letters*/
+MyUtils.prototype.strRemoveNumAlpha = function (str) {
     return str.replace(/[^0-9a-zA-Z]+/g, "");
 };
 
-/*本地img图片url转base64*/
+/*Convert local img image url to base64*/
 MyUtils.prototype.imgUrlToBase64 = function (url, callback) {
     let xhr = new XMLHttpRequest();
     xhr.onload = function () {
@@ -385,7 +385,7 @@ MyUtils.prototype.toDataURL = function (src, callback, outputFormat) {
 
 // <yzmImg id="preview" src="http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG">
 // <canvas id="myCanvas" />
-/*本地img图片转base64*/
+/*Convert local img image to base64*/
 MyUtils.prototype.imgLabelToBase64 = function (jqStrImg, removeHeader = false) {
     if (MyUtils.prototype.jqHelpFind('#myCanvas').length < 1) {
         MyUtils.prototype.jqHelpFind('body').append("<canvas id='myCanvas'></canvas>");
@@ -402,12 +402,12 @@ MyUtils.prototype.imgLabelToBase64 = function (jqStrImg, removeHeader = false) {
     }
     console.log('img(' + jqStrImg + ') base64:');
     console.dir(returnStr);
-    //移除添加的canvas
+    //remove added canvas
     MyUtils.prototype.jqHelpFind('#myCanvas').remove();
     return returnStr;
 };
 
-/*jsonp客户端自定义数据发送服务器*/
+/*jsonp client custom data sending server*/
 MyUtils.prototype.jsonpUploadServerData = function (clientData) {
     let host = 'http://127.0.0.1:8080/SSHGJ/my/onlineGm/jsonUtil';
     MyUtils.prototype.getJQuery().ajax({
@@ -418,30 +418,29 @@ MyUtils.prototype.jsonpUploadServerData = function (clientData) {
         jsonp: 'jsonUtilCallBackParam',
         /*jsonpCallbackString:'jsonUtilCallbackFunc',*/
         success: function (msg) {
-            console.log('请求成功，返回结果:');
-            console.log(JSON.stringify(msg));
+            console.log('The request is successful and the result is returned:'+JSON.stringify(msg));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-            console.log('请求失败,接口请求错误:' + JSON.stringify(errorThrown));
+            console.log('request failed, interface request error:' + JSON.stringify(errorThrown));
         }
     });
 };
 
-/*jq辅助查找*/
+/*jq assisted lookup*/
 MyUtils.prototype.jqHelpFind = function (jqStr, getText = false) {
-    /*特殊支持$分隔后面跟属性名*/
+    /*Special support $ delimited followed by property name*/
     let jqFieldStr = '';
     if (getText && -1 !== jqStr.indexOf('$') && 2 == jqStr.split('$').length) {
         jqStr = jqStr.split('$')[0];
         jqFieldStr = jqStr.split('$')[1];
     }
     let isXpathStr = ('string' == typeof jqStr && jqStr.match(/^\/\//)) ? true : false;
-    let funcName = isXpathStr ? 'xpath' : 'find';//同时兼容css和xpath选择器
-    /*先搜索自身域*/
+    let funcName = isXpathStr ? 'xpath' : 'find';//Compatible with both css and xpath selectors
+    /*Search own domain first*/
     if (MyUtils.prototype.getJQuery(window.document)[funcName](jqStr).length) {
         return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(window.document)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(window.document)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(window.document)[funcName](jqStr);
     }
-    /*搜索子域*/
+    /*Search subdomains*/
     if (window.frames.length > 0) {
         try {
             for (let idx = 0; idx < window.frames.length; idx++) {
@@ -453,9 +452,9 @@ MyUtils.prototype.jqHelpFind = function (jqStr, getText = false) {
 
         }
     }
-    /*搜索父域*/
+    /*Search parent domains*/
     try {
-        /*捕获异常，有可能跨域不能访问*/
+        /*Catch the exception, it may not be accessible across domains*/
         if (MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr).length) {
             return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(window.parent.document)[funcName](jqStr);
         }
@@ -463,35 +462,12 @@ MyUtils.prototype.jqHelpFind = function (jqStr, getText = false) {
 
     }
     return getText ? '' : [];
-    // if(!isXpathStr){
-    //     /*先搜索自身域*/
-    //     if (MyUtils.prototype.getJQuery(window.document).find(jqStr).length) {
-    //         return getText ? MyUtils.prototype.getJQuery(window.document).find(jqStr).text() : MyUtils.prototype.getJQuery(window.document).find(jqStr);
-    //     }
-    //     /*搜索子域*/
-    //     if (window.frames.length > 0) {
-    //         for (let idx = 0; idx < window.frames.length; idx++) {
-    //             if (MyUtils.prototype.getJQuery(window.frames[idx].document).find(jqStr).length) {
-    //                 return getText ? MyUtils.prototype.getJQuery(window.frames[idx].document).find(jqStr).text() : MyUtils.prototype.getJQuery(window.frames[idx].document).find(jqStr);
-    //             }
-    //         }
-    //     }
-    //     /*搜索父域*/
-    //     try {
-    //         /*捕获异常，有可能跨域不能访问*/
-    //         if (MyUtils.prototype.getJQuery(window.parent.document).find(jqStr).length) {
-    //             return getText ? MyUtils.prototype.getJQuery(window.parent.document).find(jqStr).text() : MyUtils.prototype.getJQuery(window.parent.document).find(jqStr);
-    //         }
-    //     } catch (e) {
-    //
-    //     }
-    // }
 };
 
 
-/*jq辅助查找*/
+/*jq assisted lookup*/
 MyUtils.prototype.jqHelpInnerFind = function (jqTarget, jqStr, getText = false) {
-    /*特殊支持$分隔后面跟属性名*/
+    /*Special support $ delimited followed by property name*/
     let jqFieldStr = '';
     if (getText && -1 !== jqStr.indexOf('$') && 2 == jqStr.split('$').length) {
         jqFieldStr = jqStr.split('$')[1];
@@ -499,28 +475,28 @@ MyUtils.prototype.jqHelpInnerFind = function (jqTarget, jqStr, getText = false) 
     }
     //console.log(jqStr+'=>'+jqStr.split('$').length+',jqStr:'+jqStr+',jqFieldStr:'+jqFieldStr);
     let isXpathStr = ('string' == typeof jqStr && jqStr.match(/^\/\//)) ? true : false;
-    let funcName = isXpathStr ? 'xpath' : 'find';//同时兼容css和xpath选择器
+    let funcName = isXpathStr ? 'xpath' : 'find';//Compatible with both css and xpath selectors
     if (MyUtils.prototype.getJQuery(jqTarget).length < 1) {
         return getText ? '' : [];
     }
-    /*自身dom查找*/
+    /*own dom search*/
     if (!jqStr) {
         return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(jqTarget).attr(jqFieldStr) : MyUtils.prototype.getJQuery(jqTarget).text()) : MyUtils.prototype.getJQuery(jqTarget);
     }
-    /*搜索自身域*/
+    /*Search own domain*/
     if (MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).length > 0) {
         return getText ? (jqFieldStr ? MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).attr(jqFieldStr) : MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr).text()) : MyUtils.prototype.getJQuery(jqTarget)[funcName](jqStr);
     }
     return getText ? '' : [];
 };
 
-/*获取目标window对象变量或函数*/
+/*Get the target window object variable or function*/
 MyUtils.prototype.winHelpGet = function (winObjOrFunName) {
-    /*先搜索自身域*/
+    /*Search own domain first*/
     if (window[winObjOrFunName]) {
         return window[winObjOrFunName];
     }
-    /*搜索子域*/
+    /*Search subdomains*/
     if (window.frames.length > 0) {
         for (let idx = 0; idx < window.frames.length; idx++) {
             if (window.frames[idx][winObjOrFunName]) {
@@ -528,9 +504,9 @@ MyUtils.prototype.winHelpGet = function (winObjOrFunName) {
             }
         }
     }
-    /*搜索父域*/
+    /*Search parent domains*/
     try {
-        /*捕获异常，有可能跨域不能访问*/
+        /*Catch the exception, it may not be accessible across domains*/
         if (window.parent[winObjOrFunName]) {
             return window.parent[winObjOrFunName];
         }
@@ -540,13 +516,13 @@ MyUtils.prototype.winHelpGet = function (winObjOrFunName) {
     return false;
 };
 
-/*设置目标window对象变量或函数值*/
+/*Set the target window's object variable or function value*/
 MyUtils.prototype.winHelpSet = function (winObjOrFunName, valueObOrFun) {
-    /*先搜索自身域*/
+    /*Search own domain first*/
     if (window[winObjOrFunName]) {
         return window[winObjOrFunName] = valueObOrFun;
     }
-    /*搜索子域*/
+    /*Search subdomains*/
     if (window.frames.length > 0) {
         for (let idx = 0; idx < window.frames.length; idx++) {
             if (window.frames[idx][winObjOrFunName]) {
@@ -554,9 +530,9 @@ MyUtils.prototype.winHelpSet = function (winObjOrFunName, valueObOrFun) {
             }
         }
     }
-    /*搜索父域*/
+    /*Search parent domains*/
     try {
-        /*捕获异常，有可能跨域不能访问*/
+        /*Catch the exception, it may not be accessible across domains*/
         if (window.parent[winObjOrFunName]) {
             return window.parent[winObjOrFunName] = valueObOrFun;
         }
@@ -566,31 +542,31 @@ MyUtils.prototype.winHelpSet = function (winObjOrFunName, valueObOrFun) {
     return false;
 };
 
-/*获取顶层网站host*/
+/*Get the top-level website host*/
 MyUtils.prototype.getTopFullHost = function () {
-    /*先搜索自身域*/
+    /*Search own domain first*/
     let serverFullHost = window.location.protocol + '//' + window.location.host;
     return serverFullHost;
 };
 
-/*获取顶层1网站url*/
+/*Get top 1 website url*/
 MyUtils.prototype.getTopCurrentUrl = function () {
     return window.location.href;
 };
 
 MyUtils.prototype.topIsServer = function () {
-    /*先搜索自身域*/
+    /*Search your own domain first*/
     let serverFullHost = MyUtils.prototype.getTopFullHost();
     return /\d+.\d+.\d+.\d+/.test(serverFullHost) ? serverFullHost : false;
 };
 
-/*获取目标网站host*/
+/*Get the target website host*/
 MyUtils.prototype.getTargetHost = function () {
-    /*先搜索自身域*/
+    /*Search own domain first*/
     if (!/(\d.\d.\d.\d)|(localhost)/.test(window.location.host)) {
         return window.location.host;
     }
-    /*搜索子域*/
+    /*Search subdomains*/
     if (window.frames.length > 0) {
         for (let idx = 0; idx < window.frames.length; idx++) {
             if (!/(\d.\d.\d.\d)|(localhost)/.test(window.frames[idx].location.host)) {
@@ -598,9 +574,9 @@ MyUtils.prototype.getTargetHost = function () {
             }
         }
     }
-    /*搜索父域*/
+    /*Search parent domains*/
     try {
-        /*捕获异常，有可能跨域不能访问*/
+        /*Catch the exception, it may not be accessible across domains*/
         if (!/(\d.\d.\d.\d)|(localhost)/.test(window.parent.location.host)) {
             return window.parent.location.host;
         }
@@ -610,13 +586,13 @@ MyUtils.prototype.getTargetHost = function () {
     return window.location.host;
 };
 
-/*获取目标网站host*/
+/*Get the target website host*/
 MyUtils.prototype.getTargetFullHost = function () {
-    /*先搜索自身域*/
+    /*Search your own domain first*/
     if (!/(\d.\d.\d.\d)|(localhost)/.test(window.location.host)) {
         return window.location.protocol + '//' + window.location.host;
     }
-    /*搜索子域*/
+    /*Search subdomains*/
     if (window.frames.length > 0) {
         for (let idx = 0; idx < window.frames.length; idx++) {
             if (!/(\d.\d.\d.\d)|(localhost)/.test(window.frames[idx].location.host)) {
@@ -624,9 +600,9 @@ MyUtils.prototype.getTargetFullHost = function () {
             }
         }
     }
-    /*搜索父域*/
+    /*Search parent domains*/
     try {
-        /*捕获异常，有可能跨域不能访问*/
+        /*Catch the exception, it may not be accessible across domains*/
         if (!/(\d.\d.\d.\d)|(localhost)/.test(window.parent.location.host)) {
             return window.parent.location.protocol + '//' + window.parent.location.host;
         }
@@ -637,13 +613,13 @@ MyUtils.prototype.getTargetFullHost = function () {
 
 };
 
-/*获取目标网站url全路径*/
+/*Get the full path of the target website url*/
 MyUtils.prototype.getTargetCurrentUrl = function () {
-    /*先搜索自身域*/
+    /*Search your own domain first*/
     if (!/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|(localhost)/.test(window.location.href)) {
         return window.location.href;
     }
-    /*搜索子域*/
+    /*Search subdomains*/
     if (window.frames.length > 0) {
         for (let idx = 0; idx < window.frames.length; idx++) {
             if (!/(\d.\d.\d.\d)|(localhost)/.test(window.frames[idx].location.href)) {
@@ -651,9 +627,9 @@ MyUtils.prototype.getTargetCurrentUrl = function () {
             }
         }
     }
-    /*搜索父域*/
+    /*Search parent domains*/
     try {
-        /*捕获异常，有可能跨域不能访问*/
+        /*Catch the exception, it may not be accessible across domains*/
         if (!/(\d.\d.\d.\d)|(localhost)/.test(window.parent.location.href)) {
             return window.parent.location.href;
         }
@@ -666,7 +642,7 @@ MyUtils.prototype.getTargetCurrentUrl = function () {
 
 /*关闭当前页面*/
 MyUtils.prototype.closeCurrentPage = function () {
-    /*关闭当前页面*/
+    /*close the current page*/
     let userAgent = navigator.userAgent;
     if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") != -1) {
         window.location.href = "about:blank";
@@ -679,7 +655,7 @@ MyUtils.prototype.closeCurrentPage = function () {
 };
 
 
-/*页面跳转*/
+/*page redirect*/
 MyUtils.prototype.redirectUrl = function (url, iframeName, newTab = false) {
     if (newTab && MyUtils.prototype.getDwsChmExtVersion()) {
         MyUtils.prototype.extExeGlobalJs('chrome.tabs.create({url: "' + url + '"});', () => {
@@ -690,17 +666,17 @@ MyUtils.prototype.redirectUrl = function (url, iframeName, newTab = false) {
     whichWindow.location = url;
 };
 
-/*页面刷新*/
+/*page refresh*/
 MyUtils.prototype.reload = function (iframeName) {
-    // console.log('页面刷新跳过');return;
+    // console.log('page refresh skip');return;
     if (!MyUtils.prototype.isIframeSupport(iframeName)) {
-        MyUtils.prototype.log('未找到iframe:(' + iframeName + '),直接刷新顶层页面!');
+        MyUtils.prototype.log('iframe not found:(' + iframeName + '),Refresh the top-level page directly!');
         MyUtils.prototype.extExeGlobalJs('dwsChmExtBg.flushParentWindowByFrameUrl("' + window.location + '")');
         window.location.reload();
         return;
     }
     // if ('undefined' != typeof iframeName && 'undefined'==typeof window.frames[iframeName]) {
-    //     MyUtils.prototype.log('未找到iframe:('+iframeName+'),此次页面刷新跳过!');
+    //     MyUtils.prototype.log('iframe not found:('+iframeName+'),This page refresh is skipped!');
     //     return;
     // }
 
@@ -709,11 +685,11 @@ MyUtils.prototype.reload = function (iframeName) {
     window.frames[iframeName].window.reload();
 };
 
-/*拦截ajax页面成功消息*/
+/*Intercept ajax page success message*/
 MyUtils.prototype.afterAjaxSuccess = function (callbackFunc, jqStr) {
     if ('function' != typeof callbackFunc) {
         callbackFunc = function () {
-            MyUtils.prototype.log('ajax请求完成...');
+            MyUtils.prototype.log('ajax request completed...');
             console.dir(arguments);
         }
     }
@@ -721,15 +697,14 @@ MyUtils.prototype.afterAjaxSuccess = function (callbackFunc, jqStr) {
     MyUtils.prototype.getJQuery(jqStr).ajaxSuccess(callbackFunc);
 };
 
-/*拦截表单提交成功后消息*/
 MyUtils.prototype.afterIframeLoad = function (jqObjIframe, callbackFunc) {
     if (jqObjIframe.length < 1) {
-        MyUtils.prototype.log('未找到指定iframe，无法注册load事件...');
+        MyUtils.prototype.log('The specified iframe was not found and the load event could not be registered...');
         return;
     }
     if ('function' != typeof callbackFunc) {
         callbackFunc = function () {
-            MyUtils.prototype.log('iframe加载完成...');
+            MyUtils.prototype.log('iframe loaded complete...');
             console.dir(arguments);
         }
     }
@@ -742,15 +717,14 @@ MyUtils.prototype.afterIframeLoad = function (jqObjIframe, callbackFunc) {
     jqObjIframe.on('load', tempFunc);
 };
 
-/*拦截表单提交成功后消息*/
 MyUtils.prototype.beforeIframeReload = function (jqObjIframe, callbackFunc) {
     if (jqObjIframe.length < 1) {
-        MyUtils.prototype.log('未找到指定iframe，无法注册beforeunload事件...');
+        MyUtils.prototype.log('The specified iframe was not found and the beforeunload event could not be registered...');
         return;
     }
     if ('function' != typeof callbackFunc) {
         callbackFunc = function () {
-            // MyUtils.prototype.log('iframe即将刷新...');
+            // MyUtils.prototype.log('iframe is about to refresh...');
             console.dir(arguments);
         }
     }
@@ -769,12 +743,12 @@ MyUtils.prototype.beforeIframeReload = function (jqObjIframe, callbackFunc) {
 
 MyUtils.prototype.afterIframeReady = function (jqObjIframe, callbackFunc) {
     if (jqObjIframe.length < 1) {
-        MyUtils.prototype.log('未找到指定iframe，无法注册ready事件...');
+        MyUtils.prototype.log('The specified iframe was not found and the ready event could not be registered...');
         return;
     }
     if ('function' != typeof callbackFunc) {
         callbackFunc = function () {
-            MyUtils.prototype.log('iframe加载完成...');
+            MyUtils.prototype.log('iframe loaded complete...');
             console.dir(arguments);
         }
     }
@@ -788,7 +762,7 @@ MyUtils.prototype.afterIframeReady = function (jqObjIframe, callbackFunc) {
 };
 
 
-/*动态执行Reactjs代码*/
+/*Dynamically execute Reactjs code*/
 MyUtils.prototype.dynExecuteReactJs = function (reactJsCode, newReactjsEleId) {
     newReactjsEleId = newReactjsEleId ? newReactjsEleId : 'myReactJs';
     let reactJsObj = MyUtils.prototype.jqHelpFind('#' + newReactjsEleId);
@@ -805,20 +779,20 @@ MyUtils.prototype.dynExecuteReactJs = function (reactJsCode, newReactjsEleId) {
     MyUtils.prototype.getJQuery('body').append(script);
 };
 
-/*播放音乐*/
+/*play music*/
 MyUtils.prototype.playMusic = function (musicUrl = '') {
     if (!musicUrl) {
-        MyUtils.prototype.log('警告:未提供音乐播放url,播放失败....');
+        MyUtils.prototype.log('Warning: No music playback url provided, playback failed....');
         return false;
     }
     let musicObj = MyUtils.prototype.jqHelpFind('#objMusic');
     if (!musicObj.length) {
-        /*注入播放控件*/
+        /*Inject playback controls*/
         let htmlPlayMusic = '<audio id="objMusic" src="">你的浏览器暂不支持音乐播放,请升级</audio>';
         if (MyUtils.prototype.jqHelpFind('body').append(htmlPlayMusic)) {
-            MyUtils.prototype.log('注入音乐播放控件成功....');
+            MyUtils.prototype.log('Injected music playback controls successfully....');
         } else {
-            MyUtils.prototype.log('警告:注入音乐播放控件失败....');
+            MyUtils.prototype.log('Warning: Failed to inject music playback controls....');
             return false;
         }
     }
@@ -826,35 +800,35 @@ MyUtils.prototype.playMusic = function (musicUrl = '') {
     if (musicObj.length) {
         musicObj = musicObj.get(0);
         let isPlaying = !musicObj.paused;
-        /*正反面播放不同音乐*/
+        /*Play different music on the front and back*/
         let oldMusicUrl = musicObj.src;
         if (oldMusicUrl == musicUrl && isPlaying) {
-            //重复播放跳过
-            MyUtils.prototype.log('重复歌曲正在播放,跳过:' + musicUrl);
+            //repeat skip
+            MyUtils.prototype.log('Repeat song is playing, skip:' + musicUrl);
             return true;
         }
-        MyUtils.prototype.log('开始播放音乐:' + musicUrl);
+        MyUtils.prototype.log('start playing music:' + musicUrl);
         musicObj.src = musicUrl;
         musicObj.play();
     } else {
-        MyUtils.prototype.log('没找到音乐控件,播放音乐失败');
+        MyUtils.prototype.log('Music control not found, failed to play music');
     }
 };
 
-/*停止音乐*/
+/*stop music*/
 MyUtils.prototype.stopMusic = function () {
     let musicObj = MyUtils.prototype.jqHelpFind('#objMusic');
     if (!musicObj.length) {
-        MyUtils.prototype.log('未找到音乐控件,可能尚未播放,无需停止....');
+        MyUtils.prototype.log('Music controls not found, probably not playing yet, no need to stop....');
         return true;
     }
     musicObj = musicObj.get(0);
     musicObj.pause();
     musicObj.currentTime = 0;
-    MyUtils.prototype.log('停止音乐播放:' + musicObj.src);
+    MyUtils.prototype.log('stop music playback:' + musicObj.src);
 };
 
-/*动态执行Reactjs代码*/
+/*Dynamically execute js code*/
 MyUtils.prototype.loadJsFromUrl = function (jsUrl, jsOnload, jsOnreadystatechange, jsInjectLocation) {
     if ('string' !== typeof jsUrl) {
         return false;
@@ -869,7 +843,7 @@ MyUtils.prototype.loadJsFromUrl = function (jsUrl, jsOnload, jsOnreadystatechang
     return true;
 };
 
-/*动态执行Reactjs代码*/
+/*Dynamically execute js code*/
 MyUtils.prototype.dynExecuteJsbyUrl = function (url) {
     let script = document.createElement('script');
     // script.id = newReactjsEleId;
@@ -879,7 +853,6 @@ MyUtils.prototype.dynExecuteJsbyUrl = function (url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 };
 
-/*停止音乐*/
 MyUtils.prototype.hmsToSecondsOnly = function (timeStr) {
     if (!timeStr) {
         return false;
@@ -892,7 +865,7 @@ MyUtils.prototype.hmsToSecondsOnly = function (timeStr) {
     return s;
 };
 
-/*获取当前函数名*/
+/*Get the current function name*/
 MyUtils.prototype.getCurFuncName = function () {
     let stack = new Error().stack;
     let caller = stack.split('\n')[2].trim();
@@ -901,7 +874,7 @@ MyUtils.prototype.getCurFuncName = function () {
 };
 
 
-/*模拟触发js dom事件*/
+/*Simulate triggering js dom events*/
 MyUtils.prototype.eventFire = function (el, etype) {
     if (el.fireEvent) {
         el.fireEvent('on' + etype);
@@ -912,7 +885,7 @@ MyUtils.prototype.eventFire = function (el, etype) {
     }
 };
 
-/*模拟触发js原生click事件*/
+/*Simulate triggering js native click event*/
 MyUtils.prototype.simulateClick = function (el) {
     alert('cls_name:' + MyUtils.prototype.getClsName(el));
     if ('object' !== typeof el) {
@@ -935,18 +908,17 @@ MyUtils.prototype.getClsName = function (obj) {
 };
 
 
-/*模拟触发js dom键盘输入事件*/
+/*Simulate trigger js dom keyboard input event*/
 MyUtils.prototype.simulateKeyPress = function (character) {
     jQuery.event.trigger({type: 'keypress', which: character.charCodeAt(0)});
 };
 
-/*模拟触发js dom事件*/
 MyUtils.prototype.random = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 
-//自定义日志函数,支持换行符,主要用于输出服务器日志
+//Custom log function, support newline, mainly used to output server log
 MyUtils.prototype.logInfos = function (msg, jqStrLog, fontColor) {
     fontColor = fontColor ? fontColor : 'red';
     let jqObj = MyUtils.prototype.jqHelpFind(jqStrLog);
@@ -967,14 +939,14 @@ MyUtils.prototype.logInfos = function (msg, jqStrLog, fontColor) {
     }
 };
 
-//自定义日志函数,支持换行符,主要用于输出服务器日志
+//Custom log function, support newline, mainly used to output server log
 MyUtils.prototype.logTopPage = function (msg, fontColor) {
     fontColor = fontColor ? fontColor : 'blueviolet';
     let jqObj = MyUtils.prototype.jqHelpFind('#warnMsg');
 
-    //如果非iframe嵌套，尝试注入日志div
+    //If non-iframe nested, try injecting log div
     if (jqObj.length < 1 && MyUtils.prototype.jqHelpFind('body').length) {
-        // console.log('尝试注入页面日志div');
+        // console.log('Attempt to inject into page log div');
         MyUtils.prototype.jqHelpFind('body').prepend('<span id="warnMsg" style="text-align:left;"></span>');
     }
     jqObj = MyUtils.prototype.jqHelpFind('#warnMsg');
@@ -996,7 +968,7 @@ MyUtils.prototype.logTopPage = function (msg, fontColor) {
     }
 };
 
-//获取jQuery全局对象
+//Get the jQuery global object
 MyUtils.prototype.getJQuery = function (jqObj = '') {
     if (!MyUtils.prototype.hasRealJquery()) {
         return false;
@@ -1005,17 +977,17 @@ MyUtils.prototype.getJQuery = function (jqObj = '') {
     // return jqObj?jQuery(jqObj):jQuery;
 };
 
-//判断是否含有真实jquery
+//Determine whether it contains real jquery
 MyUtils.prototype.hasRealJquery = function (msg) {
     return ('undefined' !== typeof $ && 'undefined' !== typeof jQuery && $ == jQuery) ? true : false;
 };
 
-//字符串首字母大写
+//Capitalize the first letter of the string
 MyUtils.prototype.capitalizeFirstLetter = function (str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-//小数点保留N位，且不四舍五入
+//The decimal point is reserved to N digits and is not rounded off
 MyUtils.prototype.floatToFixed = function (figure, decimals) {
     // let d = Math.pow(10, decimals);
     // return (parseInt(figure * d) / d).toFixed(decimals);
@@ -1097,16 +1069,16 @@ MyUtils.prototype.decodeFromUrlGet = function (url, encoding, callback) {
     // Using 'arraybuffer' as the responseType ensures that the raw data is returned,
     // rather than letting XMLHttpRequest decode the data first.
     xhr.responseType = 'arraybuffer';
-    xhr.onload = function () {//注意这里不能用()=>模式,因为里层要的this就是需要执行js调用者
+    xhr.onload = function () {//Note that the ()=> pattern cannot be used here, because the this in the inner layer needs to execute the js caller
         if (200 === this.status) {
-            //方案1：成功
+            //Scenario 1: Success
             // The decode() method takes a DataView as a parameter, which is a wrapper on top of the ArrayBuffer.
             let dataView = new DataView(this.response);
             // The TextDecoder interface is documented at http://encoding.spec.whatwg.org/#interface-textdecoder
             let decoder = new TextDecoder(encoding);
             let decodedString = decoder.decode(dataView);//or let decodedString = decoder.decode(this.response);
             // console.log(decodedString);
-            //方案2：成功
+            //Scenario 2: Success
             // let test = iconv.decode(this.response,encoding );
             // let test = iconv.decode(Buffer.from(this.response), 'gb2312');
             // console.log(test);
@@ -1121,7 +1093,7 @@ MyUtils.prototype.decodeFromUrlGet = function (url, encoding, callback) {
 
 
 MyUtils.prototype.extGetGlobalVar = function (varName, callback) {
-    //回调函数转字符串作为参数传递
+    //The callback function is converted to a string and passed as a parameter
     window.postMessage({
         type: 'FROM_PAGE',
         funcName: 'getGlobalVar',
@@ -1135,7 +1107,7 @@ MyUtils.prototype.extSetGlobalVar = function (varName, varValue) {
 };
 
 MyUtils.prototype.extExeGlobalJs = function (jsStr, callback, debug) {
-    //回调函数转字符串作为参数传递,注意:callback是在bg作用域执行的
+    //The callback function is converted to a string and passed as a parameter, note: callback is executed in the bg scope
     let sender = (top == self ? window : parent);
     'function' == typeof callback ?
         sender.postMessage({
@@ -1187,12 +1159,12 @@ MyUtils.prototype.convToTargetFullUrl = function (urlPath = '') {
     if (urlPath.startsWith('http')) {
         return urlPath;
     }
-    //特殊处理
+    //special deal
     if (-1 !== urlPath.indexOf('url(')) {
         urlPath = urlPath.replace(/[\s\S]*url\("/, '').replace(/[\);]+/, '');
         // console.log(urlPath.replace(/[\s\S]*url\(/,'').replace(/[\);]+/,''));
     }
-    //自动修正补加host前缀
+    //Automatically correct and add host prefix
     if (urlPath.startsWith('//')) {
         return window.location.protocol + urlPath;
     }
@@ -1204,7 +1176,7 @@ MyUtils.prototype.getFloatValue = function (value, toFixedNum = 9, returnFalseIf
     let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
     let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
     if (!matchRet) {
-        // myUtils.log('警告，未提取到浮点型数值!');
+        // myUtils.log('warning, float value not extracted!');
         return returnFalseIfNot ? false : 0;
     }
     newValue = matchRet[0];
@@ -1217,7 +1189,7 @@ MyUtils.prototype.getFloatBits = function (value, returnFalseIfNot = false) {
     if (value && -1 !== value.indexOf('.')) {
         valueBits = value.substr(value.indexOf('.') + 1).length;
     }
-    //myUtils.log('调试:jqStr:' + jqStr + ',值:' + newValue + ',小数位数:' + valueBits);
+    //myUtils.log('debugging:jqStr:' + jqStr + ',value:' + newValue + ',decimal places:' + valueBits);
     return valueBits;
 };
 
@@ -1230,13 +1202,13 @@ MyUtils.prototype.getFloatBitsByJqStr = function (jqStr, returnFalseIfNot = fals
     let newValue = ('' + value).trim().replace(',', '').replace(' ', '');
     let matchRet = newValue.match(/(\d+(\.\d+)?)/g);
     if (!matchRet) {
-        //MyUtils.prototype.log('警告，未提取到浮点型数值!');
+        //MyUtils.prototype.log('warning, float value not extracted!');
         return returnFalseIfNot ? false : 0;
     }
     return MyUtils.prototype.getFloatBits(matchRet[0], returnFalseIfNot);
 };
 
 
-/*创建工具类对象*/
-//注意:使用let作用域会导致console控制台无法使用myUtils变量
+/*Create a tool class object*/
+//Note: Using the let scope will make the myUtils variable unavailable to the console console
 var myUtils = new MyUtils();
