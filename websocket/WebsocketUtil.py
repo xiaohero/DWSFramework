@@ -79,7 +79,7 @@ class WebsocketUtil:
             'msg': successMsg,
             'data': {'exeJsCode':jsCode}
          }
-        #下面的字段为兼容客户端老数据个
+        #下面的字段为兼容客户端老数据格式
         retData['op']='doTask'
         retData['data']=json.dumps(retData['data'])
         return retData

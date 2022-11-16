@@ -418,7 +418,7 @@ MyUtils.prototype.jsonpUploadServerData = function (clientData) {
         jsonp: 'jsonUtilCallBackParam',
         /*jsonpCallbackString:'jsonUtilCallbackFunc',*/
         success: function (msg) {
-            console.log('The request is successful and the result is returned:'+JSON.stringify(msg));
+            console.log('The request is successful and the result is returned:' + JSON.stringify(msg));
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
             console.log('request failed, interface request error:' + JSON.stringify(errorThrown));
@@ -652,18 +652,6 @@ MyUtils.prototype.closeCurrentPage = function () {
         window.close();
     }
     /************/
-};
-
-
-/*page redirect*/
-MyUtils.prototype.redirectUrl = function (url, iframeName, newTab = false) {
-    if (newTab && MyUtils.prototype.getDwsChmExtVersion()) {
-        MyUtils.prototype.extExeGlobalJs('chrome.tabs.create({url: "' + url + '"});', () => {
-        });
-        return;
-    }
-    let whichWindow = MyUtils.prototype.isIframeSupport(iframeName) ? window.frames[iframeName].window : window;
-    whichWindow.location = url;
 };
 
 /*page refresh*/
@@ -1046,13 +1034,23 @@ MyUtils.prototype.isIframeSupport = function (iframeName) {
     return isOk;
 };
 
-MyUtils.prototype.openNewTab = function (url) {
-    MyUtils.prototype.getJQuery().ajax({
-        url: 'http://www.163.com',
-        success: function () {
-            window.open(url, '_blank');
-        },
-        async: false
+/*page redirect*/
+MyUtils.prototype.redirectUrl = function (url, iframeName, newTab = false) {
+    if (newTab && MyUtils.prototype.getDwsChmExtVersion()) {
+        MyUtils.prototype.extExeGlobalJs('chrome.tabs.create({url: "' + url + '"});', () => {
+        });
+        return;
+    }
+    let whichWindow = MyUtils.prototype.isIframeSupport(iframeName) ? window.frames[iframeName].window : window;
+    whichWindow.location = url;
+};
+
+MyUtils.prototype.openNewTab = function (url, newWindow = false, isFullscreen = false) {
+    if (!newWindow) {
+        window.open(url, '_blank');
+        return;
+    }
+    MyUtils.prototype.extExeGlobalJs('chrome.windows.create({focused:true,state:"' + (isFullscreen ? "fullscreen" : "maximized") + '",url: "' + url + '"});', () => {
     });
 };
 
@@ -1206,6 +1204,30 @@ MyUtils.prototype.getFloatBitsByJqStr = function (jqStr, returnFalseIfNot = fals
         return returnFalseIfNot ? false : 0;
     }
     return MyUtils.prototype.getFloatBits(matchRet[0], returnFalseIfNot);
+};
+
+/*send http get by bg,resolve cross-domain problems*/
+MyUtils.prototype.bgHttpGet = function get(url, data, callback, async = true) {
+    if (MyUtils.prototype.getDwsChmExtVersion()) {
+        let jsCode = `ajaxUtil.get("${url}", ${data}, ${callback}, ${async})`;
+        MyUtils.prototype.extExeGlobalJs(jsCode, () => {
+        });
+        return true;
+    }
+    callback("error:target chrome extension not installed");
+    return false;
+};
+
+/*send http get by bg,resolve cross-domain problems*/
+MyUtils.prototype.bgHttpPost = function get(url, data, callback, async = true) {
+    if (MyUtils.prototype.getDwsChmExtVersion()) {
+        let jsCode = `ajaxUtil.post("${url}", ${data}, ${callback}, ${async})`;
+        MyUtils.prototype.extExeGlobalJs(jsCode, () => {
+        });
+        return true;
+    }
+    callback("error:target chrome extension not installed");
+    return false;
 };
 
 

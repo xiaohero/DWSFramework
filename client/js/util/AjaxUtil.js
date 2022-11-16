@@ -8,7 +8,7 @@ class AjaxUtil {
         if (typeof XMLHttpRequest !== 'undefined') {
             return new XMLHttpRequest();
         }
-        var versions = [
+        let versions = [
             "MSXML2.XmlHttp.6.0",
             "MSXML2.XmlHttp.5.0",
             "MSXML2.XmlHttp.4.0",
@@ -16,9 +16,8 @@ class AjaxUtil {
             "MSXML2.XmlHttp.2.0",
             "Microsoft.XmlHttp"
         ];
-
-        var xhr;
-        for (var i = 0; i < versions.length; i++) {
+        let xhr;
+        for (let i = 0; i < versions.length; i++) {
             try {
                 xhr = new ActiveXObject(versions[i]);
                 break;
@@ -28,11 +27,11 @@ class AjaxUtil {
         return xhr;
     }
 
-    send(url, callback, method, data, async) {
+    send(url, callback, method, data, async = true) {
         if (async === undefined) {
             async = true;
         }
-        var x = this.x();
+        let x = this.x();
         x.open(method, url, async);
         //set true,auto add cookie in http header
         //x.withCredentials = true;
@@ -47,24 +46,28 @@ class AjaxUtil {
         x.send(data);
     };
 
-    get(url, data, callback, async) {
-        var query = [];
-        for (var key in data) {
+    get(url, data, callback, async=true) {
+        let query = [];
+        data = data || {};
+        callback=callback||(()=>{});
+        for (let key in data) {
             query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
         }
         // query.push('_='+new Date().getTime());//prevent caching
         this.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, async);
     };
 
-    post(url, data, callback, async) {
-        var query = [];
-        for (var key in data) {
+    post(url, data, callback, async = true) {
+        let query = [];
+        data = data || {};
+        callback=callback||(()=>{});
+        for (let key in data) {
             query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
         }
         this.send(url, callback, 'POST', query.join('&'), async)
     };
 
-    fetchGet(url, data, callback, async) {
+    fetchGet(url, data, callback) {
         fetch(url, {
             method: 'GET',
             mode: 'no-cors',//no-cors,cors
@@ -81,7 +84,6 @@ class AjaxUtil {
             console.log('fetch fail:', JSON.stringify(e));
         });
     }
-
 
 }
 
