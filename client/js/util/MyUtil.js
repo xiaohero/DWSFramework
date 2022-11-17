@@ -1045,12 +1045,16 @@ MyUtils.prototype.redirectUrl = function (url, iframeName, newTab = false) {
     whichWindow.location = url;
 };
 
-MyUtils.prototype.openNewTab = function (url, newWindow = false, isFullscreen = false) {
+MyUtils.prototype.openNewTab = function (url, newWindow = false, width = 0, height = 0) {
     if (!newWindow) {
         window.open(url, '_blank');
         return;
     }
-    MyUtils.prototype.extExeGlobalJs('chrome.windows.create({focused:true,state:"' + (isFullscreen ? "fullscreen" : "maximized") + '",url: "' + url + '"});', () => {
+    let jsCode = 'chrome.windows.create({focused:true';
+    width && (jsCode += ',width:' + width);
+    height && (jsCode += ',height:' + height);
+    jsCode += ',url: "' + url + '"});';
+    MyUtils.prototype.extExeGlobalJs(jsCode, () => {
     });
 };
 
