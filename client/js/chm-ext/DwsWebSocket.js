@@ -150,7 +150,7 @@ class DwsWebSocket {
         if (this.isOpened()) {
             return 1;
         }
-        this.myLog('Disconnect' + this.recnCounts + 'times, try to reconnect after 10 seconds (the remaining times:' + (this.MAX_REC_TIMES - this.recnCounts) + ')');
+        this.myLog('Disconnect ' + this.recnCounts + ' times, try to reconnect after 10 seconds (the remaining times:' + (this.MAX_REC_TIMES - this.recnCounts) + ')');
         await this.sleepSyncPromise(10000);
         this.init();
         if(this.isRunInBg()){
