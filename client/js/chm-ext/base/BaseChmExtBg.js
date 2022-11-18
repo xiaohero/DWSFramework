@@ -195,6 +195,10 @@ class BaseChmExtBg {
         return hex;
     }
 
+    getCurrentExtentionId() {
+        return chrome.runtime.id;
+    }
+
     getClientExtId() {
         if (!this.clientExtId) {
             this.initClientExtId();
