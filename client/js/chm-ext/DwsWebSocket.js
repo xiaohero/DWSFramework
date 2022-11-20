@@ -220,8 +220,8 @@ class DwsWebSocket {
             return;
         }
         // Temporarily block login
-        if (-1 !== str.indexOf('请先登录') && !this.isLogined) {//The login prompt may pop up multiple times
-        // if (-1 !== str.indexOf('请先登录') && null===this.isLogined) {//Make sure the login prompt only pops up once
+        if (-1 !== str.indexOf('Please login') && !this.isLogined) {//The login prompt may pop up multiple times
+        // if (-1 !== str.indexOf('Please login') && null===this.isLogined) {//Make sure the login prompt only pops up once
             this.isLogined=false;
             let tmpJs = 'let resText = "";fetch("'+this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Gm/bindSessionByBid?bid='+this.bid+'").then(response => {return response.text()}).then(text => {resText=text}).finally(() => {if ("success"!=resText) {alert("It is detected that you are not logged in and will be redirected to the login page for you");window.open("' + this.servHost.replace('ws://', 'http://') + '/'+this.upPrjName+'/Accounts/login' + '");}})';
             // this.isCurRunInBg?dwsChmExtBg.sendJsToPageByUrl(this.targetUrl,tmpJs,true):window.eval(tmpJs);

@@ -36,7 +36,7 @@ class AnnoUser(object):
             # print('当前channel:{} 是否登录:{} 用户名:{} uid:{}'.format(message.channel.name,message.user.is_authenticated,message.user.username,message.reply_channel))
             if not message.user.is_authenticated:
                 loginErr={
-                    'text': json.dumps({'msg': '请先登录:'+message.channel.name}),
+                    'text': json.dumps({'msg': 'Please login:'+message.channel.name}),
                 }
                 message.reply_channel.send(loginErr)
             else:
@@ -59,7 +59,7 @@ class AnnoUser(object):
             # print('当前channel:{} 是否登录:{} 用户名:{} uid:{}'.format(message.channel.name,message.user.is_authenticated,message.user.username,message.reply_channel))
             if not message.user.is_authenticated:
                 loginErr={
-                    'text': json.dumps({'msg': '请先登录:'+message.channel.name}),
+                    'text': json.dumps({'msg': 'Please login:'+message.channel.name}),
                 }
                 message.reply_channel.send(loginErr)
             else:
@@ -84,7 +84,9 @@ class AnnoUser(object):
             if not needSkipCheck and 'clientInfo' in message.channel_session:
                 needSkipCheck= True if '127.0.0.1'==message.channel_session['clientInfo']['ip'][0] else False
             #暂时废除老机制
-            needSkipCheck=False
+            #needSkipCheck=False
+            #临时关闭:强制登录检测
+            needSkipCheck = True
             loginErr=None
             if not message.user.is_authenticated:
                 #print(message.content)
@@ -106,9 +108,9 @@ class AnnoUser(object):
                     #aUser=authenticate(username=message.user.username, password=message.user.password)
                     #MyUtil.logInfo("自动识别到已登陆用户:bid({}),rc:{},uid:{},is_authenticated:{},is_active:{}".format(bid,message.reply_channel,uid,message.user.is_authenticated,message.user.is_active))
                 else:
-                    loginErr = '请先登录!'
+                    loginErr = 'Please login!'
             if not loginErr and not message.user.is_active:
-                loginErr='用户未激活，请联系管理员激活!'
+                loginErr='User not activated, please contact administrator to activate!'
             if loginErr:
                 if needSkipCheck and not MyUtil.isCurWindowsSystem():
                     MyUtil.logInfo('warn:{},消息:{},是否登录:{},是否激活:{},用户名:{},uid:{},ip:{}'.format('本地chrome后台环境测试,临时跳过登录验证',message.channel.name,message.user.is_authenticated,message.user.is_active,message.user.username,message.reply_channel, brwClientIp))

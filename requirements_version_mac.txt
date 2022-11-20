@@ -9,6 +9,8 @@ celery==4.3.1
 django-celery-beat==1.5.0
 django_redis==4.10.0
 mysqlclient==1.4.4
+#python3.10+(用PyMySQL替代mysqlclient)
+#PyMySQL==1.0.2
 dj-static==0.0.6
 #WhiteNoise
 #注意报错:mysql_config: command not found(解决方案:yum install python-devel mysql-devel)

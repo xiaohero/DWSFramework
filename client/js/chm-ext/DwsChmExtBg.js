@@ -9,6 +9,8 @@ class DwsChmExtBg extends BaseChmExtBg {
         this.enableBgDebug = false;
         //others
         this.ajaxUtil=ajaxUtil;
+        //js for popup
+        this.jsToPopUp = '';
         //init
         this.init();
     }
@@ -155,6 +157,9 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     createContextMenus(request) {
+        if ('undefined' == typeof chrome.contextMenus) {
+            return false;
+        }
         //Create extension icon right-click menu
         // chrome.contextMenus.removeAll();
         // Remove the old menu first
@@ -164,20 +169,31 @@ class DwsChmExtBg extends BaseChmExtBg {
         //chrome.contextMenus.remove('switchBgDebug');
         //chrome.contextMenus.remove('enableHttpstoHttp');
         //chrome.contextMenus.remove('disableHttpstoHttp');
+        //extension assistance
         chrome.contextMenus.create({
-            id: 'dwsHomePage',
+            id: 'flushAllTabs',
             type: 'normal',
-            title: chrome.i18n.getMessage("gotoDwsHomePage"),
+            title: chrome.i18n.getMessage("flushAllTabs"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
-                let curServUrl = this.getCurServUrl();
-                if (!curServUrl || '0' == curServUrl || 'string' != typeof curServUrl) {
-                    return;
-                }
-                window.open(curServUrl + '/'+this.upPrjName+'/');
+                this.flushAllTabs({alertDebug: false, gapMs: 5000});
             }
         });
-        //extension assistance
+        chrome.contextMenus.create({
+            id: 'flushOthersTabs',
+            type: 'normal',
+            title: chrome.i18n.getMessage("flushOtherTabs"),
+            contexts: ['browser_action', 'page', 'frame'],
+            onclick: () => {
+                chrome.tabs.query({active: true}, (tabs) => {
+                    if (tabs.length < 1) {
+                        alert('error,cur tab not found');
+                        return;
+                    }
+                    this.flushAllTabs({alertDebug: false, gapMs: 5000, notTabId: tabs[0].id});
+                });
+            }
+        });
         chrome.contextMenus.create({
             id: 'reOpenClientPages',
             type: 'normal',
@@ -234,7 +250,20 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     flushAllTabs(request) {
-        return glbFlushAllTabs(request);
+        //chrome.tabs.getAllInWindow obsolete
+        chrome.tabs.query({}, async (tabs) => {
+            for (let i in tabs) {
+                if ('undefined' != typeof request && request.notTabId && request.notTabId == tabs[i].id) {
+                    // alert('Skip current tab page refresh:'+tabs[i].title);
+                    continue;
+                }
+                'undefined' != typeof request && request.alertDebug ? alert('flush tab:' + tabs[i].url + ',infos:' + JSON.stringify(tabs[i])) : false;
+                //flush tab
+                chrome.tabs.update(tabs[i].id, {url: tabs[i].url, selected: tabs[i].selected});
+                'undefined' != typeof request && request.gapMs ? await new Promise(resolve => setTimeout(resolve, request.gapMs)) : false;
+            }
+        });
+        return true;
     }
 
     reOpenAllPages(sleepMs) {
@@ -255,6 +284,33 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     getServUrlList() {
         return 'undefined' === typeof servUrlList ? {} : servUrlList;
+    }
+
+    setJsToPopUp(outJs) {
+        this.jsToPopUp = outJs;
+    }
+
+    getJsToPopUp() {
+        return this.jsToPopUp || '2>1';
+    }
+
+    openClientHome() {
+        let servUrl = this.getCurServUrl();
+        // let servUrl = getCurServInfo()[0];
+        if ('0' == servUrl) {
+            window.alert('out of service');
+            return;
+        }
+        if (!servUrl) {
+            window.alert('the server is not yet open');
+            return;
+        }
+        servUrl += dwsServerHomePath;
+        window.open(servUrl);
+    }
+
+    setServUrlList(newServUrlList) {
+        return servUrlList = newServUrlList;
     }
 
     getFrontJs(notEncodeURI) {
