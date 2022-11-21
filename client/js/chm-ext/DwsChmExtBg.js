@@ -11,6 +11,10 @@ class DwsChmExtBg extends BaseChmExtBg {
         this.ajaxUtil=ajaxUtil;
         //js for popup
         this.jsToPopUp = '';
+        //js for other1
+        this.jsToOther1 = '';
+        //js for other2
+        this.jsToOther1 = '';
         //init
         this.init();
     }
@@ -292,6 +296,22 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     getJsToPopUp() {
         return this.jsToPopUp || '2>1';
+    }
+
+    setJsToOther1(outJs) {
+        this.jsToOther1 = outJs;
+    }
+
+    getJsToOther1() {
+        return this.jsToOther1 || '2>1';
+    }
+
+    setJsToOther2(outJs) {
+        this.jsToOther2 = outJs;
+    }
+
+    getJsToOther2() {
+        return this.jsToOther2 || '2>1';
     }
 
     openClientHome() {
