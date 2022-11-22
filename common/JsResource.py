@@ -8,7 +8,6 @@ from ..util.MyUtil import MyUtil
 
 
 class JsResource:
-
     '''
     静态资源访问类
     '''
@@ -33,20 +32,25 @@ class JsResource:
         fileContent = ''
         if needBid:
             fileContent += MyUtil.readFileToStr(jsFileBiri, True)
-        fileContent += MyUtil.readFileToStr(jsFileBaseChmExtBg, True)+MyUtil.readFileToStr(jsFileBaseChmExtFt, True)
-        fileContent += MyUtil.readFileToStr(jsFileWebSocket, True)#提到前面引入
+        fileContent += MyUtil.readFileToStr(jsFileBaseChmExtBg, True) + MyUtil.readFileToStr(jsFileBaseChmExtFt, True)
+        fileContent += MyUtil.readFileToStr(jsFileWebSocket, True)  # 提到前面引入
         fileContent += MyUtil.readFileToStr(jsFileDwsChmBbExt, True)
         fileContent += MyUtil.readFileToStr(jsFileDwsChmFtExt, True)
+        # write merged file
+        newFilePath = MyUtil.writeDataFile(fileContent, 'obf_out/chmExt.js', False, False, True)
+        # obf final js file
+        fileContent = MyUtil.readFileToStr(newFilePath, True, True, True)
         return fileContent
 
-    #获取基础js资源
+    # 获取基础js资源
     @classmethod
     def getBaseJsContents(cls, needJquery=0, needJqueryXpath=0, needReact=0, needVue=0, needJqueryCookie=1, needBid=1):
         fileContent = ''
         # fixme:正式上线后，如若js不再更改，可开启读文件缓存
         jsFileJquery = '{}/js/third-party/jquery/3.2.1/jquery.js'.format(MyUtil.getDWSClientDir())
         jsFileJqueryXPath = '{}/js/third-party/jquery-xpath/0.3.1/jquery.xpath.min.js'.format(MyUtil.getDWSClientDir())
-        jsFileJqueryCookie = '{}/js/third-party/jquery-cookie/1.4.1/jquery.cookie.min.js'.format(MyUtil.getDWSClientDir())
+        jsFileJqueryCookie = '{}/js/third-party/jquery-cookie/1.4.1/jquery.cookie.min.js'.format(
+            MyUtil.getDWSClientDir())
         jsFileReact = '{}/js/third-party/react/15.6.1/react.js'.format(MyUtil.getDWSClientDir())
         jsFileReactDom = '{}/js/third-party/react/15.6.1/react-dom.js'.format(MyUtil.getDWSClientDir())
         jsFileVue = '{}/js/third-party/vue/2.3.4/vue.js'.format(MyUtil.getDWSClientDir())
@@ -85,10 +89,10 @@ class JsResource:
 
     # 根据平台代码,获取逻辑js资源
     @classmethod
-    def getDefaultClientJsContents(cls, siteCode:str, needJquery=0,runMethod:str='run',runStrParams:str=''):
-        fileContent=''
+    def getDefaultClientJsContents(cls, siteCode: str, needJquery=0, runMethod: str = 'run', runStrParams: str = ''):
+        fileContent = ''
         # 默认业务类路径
-        jsFileLogicClient = '{}/js/logic/{}/ClientService.js'.format(MyUtil.getProjectStaticDir(),siteCode)
+        jsFileLogicClient = '{}/js/logic/{}/ClientService.js'.format(MyUtil.getProjectStaticDir(), siteCode)
         if MyUtil.isFilePathExisted(jsFileLogicClient):
             # 载入框架基础js库
             fileContent += cls.getBaseJsContents(needJquery)
@@ -98,7 +102,8 @@ class JsResource:
                 'class BaseClientService', 'var BaseClientService=class BaseClientService'
             )
             # 载入客户端实际业务基类(如果存在)
-            jsFileLogicCommonClient = '{}/js/logic/common/CommonClientService.js'.format(MyUtil.getProjectStaticDir(), siteCode)
+            jsFileLogicCommonClient = '{}/js/logic/common/CommonClientService.js'.format(MyUtil.getProjectStaticDir(),
+                                                                                         siteCode)
             if MyUtil.isFilePathExisted(jsFileLogicCommonClient):
                 fileContent += MyUtil.readFileToStr(jsFileLogicCommonClient, True).replace(
                     'class CommonClientService', 'var CommonClientService=class CommonClientService'
@@ -109,8 +114,12 @@ class JsResource:
             )
             # 启动客户端程序
             fileContent += ';clientService=new ClientService();'
-            fileContent += ';clientService.{}({});'.format(runMethod,runStrParams)
-            #print(';clientService.{}({});'.format(runMethod,runStrParams))
+            fileContent += ';clientService.{}({});'.format(runMethod, runStrParams)
+            # write merged file
+            newFilePath = MyUtil.writeDataFile(fileContent, 'obf_out/defaultClient.js', False, False, True)
+            # obf final js file
+            fileContent = MyUtil.readFileToStr(newFilePath, True, True, True)
+            # print(';clientService.{}({});'.format(runMethod,runStrParams))
         else:
             MyUtil.logInfo('默认业务js类路径文件({})未找到，请自行实现客户端业务类js查找并返回!'.format(jsFileLogicClient))
         return fileContent

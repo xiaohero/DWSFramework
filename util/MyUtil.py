@@ -147,7 +147,43 @@ class MyUtil:
     '''
 
     @classmethod
-    def readFileToStr(cls, filePath, noCache=False, appenDemicolon=True):
+    def readFileToStr(cls, filePath, noCache=False, appenDemicolon=True, needObf=False):
+        '''
+        :param filePath:
+        :param getFromCache:
+        :return:
+        '''
+        oldPath = filePath
+        newPath = filePath.replace('.js', '_Protected.js')
+        # 线上代码混淆后新文件名readFileToStr
+        if needObf and '.js' in filePath:
+            filePath = newPath
+        enableJsFileCache = (True if 'Y' == CacheUtil.get(cls.REDIS_JS_FILE_CACHE) else False)
+        # 线上默认开启文件缓存
+        if filePath in cls.__caches and enableJsFileCache:
+            return cls.__caches[filePath]
+        # 判断是否需要混淆
+        if newPath == filePath:
+            # 执行代码混淆，生成新文件
+            exeResult = subprocess.call([
+                'javascript-obfuscator',
+                oldPath,
+                '--output',
+                newPath
+            ])
+            print(exeResult)
+        if False and getattr(Path(filePath), 'read_text', None):
+            data = Path(filePath).read_text('utf-8')
+        else:  # 兼容非python3.6环境
+            with open(filePath, 'r', encoding='utf-8') as myFile:
+                data = myFile.read()
+        # 全局缓存
+        data = (data + ';') if (appenDemicolon and data) else data
+        cls.__caches[filePath] = data
+        return data
+
+    @classmethod
+    def readFileToStrOld(cls, filePath, noCache=False, appenDemicolon=True):
         '''
         :param filePath:
         :param getFromCache:
@@ -402,6 +438,7 @@ class MyUtil:
             out.write((MyUtil.getCurDateTime() + ':' if logAddTime else '') + strMsg + '\n')
         if outConsole:
             print(strMsg)
+        return targetFilePath
 
     @classmethod
     def getCurServerIp(cls, innetAddr=False):

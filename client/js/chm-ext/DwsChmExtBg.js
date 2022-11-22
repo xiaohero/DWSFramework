@@ -222,16 +222,16 @@ class DwsChmExtBg extends BaseChmExtBg {
         });
 
         //test menu
-        chrome.contextMenus.create({
-            id: 'switchBgDebug',
-            type: 'normal',
-            title: chrome.i18n.getMessage("switchBgDebug"),
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                this.enableBgDebug = !this.enableBgDebug;
-                alert('switch successful, the current debug switch(' + this.enableBgDebug + '):'+this.getClientExtId());
-            }
-        });
+        //chrome.contextMenus.create({
+        //    id: 'switchBgDebug',
+        //    type: 'normal',
+        //    title: chrome.i18n.getMessage("switchBgDebug"),
+        //    contexts: ['browser_action', 'page', 'frame'],
+        //    onclick: () => {
+        //        this.enableBgDebug = !this.enableBgDebug;
+        //        alert('switch successful, the current debug switch(' + this.enableBgDebug + '):'+this.getClientExtId());
+        //    }
+        //});
         chrome.contextMenus.create({
             id: 'enableHttpstoHttp',
             type: 'normal',
