@@ -1,4 +1,4 @@
-# DWSFramework ([English introduction](https://github.com/xiaohero/DWSFramework/blob/master/README.en.md)) (a general web framework based on django+websocket)
+# DWSFramework (a general web framework based on django+websocket)
 
 #### introduce
 * DWSFramework is a general web framework based on django+websocket, the code is written in the OOP style of java (convenient and easy to use).
