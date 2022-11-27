@@ -832,14 +832,27 @@ MyUtils.prototype.loadJsFromUrl = function (jsUrl, jsOnload, jsOnreadystatechang
 };
 
 /*Dynamically execute js code*/
-MyUtils.prototype.dynExecuteJsbyUrl = function (url) {
+MyUtils.prototype.dynExecuteJsbyUrl = function (url, autoRemove = true) {
+    if (!jsPath) {
+        return false;
+    }
     let script = document.createElement('script');
     // script.id = newReactjsEleId;
-    script.type = 'text/javascript';
+    //script.type = 'text/javascript';
+    script.setAttribute('type', 'text/javascript');
     script.src = url;
+    // support extension like ：chrome-extension://xxx/js/inject.js
+    //script.src = chrome.extension.getURL(jsPath);
     // script.async = true;
+    script.onload = function () {
+        // 放在页面不好看，执行完后移除掉
+        autoRemove && this.parentNode.removeChild(this);
+    };
     document.getElementsByTagName('head')[0].appendChild(script);
+    //document.head.appendChild(temp);
+    return true;
 };
+
 
 MyUtils.prototype.hmsToSecondsOnly = function (timeStr) {
     if (!timeStr) {
