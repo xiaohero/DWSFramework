@@ -1,4 +1,4 @@
-# DWSFramework（[English introduction](https://github.com/xiaohero/DWSFramework/blob/master/README.en.md)） (一个通用的基于django+websocket的web框架)
+# DWSFramework (一个通用的基于django+websocket的web框架)
 
 #### 介绍
 * DWSFramework是一个通用的基于django+websocket的web框架,代码按照java的OOP风格编写(方便好用).
