@@ -156,13 +156,11 @@ class BaseChmExtBg {
 
     getGlobalVar(request) {
         // alert('chrome_ext_bg:getGlobalVar:key:'+request.varName+',value:'+this.globalVars[request.varName]);
-        // return localStorage.getItem(request.varName);
         return 'undefined' == typeof this.globalVars[request.varName] ? null : this.globalVars[request.varName];
     }
 
     setGlobalVar(request) {
         // alert('chrome_ext_bg:setGlobalVar:key:'+request.varName+',value:'+request.varValue);
-        // return localStorage.setItem(request.varName, request.varValue);
         return this.globalVars[request.varName] = request.varValue;
     }
 
@@ -321,7 +319,7 @@ class BaseChmExtBg {
                                 if ('Network.requestWillBeSent' == method && 'request' in params && 'url' in params.request && params.request.url) {
                                     let urlMatchRet=params.request.url.match(requestMatchReg);
                                     urlMatchRet ? targetRequestIds[params.requestId] = params.requestId : false;
-                                    //urlMatchRet && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+urlMatchRet[0]+',requestId:'+params.requestId+',responseMatchReg:'+responseMatchReg);
+                                    //urlMatchRet && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+urlMatchRet[0]+',requestId:'+params.requestId+',responseMatchReg:'+requestMatchReg);
                                 }
                                 //Obtain the data after the network is loaded, otherwise the captured data may be incomplete (lost part)
                                 if ('Network.loadingFinished' == method && params.requestId in targetRequestIds) {

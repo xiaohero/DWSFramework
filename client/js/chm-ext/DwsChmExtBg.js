@@ -8,7 +8,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         //Other business parameters
         this.enableBgDebug = false;
         //others
-        this.ajaxUtil=ajaxUtil;
+        this.ajaxUtil = ajaxUtil;
         //js for popup
         this.jsToPopUp = '';
         //js for other1
@@ -146,11 +146,17 @@ class DwsChmExtBg extends BaseChmExtBg {
     httpGet(url, data, callback, async = true) {
         url = (url.includes('http://') || url.includes('https://')) ? url : (this.bgWebSocket.servAddr + url);
         return this.ajaxUtil.get(url, data, callback, async);
-    };
+    }
 
     httpPost(url, data, callback, async = true) {
         return this.ajaxUtil.post(url, data, callback, async);
-    };
+    }
+
+    importJsByUrl(url) {
+        this.httpGet(url, {}, (data) => {
+            window.eval(data);
+        });
+    }
 
     getCurServUrl() {
         return 'function'===typeof getCurServInfo ? getCurServInfo()[0]:"";
@@ -316,7 +322,6 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     openClientHome() {
         let servUrl = this.getCurServUrl();
-        // let servUrl = getCurServInfo()[0];
         if ('0' == servUrl) {
             window.alert('out of service');
             return;
@@ -344,7 +349,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     isSelfServPage(targetUrl) {
-        let selfServUrlKeywords=this.upPrjName+'/';
+        let selfServUrlKeywords = this.upPrjName + '/';
         if (targetUrl && 'string' == typeof targetUrl) {
             return -1 !== targetUrl.indexOf(selfServUrlKeywords) ? true : false;
         }

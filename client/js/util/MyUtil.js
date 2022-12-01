@@ -833,7 +833,7 @@ MyUtils.prototype.loadJsFromUrl = function (jsUrl, jsOnload, jsOnreadystatechang
 
 /*Dynamically execute js code*/
 MyUtils.prototype.dynExecuteJsbyUrl = function (url, autoRemove = true) {
-    if (!jsPath) {
+    if (!url) {
         return false;
     }
     let script = document.createElement('script');
@@ -842,7 +842,7 @@ MyUtils.prototype.dynExecuteJsbyUrl = function (url, autoRemove = true) {
     script.setAttribute('type', 'text/javascript');
     script.src = url;
     // support extension like ：chrome-extension://xxx/js/inject.js
-    //script.src = chrome.extension.getURL(jsPath);
+    // script.src = chrome.extension.getURL(url);
     // script.async = true;
     script.onload = function () {
         // 放在页面不好看，执行完后移除掉
@@ -1247,6 +1247,59 @@ MyUtils.prototype.bgHttpPost = function get(url, data, callback, async = true) {
     return false;
 };
 
+MyUtils.prototype.downloadCsvFromArray = async function (arrItems, fileName, arrHeaders = [], mimeType = 'text/csv;charset=utf-8;') {
+    //check arrItems not empty
+    if (arrItems.length < 1) {
+        return false;
+    }
+    //auto parse arrHeaders
+    if (arrHeaders.length<1) {
+        for (let key in arrItems[0]) {
+            arrHeaders.push(key);
+        }
+    }
+    //check auto import json2csv lib
+    if ('undefined' == typeof json2csv) {
+        MyUtils.prototype.dynExecuteJsbyUrl("https://cdn.jsdelivr.net/npm/json2csv", false);
+        await MyUtils.prototype.sleepSyncPromise(3000);
+    }
+    const xmlParser = new json2csv.Parser({fields: arrHeaders});
+    const csvDataStr = xmlParser.parse(arrItems);
+    //download csv file
+    let eleA = document.createElement('a');
+    mimeType = mimeType || 'application/octet-stream';//'text/csv;charset=utf-8;'
+    if (navigator.msSaveBlob) { // IE10
+        navigator.msSaveBlob(new Blob([csvDataStr], {
+            type: mimeType
+        }), fileName);
+    } else if (URL && 'download' in eleA) { //html5 A[download]
+        eleA.href = URL.createObjectURL(new Blob([csvDataStr], {
+            type: mimeType
+        }));
+        eleA.setAttribute('download', fileName);
+        document.body.appendChild(eleA);
+        eleA.click();
+        document.body.removeChild(eleA);
+    } else {
+        location.href = 'data:application/octet-stream,' + encodeURIComponent(csvDataStr); // only this mime type is supported
+    }
+};
+
+MyUtils.prototype.hasNestedField = function (obj, key) {
+    return key.split(".").every(function (x) {
+        if (typeof obj != "object" || obj === null || !x in obj) {
+            return false;
+        }
+        obj = obj[x];
+        return true;
+    });
+};
+
+MyUtils.prototype.getNestedField = function (obj, key) {
+    return key.split(".").reduce(function (o, x) {
+        return (typeof o == "undefined" || o === null) ? o : o[x];
+    }, obj);
+};
 
 /*Create a tool class object*/
 //Note: Using the let scope will make the myUtils variable unavailable to the console console
