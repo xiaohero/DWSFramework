@@ -220,7 +220,7 @@ class DwsChmExtBg extends BaseChmExtBg {
             title: chrome.i18n.getMessage("checkWsStatus"),
             contexts: ['browser_action', 'page', 'frame'],
             onclick: () => {
-                alert('current server connection status(' + this.getBgWebSocketStatus() + ')');
+                alert('current status(' + this.getBgWebSocketStatus() + ')');
                 if ('已关闭' == this.getBgWebSocketStatus()) {
                     this.getBgWebSocket().reconnect(true);
                 }

@@ -204,6 +204,10 @@ class BaseChmExtBg {
         return this.clientExtId;
     }
 
+    setRunningStatus(runStatus) {
+        dwsClientStatusInfo['errTxt'] = runStatus;
+    }
+
     initClientExtId() {
         chrome.storage.sync.get('chmId', (items) => {
             let chmId = items.chmId;

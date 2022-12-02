@@ -155,6 +155,8 @@ class MyUtil:
         '''
         oldPath = filePath
         newPath = filePath.replace('.js', '_Protected.js')
+        #测试用
+        #needObf=False
         # 线上代码混淆后新文件名readFileToStr
         if needObf and '.js' in filePath:
             filePath = newPath
