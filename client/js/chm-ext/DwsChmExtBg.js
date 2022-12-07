@@ -179,54 +179,60 @@ class DwsChmExtBg extends BaseChmExtBg {
         //chrome.contextMenus.remove('switchBgDebug');
         //chrome.contextMenus.remove('enableHttpstoHttp');
         //chrome.contextMenus.remove('disableHttpstoHttp');
+
         //extension assistance
-        chrome.contextMenus.create({
-            id: 'flushAllTabs',
-            type: 'normal',
-            title: chrome.i18n.getMessage("flushAllTabs"),
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                this.flushAllTabs({alertDebug: false, gapMs: 5000});
-            }
-        });
-        chrome.contextMenus.create({
-            id: 'flushOthersTabs',
-            type: 'normal',
-            title: chrome.i18n.getMessage("flushOtherTabs"),
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                chrome.tabs.query({active: true}, (tabs) => {
-                    if (tabs.length < 1) {
-                        alert('error,cur tab not found');
-                        return;
-                    }
-                    this.flushAllTabs({alertDebug: false, gapMs: 5000, notTabId: tabs[0].id});
-                });
-            }
-        });
-        chrome.contextMenus.create({
-            id: 'reOpenClientPages',
-            type: 'normal',
-            title: chrome.i18n.getMessage("reOpenAllPages"),
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                this.reOpenAllPages(2000);
-            }
-        });
-
-        chrome.contextMenus.create({
-            id: 'bgWsStatus',
-            type: 'normal',
-            title: chrome.i18n.getMessage("checkWsStatus"),
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                alert('current status(' + this.getBgWebSocketStatus() + ')');
-                if ('已关闭' == this.getBgWebSocketStatus()) {
-                    this.getBgWebSocket().reconnect(true);
-                }
-            }
-        });
-
+        // chrome.contextMenus.create({
+        //     id: 'flushAllTabs',
+        //     type: 'normal',
+        //     title: chrome.i18n.getMessage("flushAllTabs"),
+        //     contexts: ['browser_action', 'page', 'frame'],
+        //     onclick: () => {
+        //         this.flushAllTabs({alertDebug: false, gapMs: 5000});
+        //     }
+        // });
+        // chrome.contextMenus.create({
+        //     id: 'flushOthersTabs',
+        //     type: 'normal',
+        //     title: chrome.i18n.getMessage("flushOtherTabs"),
+        //     contexts: ['browser_action', 'page', 'frame'],
+        //     onclick: () => {
+        //         chrome.tabs.query({active: true}, (tabs) => {
+        //             if (tabs.length < 1) {
+        //                 alert('error,cur tab not found');
+        //                 return;
+        //             }
+        //             this.flushAllTabs({alertDebug: false, gapMs: 5000, notTabId: tabs[0].id});
+        //         });
+        //     }
+        // });
+        // chrome.contextMenus.create({
+        //     id: 'reOpenClientPages',
+        //     type: 'normal',
+        //     title: chrome.i18n.getMessage("reOpenAllPages"),
+        //     contexts: ['browser_action', 'page', 'frame'],
+        //     onclick: () => {
+        //         this.reOpenAllPages(2000);
+        //     }
+        // });
+        //
+        // chrome.contextMenus.create({
+        //     id: 'enableHttpstoHttp',
+        //     type: 'normal',
+        //     title: chrome.i18n.getMessage("enableHttpstoHttp"),
+        //     contexts: ['browser_action', 'page', 'frame'],
+        //     onclick: () => {
+        //         this.enableHttpstoHttp = true;
+        //     }
+        // });
+        // chrome.contextMenus.create({
+        //     id: 'disableHttpstoHttp',
+        //     type: 'normal',
+        //     title: chrome.i18n.getMessage("disableHttpstoHttp"),
+        //     contexts: ['browser_action', 'page', 'frame'],
+        //     onclick: () => {
+        //         this.enableHttpstoHttp = false;
+        //     }
+        // });
         //test menu
         //chrome.contextMenus.create({
         //    id: 'switchBgDebug',
@@ -238,25 +244,19 @@ class DwsChmExtBg extends BaseChmExtBg {
         //        alert('switch successful, the current debug switch(' + this.enableBgDebug + '):'+this.getClientExtId());
         //    }
         //});
-        chrome.contextMenus.create({
-            id: 'enableHttpstoHttp',
-            type: 'normal',
-            title: chrome.i18n.getMessage("enableHttpstoHttp"),
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                this.enableHttpstoHttp = true;
-            }
-        });
 
-        chrome.contextMenus.create({
-            id: 'disableHttpstoHttp',
-            type: 'normal',
-            title: chrome.i18n.getMessage("disableHttpstoHttp"),
-            contexts: ['browser_action', 'page', 'frame'],
-            onclick: () => {
-                this.enableHttpstoHttp = false;
-            }
-        });
+        // chrome.contextMenus.create({
+        //     id: 'bgWsStatus',
+        //     type: 'normal',
+        //     title: chrome.i18n.getMessage("checkWsStatus"),
+        //     contexts: ['browser_action', 'page', 'frame'],
+        //     onclick: () => {
+        //         alert('current status(' + this.getBgWebSocketStatus() + ')');
+        //         if ('已关闭' == this.getBgWebSocketStatus()) {
+        //             this.getBgWebSocket().reconnect(true);
+        //         }
+        //     }
+        // });
     }
 
     flushAllTabs(request) {
