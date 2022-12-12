@@ -22,10 +22,13 @@ class DwsChmExtFt extends BaseChmExtFt{
         }
     }
 
-    enterGame(){
-       this.invokeGlobalJs('dwsChmExtBg.getBgWebSocket().getEnterJs("'+window.location.href+'",1)', (result) => {
-           // console.log('bg request result:' + result);
-       });
+    enterGame() {
+        this.invokeGlobalJs('dwsChmExtBg.bgEnterGame("' + window.location.href + '")', (result) => {
+            // console.log('bg request result:' + result);
+        });
+        //this.invokeGlobalJs('dwsChmExtBg.getBgWebSocket() && dwsChmExtBg.getBgWebSocket().getEnterJs("' + window.location.href + '",1)', (result) => {
+        //    // console.log('bg request result:' + result);
+        //});
     }
 }
 /* javascript-obfuscator:enable */

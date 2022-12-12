@@ -1,12 +1,13 @@
 /**DWS chrome universal extension: background**/
 class DwsChmExtBg extends BaseChmExtBg {
-    constructor() {
+    constructor(enableBgWs = true) {
         super();
         this.upPrjName = ('undefined' !== typeof dwsServPrjName ? dwsServPrjName : 'DJXXX');
         this.bgWebSocket = null;
 
         //Other business parameters
         this.enableBgDebug = false;
+        this.enableBgWs = enableBgWs;
         //others
         this.ajaxUtil = ajaxUtil;
         //js for popup
@@ -23,7 +24,7 @@ class DwsChmExtBg extends BaseChmExtBg {
         this.removeIframeDisable();
         this.redirectHttpsToHttp();
         this.createContextMenus();
-        this.startBgWebSocket();
+        this.enableBgWs && this.startBgWebSocket();
     }
 
     startBgWebSocket() {
@@ -68,6 +69,16 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     getWebSocket() {
         return this.bgWebSocket;
+    }
+
+    bgEnterGame(ftUrl) {
+        if (this.enableBgWs) {
+            dwsChmExtBg.getBgWebSocket().getEnterJs(ftUrl, 1);
+        } else {
+            //alert("to implement");
+            console.log("http server to be implement");
+            //todo: getEnterJs by http to be implement
+        }
     }
 
     exeJsToPageFrame(tabUrl, iframeName, iframeJsCode) {
@@ -159,7 +170,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     getCurServUrl() {
-        return 'function'===typeof getCurServInfo ? getCurServInfo()[0]:"";
+        return 'function' === typeof getCurServInfo ? getCurServInfo()[0] : "";
     }
 
     getBgWebSocketStatus() {
@@ -391,4 +402,5 @@ class DwsChmExtBg extends BaseChmExtBg {
 
     /////////////////////////business related methods////////////////
 }
+
 dwsChmExtBg = new DwsChmExtBg();

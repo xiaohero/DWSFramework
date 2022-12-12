@@ -20,7 +20,7 @@ class JsResource:
     # 根据平台代码,获取基础js资源
     #
     @classmethod
-    def getChmExtJsContents(cls, version='latest', secKey='', needBid=1):
+    def getChmExtJsContents(cls, version='latest', secKey='', needBid=1, needWs=1, appName=''):
         # todo: 1.后期根据version获取指定版本的js
         # todo: 2.后期根据secKey及过期时间控制js获取
         jsFileBaseChmExtBg = '{}/js/chm-ext/base/BaseChmExtBg.js'.format(MyUtil.getDWSClientDir())
@@ -29,13 +29,18 @@ class JsResource:
         jsFileDwsChmFtExt = '{}/js/chm-ext/DwsChmExtFt.js'.format(MyUtil.getDWSClientDir())
         jsFileWebSocket = '{}/js/chm-ext/DwsWebSocket.js'.format(MyUtil.getDWSClientDir())
         jsFileBiri = '{}/js/third-party/biri/0.4.0/biri.min.js'.format(MyUtil.getDWSClientDir())
-        fileContent = ''
+        jsFileAjaxUtil = '{}/js/util/AjaxUtil.js'.format(MyUtil.getDWSClientDir())
+        fileContent = MyUtil.readFileToStr(jsFileAjaxUtil, True)
         if needBid:
             fileContent += MyUtil.readFileToStr(jsFileBiri, True)
         fileContent += MyUtil.readFileToStr(jsFileBaseChmExtBg, True) + MyUtil.readFileToStr(jsFileBaseChmExtFt, True)
-        fileContent += MyUtil.readFileToStr(jsFileWebSocket, True)  # 提到前面引入
+        if needWs:
+            fileContent += MyUtil.readFileToStr(jsFileWebSocket, True)
         fileContent += MyUtil.readFileToStr(jsFileDwsChmBbExt, True)
         fileContent += MyUtil.readFileToStr(jsFileDwsChmFtExt, True)
+        if not needWs:
+            MyUtil.logInfo('{}:no need ws'.format(appName))
+            fileContent = fileContent.replace('new DwsChmExtBg()', 'new DwsChmExtBg(false)')
         # write merged file
         newFilePath = MyUtil.writeDataFile(fileContent, 'obf_out/chmExt.js', False, False, True)
         # obf final js file
