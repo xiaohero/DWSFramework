@@ -44,7 +44,11 @@ class InitUtil:
         return  cls.__dataPath if cls.__dataPath else os.path.abspath(os.path.join(cls.getProjectRootDir(), 'datas'))
 
     @classmethod
-    def getDIRECTORY_SEPARATOR(cls):
+    def getProjectExtCoreDir(cls):
+        return  cls.__dataPath if cls.__dataPath else os.path.abspath(os.path.join(cls.getProjectRootDir(), 'ExtCore'))
+
+    @classmethod
+    def getDirectorySeparator(cls):
         return '\\' if cls.isCurWindowsSystem() else '/'
 
     @classmethod

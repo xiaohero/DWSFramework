@@ -14,7 +14,7 @@ class DwsChmExtFt extends BaseChmExtFt{
 
     removeIframeJsLimit() {
         if (top != self) {
-            var el = document.createElement('script');
+            let el = document.createElement('script');
             el.textContent = "if (top !== self) {window.self = window.top;console.log('try to enable iframe nested...');}";
             // el.textContent = 'if (top !== self) {window.top = window.self;}';
             document.documentElement.appendChild(el);

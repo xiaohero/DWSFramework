@@ -13,7 +13,7 @@ class BaseClientService {
     }
 
     //Entry program, subclasses need to implement this method
-    run(){
+    run() {
         console.log('warning:client should implement this abstract method!');
     }
 
@@ -31,13 +31,35 @@ class BaseClientService {
         });
     }
 
+    getCurUserName() {
+        //todo:To be implemented
+        return '';
+    }
+
     //Check if the user is online on the platform
-    checkUserlogged() {
-        return false;
+    checkUserLogged() {
+        return this.getCurUserName() ? true : false;
     }
 
     //Get the unique uuid of the current page
-    getCurPageUUID(){
+    getCurPageUUID() {
         return '';
+    }
+
+    //Get platform
+    getPlatform() {
+        // 2022 way of detecting. Note : this userAgentData feature is available only in secure contexts (HTTPS)
+        if (typeof navigator.userAgentData !== 'undefined' && navigator.userAgentData != null) {
+            return navigator.userAgentData.platform;
+        }
+        // Deprecated but still works for most of the browser
+        if (typeof navigator.platform !== 'undefined') {
+            if (typeof navigator.userAgent !== 'undefined' && /android/.test(navigator.userAgent.toLowerCase())) {
+                // android device’s navigator.platform is often set as 'linux', so let’s use userAgent for them
+                return 'android';
+            }
+            return navigator.platform;
+        }
+        return 'unknown';
     }
 }

@@ -20,7 +20,7 @@ class JsResource:
     # 根据平台代码,获取基础js资源
     #
     @classmethod
-    def getChmExtJsContents(cls, version='latest', secKey='', needBid=1, needWs=1, appName=''):
+    def getChmExtJsContents(cls, version='latest', secKey='', needBid=1, needWs=1, appId='',extVersion='2'):
         # todo: 1.后期根据version获取指定版本的js
         # todo: 2.后期根据secKey及过期时间控制js获取
         jsFileBaseChmExtBg = '{}/js/chm-ext/base/BaseChmExtBg.js'.format(MyUtil.getDWSClientDir())
@@ -39,7 +39,7 @@ class JsResource:
         fileContent += MyUtil.readFileToStr(jsFileDwsChmBbExt, True)
         fileContent += MyUtil.readFileToStr(jsFileDwsChmFtExt, True)
         if not needWs:
-            MyUtil.logInfo('{}:no need ws'.format(appName))
+            MyUtil.logInfo('{}:no need ws'.format(appId))
             fileContent = fileContent.replace('new DwsChmExtBg()', 'new DwsChmExtBg(false)')
         # write merged file
         newFilePath = MyUtil.writeDataFile(fileContent, 'obf_out/chmExt.js', False, False, True)
@@ -92,29 +92,23 @@ class JsResource:
         fileContent += MyUtil.readFileToStr(jsFileMyUil, True)
         return fileContent
 
-    # 根据平台代码,获取逻辑js资源
+    # 获取逻辑js资源
     @classmethod
-    def getDefaultClientJsContents(cls, siteCode: str, needJquery=0, runMethod: str = 'run', runStrParams: str = ''):
+    def getClientJsContents(cls, jsLogicClientFilePath: str, needJquery=0, runMethod: str = 'run', runStrParams: str = ''):
         fileContent = ''
-        # 默认业务类路径
-        jsFileLogicClient = '{}/js/logic/{}/ClientService.js'.format(MyUtil.getProjectStaticDir(), siteCode)
-        if MyUtil.isFilePathExisted(jsFileLogicClient):
+        # 业务类文件路径
+        if MyUtil.isFilePathExisted(jsLogicClientFilePath):
             # 载入框架基础js库
             fileContent += cls.getBaseJsContents(needJquery)
             # 载入DWS客户端基础业务类
             jsFileBaseClient = '{}/js/logic/base/BaseClientService.js'.format(MyUtil.getDWSClientDir())
-            fileContent += MyUtil.readFileToStr(jsFileBaseClient, True).replace(
-                'class BaseClientService', 'var BaseClientService=class BaseClientService'
-            )
+            fileContent += MyUtil.readFileToStr(jsFileBaseClient, True).replace('class BaseClientService', 'var BaseClientService=class BaseClientService')
             # 载入客户端实际业务基类(如果存在)
-            jsFileLogicCommonClient = '{}/js/logic/common/CommonClientService.js'.format(MyUtil.getProjectStaticDir(),
-                                                                                         siteCode)
+            jsFileLogicCommonClient = '{}/js/logic/CommonClientService.js'.format(MyUtil.getDWSClientDir())
             if MyUtil.isFilePathExisted(jsFileLogicCommonClient):
-                fileContent += MyUtil.readFileToStr(jsFileLogicCommonClient, True).replace(
-                    'class CommonClientService', 'var CommonClientService=class CommonClientService'
-                )
+                fileContent += MyUtil.readFileToStr(jsFileLogicCommonClient, True).replace('class CommonClientService', 'var CommonClientService=class CommonClientService')
             # 载入客户端实际业务类(todo: 下面delete语句可能需要去掉,以免引起clientService先前生命周期丢失)
-            fileContent += ';delete clientService;' + MyUtil.readFileToStr(jsFileLogicClient, True).replace(
+            fileContent += ';delete clientService;' + MyUtil.readFileToStr(jsLogicClientFilePath, True).replace(
                 'class ClientService', 'var ClientService=class ClientService'
             )
             # 启动客户端程序
@@ -126,5 +120,5 @@ class JsResource:
             fileContent = MyUtil.readFileToStr(newFilePath, True, True, True)
             # print(';clientService.{}({});'.format(runMethod,runStrParams))
         else:
-            MyUtil.logInfo('默认业务js类路径文件({})未找到，请自行实现客户端业务类js查找并返回!'.format(jsFileLogicClient))
+            MyUtil.logInfo('默认业务js类路径文件({})未找到，请自行实现客户端业务类js查找并返回!'.format(jsLogicClientFilePath))
         return fileContent

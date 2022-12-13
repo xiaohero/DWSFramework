@@ -122,7 +122,7 @@ class BaseChmExtBg {
     initListenEvent() {
         //Listen to bg events
         chrome.runtime.onMessage.addListener((request, sender, callback) => {
-            // alert('chrome_ext_bg get page message:' + JSON.stringify(request) + ' execute function:' + request.funcName + ',typeof:' + typeof this[request.funcName]);
+            //console.log('chrome_ext_bg get page message:' + JSON.stringify(request) + ' execute function:' + request.funcName + ',typeof:' + typeof this[request.funcName]);
             if ('function' != typeof this[request.funcName]) {
                 alert('chrome_ext_bg error:invoke unkown method:' + request.funcName + ',self:' + JSON.stringify(this));
                 callback('chrome_ext_bg error:invoke unkown method:' + request.funcName);

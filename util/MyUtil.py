@@ -223,7 +223,7 @@ class MyUtil:
     def getProjectName(cls):
         if 'upPrjName' in cls.__caches and cls.__caches['upPrjName']:
             return cls.__caches['upPrjName']
-        prjRootDirList = cls.getProjectRootDir().split(cls.getDIRECTORY_SEPARATOR())
+        prjRootDirList = cls.getProjectRootDir().split(cls.getDirectorySeparator())
         upPrjName = prjRootDirList[-1] if len(prjRootDirList) > 1 else ''
         cls.__caches['upPrjName'] = upPrjName
         return upPrjName
@@ -237,7 +237,7 @@ class MyUtil:
     def getFrameworkName(cls):
         if 'fwPrjName' in cls.__caches:
             return cls.__caches['fwPrjName']
-        fwPrjRootDirList = cls.getDWSRootDir().split(cls.getDIRECTORY_SEPARATOR())
+        fwPrjRootDirList = cls.getDWSRootDir().split(cls.getDirectorySeparator())
         fwPrjName = fwPrjRootDirList[-1] if len(fwPrjRootDirList) > 1 else ''
         cls.__caches['fwPrjName'] = fwPrjName
         return fwPrjName
@@ -358,6 +358,10 @@ class MyUtil:
         return InitUtil.getProjectDataDir()
 
     @classmethod
+    def getProjectExtCoreDir(cls):
+        return InitUtil.getProjectExtCoreDir()
+
+    @classmethod
     def getOsName(cls):
         return InitUtil.getOsName()
 
@@ -366,8 +370,8 @@ class MyUtil:
         return InitUtil.isCurWindowsSystem()
 
     @classmethod
-    def getDIRECTORY_SEPARATOR(cls):
-        return InitUtil.getDIRECTORY_SEPARATOR()
+    def getDirectorySeparator(cls):
+        return InitUtil.getDirectorySeparator()
 
     @classmethod
     def getProjectStaticDir(cls):

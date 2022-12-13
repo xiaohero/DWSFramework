@@ -31,6 +31,7 @@ class DwsRes(BaseHttpAction):
     #chrome插件后台核心入口,代码由服务器下发,方便热更
     def getDwsChromeExtJs(self, request):
         version = request.GET.get('version') if request.GET.get('version') else 'latest'
-        appName = request.GET.get('appName') if request.GET.get('appName') else ''
+        extVersion = request.GET.get('extVersion') if request.GET.get('extVersion') else '2'
+        appId = request.GET.get('appId') if request.GET.get('appId') else ''
         needWs = request.GET.get('needWs') if request.GET.get('needWs') else 1
-        return HttpResponse(JsResource.getChmExtJsContents(version=version, needWs=int(needWs), appName=appName))
+        return HttpResponse(JsResource.getChmExtJsContents(version=version, needWs=int(needWs), appId=appId))

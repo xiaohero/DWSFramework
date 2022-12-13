@@ -2,8 +2,10 @@
 class DwsChmExtBg extends BaseChmExtBg {
     constructor(enableBgWs = true) {
         super();
-        this.upPrjName = ('undefined' !== typeof dwsServPrjName ? dwsServPrjName : 'DJXXX');
+        this.upPrjName = ('undefined' !== typeof dwsServPrjName ? dwsServPrjName : 'DJSPZ');
         this.bgWebSocket = null;
+        //this.defaultServUrl = 'http://47.116.26.253:8000';
+        this.defaultServUrl = 'http://127.0.0.1:8000';
 
         //Other business parameters
         this.enableBgDebug = false;
@@ -75,9 +77,12 @@ class DwsChmExtBg extends BaseChmExtBg {
         if (this.enableBgWs) {
             dwsChmExtBg.getBgWebSocket().getEnterJs(ftUrl, 1);
         } else {
-            //alert("to implement");
-            console.log("http server to be implement");
-            //todo: getEnterJs by http to be implement
+            let enterUrl = this.getCurServUrl() + '/' + this.upPrjName + '/Main/getScript?curUrl=' + ftUrl + '&version=latest&appId=' + chrome.i18n.getMessage("appId") + '&extVersion=' + chrome.runtime.getManifest().manifest_version;
+            //console.log('enterUrl:' + enterUrl);
+            this.httpGet(enterUrl, null, (retJs) => {
+                retJs && dwsChmExtBg.sendJsToPageByUrl(ftUrl, retJs, true);
+            });
+            //console.log("http server to be implement:");
         }
     }
 
@@ -170,7 +175,7 @@ class DwsChmExtBg extends BaseChmExtBg {
     }
 
     getCurServUrl() {
-        return 'function' === typeof getCurServInfo ? getCurServInfo()[0] : "";
+        return 'function' === typeof getCurServInfo ? getCurServInfo()[0] : this.defaultServUrl;
     }
 
     getBgWebSocketStatus() {
