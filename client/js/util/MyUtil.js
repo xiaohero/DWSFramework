@@ -1253,7 +1253,7 @@ MyUtils.prototype.downloadCsvFromArray = async function (arrItems, fileName, arr
         return false;
     }
     //auto parse arrHeaders
-    if (arrHeaders.length<1) {
+    if (arrHeaders.length < 1) {
         for (let key in arrItems[0]) {
             arrHeaders.push(key);
         }
@@ -1299,6 +1299,68 @@ MyUtils.prototype.getNestedField = function (obj, key) {
     return key.split(".").reduce(function (o, x) {
         return (typeof o == "undefined" || o === null) ? o : o[x];
     }, obj);
+};
+
+MyUtils.prototype.deepKeys = function (obj, stack = [], intermediate = false, parent = null) {
+    Object.keys(obj).forEach(function (el) {
+        // Escape . in the element name
+        let escaped = el.replace(/\./g, '\\\.');
+        // If it's a nested object
+        if ((obj[el] !== null && typeof obj[el] === 'object' && !(obj[el] instanceof Date)) && !Array.isArray(obj[el])) {
+            // Concatenate the new parent if exist
+            let p = parent ? parent + '.' + escaped : parent;
+            // Push intermediate parent key if flag is true
+            if (intermediate) stack.push(parent ? p : escaped);
+            MyUtils.prototype.deepKeys(obj[el], stack, p || escaped, intermediate);
+        } else {
+            // Create and save the key
+            let key = parent ? parent + '.' + escaped : escaped;
+            stack.push(key)
+        }
+    });
+    return stack;
+}
+
+MyUtils.prototype.deepSameKeys = function (o1, o2) {
+    // Both nulls = same
+    if (o1 === null && o2 === null) {
+        return true;
+    }
+
+    // Get the keys of each object
+    const o1keys = o1 === null ? new Set() : new Set(Object.keys(o1));
+    const o2keys = o2 === null ? new Set() : new Set(Object.keys(o2));
+    if (o1keys.size !== o2keys.size) {
+        // Different number of own properties = not the same
+        return false;
+    }
+
+    // Look for differences, recursing as necessary
+    for (const key of o1keys) {
+        if (!o2keys.has(key)) {
+            // Different keys
+            return false;
+        }
+
+        // Get the values and their types
+        const v1 = o1[key];
+        const v2 = o2[key];
+        const t1 = typeof v1;
+        const t2 = typeof v2;
+        if (t1 === "object") {
+            if (t2 === "object" && !deepSameKeys(v1, v2)) {
+                return false;
+            }
+        } else if (t2 === "object") {
+            //if (t1 === "object" && !deepSameKeys(v1, v2)) {
+            //        return false;
+            //}
+            // We know `v1` isn't an object
+            return false;
+        }
+    }
+    // No differences found
+    return true;
 };
 
 /*Create a tool class object*/

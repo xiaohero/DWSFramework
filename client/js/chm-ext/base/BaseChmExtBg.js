@@ -15,6 +15,8 @@ class BaseChmExtBg {
         //Extension Id
         this.clientExtId = '';
         this.initClientExtId();
+        //Record the tabs currently being monitored
+        this.monitoringTabs = {};
     }
 
     //Obsolete: Note that this function may be inaccurate
@@ -25,8 +27,14 @@ class BaseChmExtBg {
         return this.sendJsToPage(this.curSender.tab.id, this.curSender.frameId, jsCode);
     }
 
-    logToCurSender(logMsg) {
+    logToCurSender(logMsg, targetTabIdOrUrl = 0) {
         let jsCode = "console.log('bg debug:" + logMsg + "');";
+        if (targetTabIdOrUrl && (targetTabIdOrUrl + '').startsWith('http')) {
+            return this.sendJsToPageByUrl(targetTabIdOrUrl, jsCode);
+        }
+        if (targetTabIdOrUrl && !isNaN(targetTabIdOrUrl)) {
+            return this.sendJsToPage(targetTabIdOrUrl, 0, jsCode);
+        }
         if (!this.curSender || !this.curSender.tab) {
             return false;
         }
@@ -78,6 +86,18 @@ class BaseChmExtBg {
             }
             this.globalSenders[sender.url] = sender;
         }
+    }
+
+    getActiveTab() {
+        return new Promise(resolve => {
+            let queryInfo = {active: true};
+            chrome.tabs.query(queryInfo, (tabs) => {
+                let targetTab = (tabs && tabs.length > 0) ? tabs[0] : null;
+                //cache to globalSenders
+                this.globalSenders[targetTab.url] = targetTab;
+                resolve(targetTab);
+            });
+        });
     }
 
     getTabByUrl(tabUrl, callback, byCache=true) {
@@ -146,6 +166,7 @@ class BaseChmExtBg {
         //Listen to the page close event and clear the globalSenders cache
         chrome.tabs.onRemoved.addListener( (tabId, removeInfo)=>{
             for (let eachUrl in this.globalSenders) {
+                tabId in this.monitoringTabs && delete this.monitoringTabs[tabId];
                 if(tabId==this.globalSenders[eachUrl].tab.id){
                     delete this.globalSenders[eachUrl];
                     break;
@@ -279,23 +300,33 @@ class BaseChmExtBg {
         );
     }
 
-    enableNetworkMonitorByUrl(dstUrl, requestMatchReg='', responseMatchReg='',cbFunc,autoDetach=true,returnUrlEncode=true) {
+    async enableNetworkMonitorByUrl(dstUrl, requestMatchReg = '', responseMatchReg = '', cbFunc, autoDetach = true, returnUrlEncode = true, requestMatchTypes = []) {
         requestMatchReg = ('string' === typeof requestMatchReg && requestMatchReg) ? new RegExp(requestMatchReg) : '';
         responseMatchReg = ('string' === typeof responseMatchReg && responseMatchReg) ? new RegExp(responseMatchReg) : '';
-        if (!dstUrl||!requestMatchReg||!responseMatchReg) {
+        requestMatchTypes = ('string' === typeof requestMatchTypes && requestMatchTypes) ? requestMatchTypes.trim().replaceAll(' ', '') : '';
+        requestMatchTypes = requestMatchTypes ? requestMatchTypes.split(',') : [];
+        let activeTab=null;
+        if (!dstUrl) {
+            //If no dstUrl is passed, the currently active tab page is monitored
+            activeTab = await this.getActiveTab();
+            dstUrl= activeTab.url;
+        }
+        if (!dstUrl || !requestMatchReg || !responseMatchReg) {
             return false;
         }
+        //let curSender = activeTab ? activeTab : this.getSenderByUrl(dstUrl);
         let curSender=this.getSenderByUrl(dstUrl);
         if(curSender&&curSender.nwEnable){
-            this.logToCurSender('The current tab page has activated network monitoring, skip:'+JSON.stringify(curSender));
+            this.logToCurSender('The current tab page has activated network monitoring, skip:' + JSON.stringify(curSender), curSender.tab.id);
             return true;
         }
         //Record the traffic'requestId that needs to be captured
-        let targetRequestIds={};
-        //alert('requestMatchReg:'+requestMatchReg+',responseMatchReg:'+responseMatchReg+',target url:'+dstUrl);
+        let targetRequestIds = {};
+        //alert('requestMatchReg:' + requestMatchReg + ',responseMatchReg:' + responseMatchReg + ',requestMatchTypes:' + requestMatchTypes + ',target url:' + dstUrl);
         this.getTabByUrl(dstUrl, (findTab) => {
             if (!findTab) {
                 alert('Failed to monitor network, tab not found:' + dstUrl);
+                //console.log('Failed to monitor network, tab not found:' + dstUrl);
                 return;
             }
             //alert('find tab:' + JSON.stringify(findTab));
@@ -311,7 +342,7 @@ class BaseChmExtBg {
                         chrome.debugger.sendCommand({
                             tabId: tmpTabId
                         }, 'Network.enable', (result) => {
-                            curSender ? this.globalSenders[dstUrl].nwEnable = true : false;
+                            curSender ? this.globalSenders[dstUrl].nwEnable = this.monitoringTabs[tmpTabId] = curSender : false;
                             //monitor network traffic
                             chrome.debugger.onEvent.addListener((source, method, params) => {
                                 //method:Network.requestWillBeSent,Network.dataReceived,Network.loadingFinished,Network.responseReceived
@@ -320,14 +351,20 @@ class BaseChmExtBg {
                                     return;
                                 }
                                 //Filter the requestId that identifies the traffic that needs to be captured
-                                if ('Network.requestWillBeSent' == method && 'request' in params && 'url' in params.request && params.request.url) {
-                                    let urlMatchRet=params.request.url.match(requestMatchReg);
-                                    urlMatchRet ? targetRequestIds[params.requestId] = params.requestId : false;
-                                    //urlMatchRet && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+urlMatchRet[0]+',requestId:'+params.requestId+',responseMatchReg:'+requestMatchReg);
+                                if ('Network.requestWillBeSent' == method && 'type' in params && 'request' in params && 'url' in params.request && params.request.url) {
+                                    //console.log("debug:requestWillBeSent:tabId:" + tmpTabId + "params:" + JSON.stringify(params));
+                                    let isUrlMatch=params.request.url.match(requestMatchReg);
+                                    let isTypeMatch = requestMatchTypes.length < 1 || requestMatchTypes.includes(params.type);
+                                    (isUrlMatch && isTypeMatch) ? targetRequestIds[params.requestId] = {url:params.request.url,type:params.type} : false;
+                                    //isUrlMatch && this.logToCurSender('requestWillBeSent:'+params.request.url+',isMatch:'+isUrlMatch[0]+',requestId:'+params.requestId+',responseMatchReg:'+requestMatchReg,tmpTabId);
                                 }
                                 //Obtain the data after the network is loaded, otherwise the captured data may be incomplete (lost part)
                                 if ('Network.loadingFinished' == method && params.requestId in targetRequestIds) {
-                                    //this.logToCurSender('loadingFinished:'+JSON.stringify(params)+',requestId:'+params.requestId);
+                                    //Hit target url
+                                    let hitUrl=targetRequestIds[params.requestId].url;
+                                    //Hit target type
+                                    let hitType=targetRequestIds[params.requestId].type;
+                                    //this.logToCurSender('loadingFinished:'+JSON.stringify(params)+',requestId:'+params.requestId,tmpTabId);
                                     chrome.debugger.sendCommand({
                                         tabId: tmpTabId
                                     }, 'Network.getResponseBody', {
@@ -337,23 +374,19 @@ class BaseChmExtBg {
                                             return;
                                         }
                                         if (responseMatchReg && response.body) {
-                                            //this.logToCurSender('getResponseBody:'+response.body+',requestId:'+params.requestId);
+                                            //this.logToCurSender('getResponseBody:'+response.body+',requestId:'+params.requestId,tmpTabId);
                                             let findRet = ('/true/' === '' + responseMatchReg) ? [response.body] : response.body.match(responseMatchReg);
                                             // alert('dstUrl:' + dstUrl + ',hit:' + responseMatchReg + ',findRet:' + JSON.stringify(findRet) + ',response_body:' + response.body);
                                             if (findRet) {
                                                 findRet = returnUrlEncode ? encodeURI(findRet[0]) : findRet[0];
-                                                'function' === typeof cbFunc ? cbFunc(dstUrl,findRet) : alert(findRet);
-                                                //alert('dstUrl:'+dstUrl+',hit:'+responseMatchReg+',findRet:'+findRet);
-                                                //this.logToCurSender(findRet);
+                                                'function' === typeof cbFunc ? cbFunc(hitUrl, findRet, hitType, tmpTabId) : alert(findRet);
+                                                //console.log('tabId:' + tmpTabId + ',dstUrl:' + dstUrl + ',hitUrl:' + hitUrl + ',hitType:' + hitType + ',findRet:' + findRet.length);
                                                 //In case the url changes, unbind by tabid
                                                 if (autoDetach) {
                                                     this.disableNetworkMonitorByTabId(tmpTabId);
                                                     curSender ? this.globalSenders[dstUrl].nwEnable = false : false;
                                                 }
                                             }
-                                            //Activated tabs are cached
-                                            // let sender = this.getSenderByUrl(dstUrl);
-                                            // sender ? sender.nwEnable = nwCacheEnable : false;
                                         }
 
                                     });
@@ -366,22 +399,37 @@ class BaseChmExtBg {
         });
     }
 
-    disableNetworkMonitorByUrl(url,cbFunc=()=>{}) {
-        this.getTabByUrl(url, (findTab) => {
+    disableNetworkMonitorByUrl(url, cbFunc = () => {
+    }) {
+        return this.getTabByUrl(url, (findTab) => {
             if (!findTab) {
                 alert('detach failed, tab not found:' + url);
-                return;
+                return false;
             }
-            this.disableNetworkMonitorByTabId(findTab.id,cbFunc);
+            return this.disableNetworkMonitorByTabId(findTab.id, cbFunc);
         });
     }
 
-    disableNetworkMonitorByTabId(tabId,cbFunc=()=>{}) {
-        chrome.debugger.detach({
-            tabId: tabId
+    disableNetworkMonitorByTabId(tabId, cbFunc = () => {
+    }) {
+        //this.monitoringTabs[tabId] = false;
+        tabId in this.monitoringTabs && delete this.monitoringTabs[tabId];
+        return chrome.debugger.detach({
+            tabId: parseInt(tabId)
         }, () => {
-            cbFunc();
+            cbFunc(true);
             //alert('Close debugging successfully!');
         });
+    }
+
+    disableCurrentNetworkMonitor(cbFunc = () => {
+    }) {
+        let targetTabId = (1 == Object.keys(this.monitoringTabs).length) ? Object.keys(this.monitoringTabs)[0] : 0;
+        if (!targetTabId) {
+            console.log("The currently active tab page was not found and cannot be detach");
+            return false;
+        }
+        //alert("disableCurrentNetworkMonitor:" + targetTabId + "=>" + this.monitoringTabs[targetTabId].url);
+        return this.disableNetworkMonitorByTabId(targetTabId, cbFunc);
     }
 }
