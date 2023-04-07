@@ -19,6 +19,7 @@ from .CacheUtil import CacheUtil
 from .CacheObjectUtil import CacheObjectUtil
 import subprocess
 import time
+import requests
 
 logger = logging.getLogger(settings.PROJECT_NAME + '.log.file')
 
@@ -452,3 +453,51 @@ class MyUtil:
         from .HttpUtil import HttpUtil
         ret = HttpUtil.get('http://ifconf.me')
         return ret.strip() if ret else ''
+
+    @classmethod
+    def interCurrencyExchange2(cls, fromCurrency='', toCurrency='', amount=0):
+        '''
+        # 用你自己的App ID替换掉这里的YOUR_APP_ID
+        appId = 'YOUR_APP_ID'
+        # 指定要查询的货币对
+        currencyPair = ''.format(fromCurrency, toCurrency)
+        # 构造API请求的URL
+        url = f'https://openexchangerates.org/api/latest.json?app_id={appId}&symbols={currencyPair}'
+        # 发送API请求并获取响应数据
+        response = requests.get(url)
+        data = response.json()
+        # 解析响应数据，获取汇率
+        rate = data['rates'][currencyPair]
+        return rate
+        '''
+        retValue = 0
+        response =''
+        try:
+            url = f"https://api.apilayer.com/exchangerates_data/convert?to={toCurrency}&from={fromCurrency}&amount={amount}"
+            payload = {}
+            headers = {"apikey": "A3OSBG6m0uZW7dUFD0qSLtEi6nb60w2S"}
+            response = requests.request("GET", url, headers=headers, data=payload).text
+            # statusCode = response.status_code
+            retValue = json.loads(response)['result']
+        except Exception as e:
+            cls.logInfo('interCurrencyExchange error:{},response:{}'.format(e, response))
+            retValue = -1
+            raise e
+        return retValue
+
+    @classmethod
+    def interCurrencyExchange(cls, fromCurrency='', toCurrency='', amount=0):
+        retValue = 0
+        response =''
+        if fromCurrency == toCurrency:
+            return amount
+        try:
+            url = f"https://api.exchangerate-api.com/v4/latest/{fromCurrency}"
+            response = requests.request("GET", url).text
+            # statusCode = response.status_code
+            retValue = json.loads(response)['rates'][toCurrency] * amount
+        except Exception as e:
+            cls.logInfo('interCurrencyExchange error:{},response:{}'.format(e, response))
+            retValue = -1
+            raise e
+        return retValue

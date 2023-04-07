@@ -292,18 +292,55 @@ class DwsChmExtBg extends BaseChmExtBg {
         return true;
     }
 
-    reOpenAllPages(sleepMs) {
+    reOpenExistPages(urls = [], sleepMs = 0) {
         this.getAllTabs(async (tabs) => {
             if (tabs.length < 1) {
                 alert('No page is currently found, please refresh manually:');
                 return;
             }
             for (let eachTab of tabs) {
+                let shouldReOpen = (Array.isArray(urls) && urls.length > 0 && !urls.includes(eachTab.url)) ? false : true;
+                if (!shouldReOpen) {
+                    return;
+                }
                 chrome.tabs.remove([eachTab.id], () => {
                 });//Support batch shutdown
                 sleepMs ? await this.sleepSyncPromise(sleepMs) : false;
                 chrome.tabs.create({url: eachTab.url}, () => {
                 });
+            }
+        });
+    }
+
+    reOpenPage(tabUrl) {
+        chrome.tabs.query({url: tabUrl}, (tabs) => {
+            for (let eachTab of tabs) {
+                chrome.tabs.remove([eachTab.id], () => {
+                });
+            }
+            chrome.tabs.create({url: tabUrl}, () => {
+            });
+        });
+    }
+
+    activatePage(tabUrl) {
+        chrome.tabs.query({url: tabUrl}, (tabs) => {
+            for (let eachTab of tabs) {
+                chrome.tabs.update(eachTab.id, {active: true});
+            }
+        });
+    }
+
+    reomveTabsByUrl(urls = []) {
+        if (!Array.isArray(urls) || urls.length < 1) {
+            return false;
+        }
+        this.getAllTabs(async (tabs) => {
+            for (let eachTab of tabs) {
+                if (urls.includes(eachTab.url)) {
+                    chrome.tabs.remove([eachTab.id], () => {
+                    });
+                }
             }
         });
     }

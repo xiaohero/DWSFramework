@@ -770,7 +770,7 @@ MyUtils.prototype.dynExecuteReactJs = function (reactJsCode, newReactjsEleId) {
 /*play music*/
 MyUtils.prototype.playMusic = function (musicUrl = '') {
     if (!musicUrl) {
-        MyUtils.prototype.log('Warning: No music playback url provided, playback failed....');
+        MyUtils.prototype.log('Warning: No music playback url provided, playback failed....',true);
         return false;
     }
     let musicObj = MyUtils.prototype.jqHelpFind('#objMusic');
@@ -778,9 +778,9 @@ MyUtils.prototype.playMusic = function (musicUrl = '') {
         /*Inject playback controls*/
         let htmlPlayMusic = '<audio id="objMusic" src="">你的浏览器暂不支持音乐播放,请升级</audio>';
         if (MyUtils.prototype.jqHelpFind('body').append(htmlPlayMusic)) {
-            MyUtils.prototype.log('Injected music playback controls successfully....');
+            MyUtils.prototype.log('Injected music playback controls successfully....',true);
         } else {
-            MyUtils.prototype.log('Warning: Failed to inject music playback controls....');
+            MyUtils.prototype.log('Warning: Failed to inject music playback controls....',true);
             return false;
         }
     }
@@ -792,14 +792,14 @@ MyUtils.prototype.playMusic = function (musicUrl = '') {
         let oldMusicUrl = musicObj.src;
         if (oldMusicUrl == musicUrl && isPlaying) {
             //repeat skip
-            MyUtils.prototype.log('Repeat song is playing, skip:' + musicUrl);
+            MyUtils.prototype.log('Repeat song is playing, skip:' + musicUrl,true);
             return true;
         }
-        MyUtils.prototype.log('start playing music:' + musicUrl);
+        MyUtils.prototype.log('start playing music:' + musicUrl,true);
         musicObj.src = musicUrl;
         musicObj.play();
     } else {
-        MyUtils.prototype.log('Music control not found, failed to play music');
+        MyUtils.prototype.log('Music control not found, failed to play music',true);
     }
 };
 
@@ -807,13 +807,13 @@ MyUtils.prototype.playMusic = function (musicUrl = '') {
 MyUtils.prototype.stopMusic = function () {
     let musicObj = MyUtils.prototype.jqHelpFind('#objMusic');
     if (!musicObj.length) {
-        MyUtils.prototype.log('Music controls not found, probably not playing yet, no need to stop....');
+        MyUtils.prototype.log('Music controls not found, probably not playing yet, no need to stop....',true);
         return true;
     }
     musicObj = musicObj.get(0);
     musicObj.pause();
     musicObj.currentTime = 0;
-    MyUtils.prototype.log('stop music playback:' + musicObj.src);
+    MyUtils.prototype.log('stop music playback:' + musicObj.src,true);
 };
 
 /*Dynamically execute js code*/
@@ -888,7 +888,7 @@ MyUtils.prototype.eventFire = function (el, etype) {
 
 /*Simulate triggering js native click event*/
 MyUtils.prototype.simulateClick = function (el) {
-    alert('cls_name:' + MyUtils.prototype.getClsName(el));
+    //alert('cls_name:' + MyUtils.prototype.getClsName(el));
     if ('object' !== typeof el) {
         return false;
     }
