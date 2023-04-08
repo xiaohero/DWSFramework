@@ -268,7 +268,8 @@ class DwsChmExtBg extends BaseChmExtBg {
         //     contexts: ['browser_action', 'page', 'frame'],
         //     onclick: () => {
         //         alert('current status(' + this.getBgWebSocketStatus() + ')');
-        //         if ('已关闭' == this.getBgWebSocketStatus()) {
+        //         if ('已关闭' == this.getBgWebSocketStatus()||'Closed' == this.getBgWebSocketStatus()) {
+        //             console.log('Checking that the connection has been disconnected, trying to reconnect...');
         //             this.getBgWebSocket().reconnect(true);
         //         }
         //     }
